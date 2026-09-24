@@ -1,38 +1,40 @@
 <!DOCTYPE html>
-<html lang="zh-HK" data-theme="light">
+<html lang="zh-HK">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>每週菜單</title>
   
   <!-- PWA & iOS 設定 -->
-  <link rel="manifest" href="manifest.json">
+  <link rel="manifest" href="data:application/json;base64,ewogICJuYW1lIjogIuavj週菜單IiwKICAic2hvcnRfbmFtZSI6ICLmr4X週菜單IiwKICAic3RhcnRfdXJsIjogIi4vIiwKICAiZGlzcGxheSI6ICJzdGFuZGFsb25lIiwKICAiYmFja2dyb3VuZF9jb2xvciI6ICIjZjJmMmY3IiwKICAidGhlbWVfY29sb3IiOiAiIzAwN2FmZiIKfQ==">
   <link rel="apple-touch-icon" href="icon.png">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="每週菜單">
 
-  <!-- jspdf 用於匯出 PDF -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <!-- HTML2PDF 函式庫 (用於 PDF 匯出) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
   <style>
     :root {
       --bg-color: #f2f2f7;
       --card-bg: #ffffff;
-      --text-color: #000000;
-      --sub-text: #8e8e93;
-      --primary: #007aff;
+      --text-color: #1c1c1e;
+      --subtext-color: #8e8e93;
+      --primary-color: #007aff;
       --border-color: #e5e5ea;
-      --font-base: 16px;
+      --danger-color: #ff3b30;
+      --base-font-size: 16px;
     }
 
     [data-theme="dark"] {
       --bg-color: #000000;
       --card-bg: #1c1c1e;
       --text-color: #ffffff;
-      --sub-text: #8e8e93;
-      --primary: #0a84ff;
+      --subtext-color: #8e8e93;
+      --primary-color: #0a84ff;
       --border-color: #38383a;
+      --danger-color: #ff453a;
     }
 
     * {
@@ -43,31 +45,47 @@
     body {
       margin: 0;
       padding: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Helvetica Neue", Arial, sans-serif;
-      font-size: var(--font-base);
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", sans-serif;
       background-color: var(--bg-color);
       color: var(--text-color);
-      display: flex;
-      flex-direction: column;
-      height: 100vh;
-      /* 適應 iPhone 18 Pro Max 等動態島/瀏海屏安全區域 */
+      font-size: var(--base-font-size);
       padding-top: env(safe-area-inset-top);
-      padding-bottom: env(safe-area-inset-bottom);
+      padding-bottom: calc(env(safe-area-inset-bottom) + 70px);
+      max-width: 430px; /* 優化至 iPhone 18 Pro Max 螢幕尺寸比例 */
+      margin-left: auto;
+      margin-right: auto;
+      min-height: 100vh;
     }
 
-    /* 頂部 Header */
-    header {
+    /* 頂部導覽列與頭像 */
+    .header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 12px 20px;
-      background-color: var(--card-bg);
+      padding: 16px;
+      background: var(--card-bg);
       border-bottom: 1px solid var(--border-color);
+      position: sticky;
+      top: 0;
+      z-index: 100;
     }
 
-    header h1 {
+    .header-title-container {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .app-icon-img {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      object-fit: cover;
+    }
+
+    .header h1 {
       margin: 0;
-      font-size: calc(var(--font-base) * 1.3);
+      font-size: 1.25rem;
       font-weight: 700;
     }
 
@@ -76,550 +94,780 @@
       height: 40px;
       border-radius: 50%;
       object-fit: cover;
-      border: 2px solid var(--primary);
+      border: 2px solid var(--primary-color);
+      background-color: var(--border-color);
     }
 
-    /* 主內容區 */
-    main {
-      flex: 1;
-      overflow-y: auto;
-      padding: 16px;
-      display: none;
-    }
-
-    main.active {
-      display: block;
-    }
-
-    /* 底部導覽列 */
-    nav {
+    /* 底部 Tab */
+    .tab-bar {
+      position: fixed;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100%;
+      max-width: 430px;
+      height: 60px;
+      background: var(--card-bg);
+      border-top: 1px solid var(--border-color);
       display: flex;
       justify-content: space-around;
-      background-color: var(--card-bg);
-      border-top: 1px solid var(--border-color);
-      padding: 8px 0;
+      align-items: center;
+      padding-bottom: env(safe-area-inset-bottom);
+      z-index: 100;
     }
 
-    .nav-btn {
+    .tab-btn {
       background: none;
       border: none;
-      color: var(--sub-text);
-      font-size: calc(var(--font-base) * 0.8);
+      color: var(--subtext-color);
+      font-size: 0.75rem;
       display: flex;
       flex-direction: column;
       align-items: center;
+      gap: 3px;
       cursor: pointer;
     }
 
-    .nav-btn.active {
-      color: var(--primary);
-      font-weight: bold;
+    .tab-btn.active {
+      color: var(--primary-color);
+      font-weight: 600;
     }
 
-    /* 卡片與元件樣式 */
+    .tab-icon {
+      font-size: 1.3rem;
+    }
+
+    /* 視圖切換 */
+    .view {
+      display: none;
+      padding: 16px;
+    }
+
+    .view.active {
+      display: block;
+    }
+
+    /* 卡片通用樣式 */
     .card {
-      background-color: var(--card-bg);
-      border-radius: 12px;
+      background: var(--card-bg);
+      border-radius: 14px;
       padding: 16px;
       margin-bottom: 16px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      border: 1px solid var(--border-color);
     }
 
     .btn {
-      background-color: var(--primary);
+      background-color: var(--primary-color);
       color: #fff;
       border: none;
+      border-radius: 10px;
       padding: 10px 16px;
-      border-radius: 8px;
-      font-size: var(--font-base);
+      font-size: 0.95rem;
       font-weight: 600;
-      width: 100%;
-      margin-top: 8px;
       cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      width: 100%;
     }
 
     .btn-danger {
-      background-color: #ff3b30;
+      background-color: var(--danger-color);
     }
 
-    input, select {
+    .btn-secondary {
+      background-color: var(--subtext-color);
+    }
+
+    .form-group {
+      margin-bottom: 12px;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 0.85rem;
+      color: var(--subtext-color);
+      margin-bottom: 6px;
+    }
+
+    .form-control {
       width: 100%;
       padding: 10px;
-      margin: 6px 0;
       border-radius: 8px;
       border: 1px solid var(--border-color);
       background-color: var(--bg-color);
       color: var(--text-color);
-      font-size: var(--font-base);
+      font-size: 0.95rem;
     }
 
-    /* 每週菜單單日樣式 */
-    .day-block {
-      border-bottom: 1px solid var(--border-color);
+    /* 每週菜單卡片樣式 */
+    .day-row {
+      border-bottom: 1px dashed var(--border-color);
       padding: 10px 0;
     }
 
-    .day-title {
-      font-weight: bold;
-      color: var(--primary);
-      margin-bottom: 6px;
+    .day-row:last-child {
+      border-bottom: none;
     }
 
-    .dish-list-item {
+    .day-header {
+      font-weight: bold;
+      color: var(--primary-color);
+      margin-bottom: 6px;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .dish-line {
       display: block;
-      margin-top: 4px;
-      padding-left: 8px;
-      border-left: 3px solid var(--primary);
+      padding: 2px 0;
+      font-size: 0.9rem;
     }
 
     /* 拖拉排序列表 */
-    .drag-item {
+    .draggable-item {
       display: flex;
-      justify-content: space-between;
       align-items: center;
-      padding: 10px;
-      background: var(--bg-color);
-      margin-bottom: 6px;
-      border-radius: 6px;
+      justify-content: space-between;
+      padding: 12px;
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      margin-bottom: 8px;
       cursor: grab;
     }
 
-    .dish-tag {
-      font-size: 0.85em;
-      color: var(--sub-text);
-      margin-left: 8px;
+    .draggable-item.dragging {
+      opacity: 0.5;
+    }
+
+    .drag-handle {
+      cursor: grab;
+      color: var(--subtext-color);
+      font-size: 1.2rem;
+      margin-right: 10px;
+    }
+
+    /* 印尼文/中文 PDF 生成時隱藏元素 */
+    #pdf-template {
+      display: none;
     }
   </style>
 </head>
 <body>
 
-  <!-- Header 包含頭像 (需求 4) -->
-  <header>
-    <h1>每週菜單</h1>
-    <img id="header-avatar" class="avatar" src="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 40 40'><circle cx='20' cy='20' r='20' fill='%23ccc'/></svg>" alt="頭像">
-  </header>
+  <!-- 頂部導覽列 -->
+  <div class="header">
+    <div class="header-title-container">
+      <img src="icon.png" alt="Logo" class="app-icon-img" onerror="this.style.display='none'">
+      <h1>每週菜單</h1>
+    </div>
+    <img id="header-avatar" class="avatar" src="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%238e8e93'><path d='M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z'/></svg>" alt="Avatar">
+  </div>
 
-  <!-- TAB 1: 每週菜單 (需求 7, 8, 9, 10, 11) -->
-  <main id="tab-menu" class="active">
-    <div class="card">
-      <h3>新增 / 選擇每週菜單</h3>
-      <label>開始日期 (星期一)：</label>
-      <input type="date" id="menu-start-date">
-      <button class="btn" onclick="generateWeeklyMenu()">生成 / 載入本週菜單</button>
+  <!-- 主頁視圖：每週菜單列表與新增 -->
+  <div id="view-menu" class="view active">
+    <button class="btn" onclick="openNewMenuModal()" style="margin-bottom: 16px;">+ 新建每週菜單</button>
+    
+    <div id="menu-list"></div>
+  </div>
+
+  <!-- 分類與菜式視圖 -->
+  <div id="view-categories" class="view">
+    <div style="display: flex; gap: 8px; margin-bottom: 16px;">
+      <input type="text" id="new-dish-name" class="form-control" placeholder="輸入新菜式名稱...">
+      <select id="new-dish-category" class="form-control" style="width: 120px;"></select>
+      <button class="btn" style="width: 80px;" onclick="addDish()">新增</button>
     </div>
 
-    <div id="weekly-container"></div>
+    <div id="categories-dishes-container"></div>
+  </div>
 
-    <div class="card" id="pdf-export-card" style="display:none;">
-      <h3>匯出菜單 PDF</h3>
-      <label>選擇語言：</label>
-      <select id="pdf-lang">
-        <option value="zh">中文</option>
-        <option value="id">印尼文 (Bahasa Indonesia)</option>
-      </select>
-      <button class="btn" onclick="exportMenuPDF()">匯出每週菜單 PDF</button>
-    </div>
-  </main>
-
-  <!-- TAB 2: 菜式庫 (需求 6, 7) -->
-  <main id="tab-dishes">
+  <!-- 設定頁面視圖 -->
+  <div id="view-settings" class="view">
     <div class="card">
-      <h3>新增菜式</h3>
-      <input type="text" id="new-dish-name" placeholder="菜式名稱 (例如: 清蒸海上鮮)">
-      <label>所屬分類：</label>
-      <select id="new-dish-category"></select>
-      <button class="btn" onclick="addDish()">新增菜式</button>
+      <h3>自訂頭像</h3>
+      <div class="form-group">
+        <input type="file" id="avatar-input" accept="image/*" class="form-control" onchange="uploadAvatar(event)">
+      </div>
     </div>
 
     <div class="card">
-      <h3>菜式清單</h3>
-      <div id="dishes-container"></div>
-    </div>
-  </main>
-
-  <!-- TAB 3: 設定 (需求 5, 12, 13, 14, 15, 16, 17) -->
-  <main id="tab-settings">
-    <!-- 個人頭像設定 (需求 16) -->
-    <div class="card">
-      <h3>個人頭像</h3>
-      <input type="file" id="avatar-input" accept="image/*" onchange="uploadAvatar(event)">
-    </div>
-
-    <!-- 深淺色與字體 (需求 15, 17) -->
-    <div class="card">
-      <h3>顯示設定</h3>
-      <label>主題：</label>
-      <select id="theme-select" onchange="changeTheme(this.value)">
-        <option value="light">淺色模式 (Light)</option>
-        <option value="dark">深色模式 (Dark)</option>
-      </select>
-
-      <label style="margin-top: 10px; display:block;">字體大小：</label>
-      <select id="font-size-select" onchange="changeFontSize(this.value)">
-        <option value="14px">小</option>
-        <option value="16px" selected>標準</option>
-        <option value="18px">大</option>
-        <option value="20px">特大</option>
-      </select>
+      <h3>界面與顯示</h3>
+      <div class="form-group">
+        <label>主題模式</label>
+        <select id="theme-select" class="form-control" onchange="changeTheme(this.value)">
+          <option value="light">淺色模式 (Light)</option>
+          <option value="dark">深色模式 (Dark)</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>字體大小</label>
+        <select id="fontsize-select" class="form-control" onchange="changeFontSize(this.value)">
+          <option value="14px">小 (Small)</option>
+          <option value="16px">中 (Medium)</option>
+          <option value="18px">大 (Large)</option>
+          <option value="20px">特大 (Extra Large)</option>
+        </select>
+      </div>
     </div>
 
-    <!-- 分類管理與拖拉排序 (需求 12, 13, 14) -->
     <div class="card">
-      <h3>管理分類 (按住可拖拉排序)</h3>
+      <h3>分類管理與排序 (可拖拉排序)</h3>
+      <div style="display: flex; gap: 8px; margin-bottom: 12px;">
+        <input type="text" id="add-category-input" class="form-control" placeholder="新增分類名稱...">
+        <button class="btn" style="width: 80px;" onclick="addCategory()">新增</button>
+      </div>
       <div id="category-drag-list"></div>
-      
-      <h4 style="margin-top:15px;">新增分類</h4>
-      <input type="text" id="new-cat-name" placeholder="分類名稱">
-      <button class="btn" onclick="addCategory()">新增分類</button>
     </div>
 
-    <!-- 匯出匯入 (需求 5) -->
     <div class="card">
-      <h3>資料備份與復原 (JSON)</h3>
-      <button class="btn" onclick="exportData()">匯出資料 (支援 iPhone)</button>
-      <input type="file" id="import-file" accept=".json" style="display:none;" onchange="importData(event)">
-      <button class="btn" style="background-color:#34c759;" onclick="document.getElementById('import-file').click()">匯入資料</button>
+      <h3>資料備份 (匯入 / 匯出)</h3>
+      <p style="font-size: 0.8rem; color: var(--subtext-color);">支援 iOS Safari 匯出與匯入 JSON 格式備份檔。</p>
+      <div style="display: flex; gap: 10px;">
+        <button class="btn" onclick="exportData()">匯出備份</button>
+        <button class="btn btn-secondary" onclick="document.getElementById('import-file').click()">匯入備份</button>
+        <input type="file" id="import-file" accept=".json" style="display: none;" onchange="importData(event)">
+      </div>
     </div>
-  </main>
+  </div>
 
-  <!-- 底部導覽列 -->
-  <nav>
-    <button class="nav-btn active" onclick="switchTab('tab-menu', this)">每週菜單</button>
-    <button class="nav-btn" onclick="switchTab('tab-dishes', this)">菜式庫</button>
-    <button class="nav-btn" onclick="switchTab('tab-settings', this)">設定</button>
-  </nav>
+  <!-- 底部選單 -->
+  <div class="tab-bar">
+    <button class="tab-btn active" onclick="switchTab('menu', this)">
+      <span class="tab-icon">📅</span>
+      <span>每週菜單</span>
+    </button>
+    <button class="tab-btn" onclick="switchTab('categories', this)">
+      <span class="tab-icon">🍲</span>
+      <span>菜式分類</span>
+    </button>
+    <button class="tab-btn" onclick="switchTab('settings', this)">
+      <span class="tab-icon">⚙️</span>
+      <span>設定</span>
+    </button>
+  </div>
+
+  <!-- 新建/編輯每週菜單 Modal (簡易浮層) -->
+  <div id="menu-modal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 200; overflow-y: auto; padding: 20px;">
+    <div class="card" style="max-width: 400px; margin: 20px auto;">
+      <h3 id="modal-title">新建每週菜單</h3>
+      
+      <div class="form-group">
+        <label>開始日期 (星期一)</label>
+        <input type="date" id="menu-start-date" class="form-control" onchange="updateModalDayDates()">
+      </div>
+
+      <div class="form-group" style="display: flex; gap: 10px;">
+        <div>
+          <label>用餐人數</label>
+          <input type="number" id="menu-dine-count" class="form-control" value="2" min="1">
+        </div>
+        <div>
+          <label>外帶人數</label>
+          <input type="number" id="menu-takeout-count" class="form-control" value="0" min="0">
+        </div>
+      </div>
+
+      <div id="modal-days-container"></div>
+
+      <div style="display: flex; gap: 10px; margin-top: 16px;">
+        <button class="btn" onclick="saveWeeklyMenu()">儲存菜單</button>
+        <button class="btn btn-secondary" onclick="closeMenuModal()">取消</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- PDF 匯出隱藏樣式模板 -->
+  <div id="pdf-export-area" style="display: none; padding: 20px; background: #fff; color: #000; font-family: sans-serif;">
+    <h2 id="pdf-title" style="text-align: center; margin-bottom: 8px;"></h2>
+    <p id="pdf-subinfo" style="text-align: center; margin-bottom: 20px; font-size: 14px;"></p>
+    <table style="width: 100%; border-collapse: collapse; margin-top: 10px;" border="1" cellpadding="8">
+      <thead>
+        <tr style="background-color: #f0f0f0;">
+          <th style="width: 30%;" id="pdf-th-day">日期 / Day</th>
+          <th id="pdf-th-dishes">菜式 / Dishes</th>
+        </tr>
+      </thead>
+      <tbody id="pdf-tbody"></tbody>
+    </table>
+  </div>
 
   <script>
-    // --- 預設資料結構 ---
-    const DEFAULT_CATEGORIES = ["雞", "牛", "豬", "魚", "菜", "湯", "其他"];
-    
+    // 預設資料庫結構
     let appData = {
-      categories: [...DEFAULT_CATEGORIES],
-      dishes: [
-        { id: '1', name: '白切雞', category: '雞', lastCooked: '' },
-        { id: '2', name: '清蒸海上鮮', category: '魚', lastCooked: '' }
-      ],
-      weeklyMenus: {}, // key: YYYY-MM-DD (monday)
-      avatar: '',
-      theme: 'light',
-      fontSize: '16px'
+      categories: ['雞', '牛', '豬', '魚', '菜', '湯', '其他'],
+      dishes: [], // { id, name, category, lastCooked }
+      menus: [],  // { id, startDate, dineCount, takeoutCount, days: { Monday: [dishNames], ... } }
+      settings: {
+        avatar: '',
+        theme: 'light',
+        fontSize: '16px'
+      }
     };
 
-    // --- 初始化 ---
-    window.addEventListener('DOMContentLoaded', () => {
+    const DAYS = ['星期一', '星期二', '星期三', '星期四', '星期五', '星期六', '星期日'];
+    const DAYS_ID = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu'];
+
+    // 初始化 App
+    window.onload = function() {
       loadLocalStorage();
       applySettings();
-      renderCategorySelects();
-      renderCategoryDragList();
-      renderDishes();
-      
-      // 預設日期設為本週一
-      document.getElementById('menu-start-date').value = getMonday(new Date()).toISOString().split('T')[0];
-    });
-
-    function saveLocalStorage() {
-      localStorage.setItem('weekly_menu_app_data', JSON.stringify(appData));
-    }
+      renderAll();
+    };
 
     function loadLocalStorage() {
-      const saved = localStorage.getItem('weekly_menu_app_data');
+      const saved = localStorage.getItem('weekly_menu_pwa_data');
       if (saved) {
-        appData = { ...appData, ...JSON.parse(saved) };
+        try {
+          appData = JSON.parse(saved);
+        } catch(e) {
+          console.error("Data loading error", e);
+        }
       }
+    }
+
+    function saveData() {
+      localStorage.setItem('weekly_menu_pwa_data', JSON.stringify(appData));
+      renderAll();
     }
 
     function applySettings() {
-      // 主題 (需求 15)
-      document.documentElement.setAttribute('data-theme', appData.theme);
-      document.getElementById('theme-select').value = appData.theme;
-
-      // 字體 (需求 17)
-      document.documentElement.style.setProperty('--font-base', appData.fontSize);
-      document.getElementById('font-size-select').value = appData.fontSize;
-
-      // 頭像 (需求 4, 16)
-      if (appData.avatar) {
-        document.getElementById('header-avatar').src = appData.avatar;
+      document.documentElement.setAttribute('data-theme', appData.settings.theme || 'light');
+      document.documentElement.style.setProperty('--base-font-size', appData.settings.fontSize || '16px');
+      document.getElementById('theme-select').value = appData.settings.theme || 'light';
+      document.getElementById('fontsize-select').value = appData.settings.fontSize || '16px';
+      
+      if (appData.settings.avatar) {
+        document.getElementById('header-avatar').src = appData.settings.avatar;
       }
     }
 
-    // Tab 切換
-    function switchTab(tabId, btn) {
-      document.querySelectorAll('main').forEach(m => m.classList.remove('active'));
-      document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-      document.getElementById(tabId).classList.add('active');
-      btn.classList.add('active');
-
-      if(tabId === 'tab-dishes') renderDishes();
+    function switchTab(tabName, btnElement) {
+      document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      
+      document.getElementById(`view-${tabName}`).classList.add('active');
+      btnElement.classList.add('active');
     }
 
-    // --- 計算星期一 ---
-    function getMonday(d) {
-      d = new Date(d);
-      const day = d.getDay(), diff = d.getDate() - day + (day === 0 ? -6 : 1);
-      return new Date(d.setDate(diff));
-    }
-
-    // --- 分類管理 (需求 6, 12, 13, 14) ---
-    function renderCategorySelects() {
-      const select = document.getElementById('new-dish-category');
-      select.innerHTML = appData.categories.map(c => `<option value="${c}">${c}</option>`).join('');
-    }
-
-    function renderCategoryDragList() {
-      const container = document.getElementById('category-drag-list');
-      container.innerHTML = appData.categories.map((cat, index) => `
-        <div class="drag-item" draggable="true" ondragstart="dragStart(event, ${index})" ondragover="dragOver(event)" ondrop="drop(event, ${index})">
-          <span>${cat}</span>
-          ${cat !== '其他' ? `<button onclick="deleteCategory('${cat}')" style="color:red; background:none; border:none;">刪除</button>` : ''}
-        </div>
-      `).join('');
-    }
-
-    let draggedIdx = null;
-    function dragStart(e, index) { draggedIdx = index; }
-    function dragOver(e) { e.preventDefault(); }
-    function drop(e, targetIdx) {
-      e.preventDefault();
-      const item = appData.categories.splice(draggedIdx, 1)[0];
-      appData.categories.splice(targetIdx, 0, item);
-      saveLocalStorage();
+    function renderAll() {
+      renderCategoriesSelect();
+      renderCategoriesDishesView();
+      renderMenuList();
       renderCategoryDragList();
-      renderCategorySelects();
+    }
+
+    /* ------------------- 分類與菜式邏輯 ------------------- */
+    function renderCategoriesSelect() {
+      const select = document.getElementById('new-dish-category');
+      select.innerHTML = '';
+      appData.categories.forEach(cat => {
+        const opt = document.createElement('option');
+        opt.value = cat;
+        opt.textContent = cat;
+        select.appendChild(opt);
+      });
+    }
+
+    function addDish() {
+      const nameInput = document.getElementById('new-dish-name');
+      const catSelect = document.getElementById('new-dish-category');
+      const name = nameInput.value.trim();
+      const category = catSelect.value;
+
+      if (!name) return alert('請輸入菜式名稱');
+
+      appData.dishes.push({
+        id: Date.now().toString(),
+        name: name,
+        category: category,
+        lastCooked: ''
+      });
+
+      nameInput.value = '';
+      saveData();
+    }
+
+    function renderCategoriesDishesView() {
+      const container = document.getElementById('categories-dishes-container');
+      container.innerHTML = '';
+
+      appData.categories.forEach(cat => {
+        const card = document.createElement('div');
+        card.className = 'card';
+        
+        let dishesHTML = '';
+        const catDishes = appData.dishes.filter(d => d.category === cat);
+
+        if (catDishes.length === 0) {
+          dishesHTML = '<p style="font-size:0.85rem; color:var(--subtext-color);">此分類暫無菜式</p>';
+        } else {
+          catDishes.forEach(d => {
+            const lastDateText = d.lastCooked ? `(上次烹飪: ${d.lastCooked})` : '(尚未烹飪)';
+            dishesHTML += `
+              <div style="display:flex; justify-content:space-between; align-items:center; padding: 6px 0; border-bottom: 1px solid var(--border-color);">
+                <div>
+                  <strong>${d.name}</strong>
+                  <br><span style="font-size:0.75rem; color:var(--subtext-color);">${lastDateText}</span>
+                </div>
+                <button style="background:none; border:none; color:var(--danger-color); cursor:pointer;" onclick="deleteDish('${d.id}')">刪除</button>
+              </div>
+            `;
+          });
+        }
+
+        card.innerHTML = `<h4 style="margin:0 0 10px 0; color:var(--primary-color);">${cat}</h4>${dishesHTML}`;
+        container.appendChild(card);
+      });
+    }
+
+    function deleteDish(id) {
+      if (confirm('確定刪除此菜式？')) {
+        appData.dishes = appData.dishes.filter(d => d.id !== id);
+        saveData();
+      }
+    }
+
+    /* ------------------- 設定頁面：分類管理與拖拉排序 ------------------- */
+    function renderCategoryDragList() {
+      const list = document.getElementById('category-drag-list');
+      list.innerHTML = '';
+
+      appData.categories.forEach((cat, index) => {
+        const item = document.createElement('div');
+        item.className = 'draggable-item';
+        item.draggable = true;
+        item.dataset.index = index;
+
+        item.innerHTML = `
+          <div style="display:flex; align-items:center;">
+            <span class="drag-handle">☰</span>
+            <span>${cat}</span>
+          </div>
+          <div>
+            ${cat !== '其他' ? `<button style="background:none; border:none; color:var(--danger-color); cursor:pointer;" onclick="deleteCategory('${cat}')">刪除</button>` : '<span style="font-size:0.8rem; color:var(--subtext-color);">預設</span>'}
+          </div>
+        `;
+
+        // 拖拉事件
+        item.addEventListener('dragstart', handleDragStart);
+        item.addEventListener('dragover', handleDragOver);
+        item.addEventListener('drop', handleDrop);
+        item.addEventListener('dragend', handleDragEnd);
+
+        list.appendChild(item);
+      });
+    }
+
+    let dragSrcIndex = null;
+
+    function handleDragStart(e) {
+      dragSrcIndex = this.dataset.index;
+      this.classList.add('dragging');
+      e.dataTransfer.effectAllowed = 'move';
+    }
+
+    function handleDragOver(e) {
+      if (e.preventDefault) e.preventDefault();
+      return false;
+    }
+
+    function handleDrop(e) {
+      if (e.stopPropagation) e.stopPropagation();
+      const targetIndex = this.dataset.index;
+      if (dragSrcIndex !== null && dragSrcIndex !== targetIndex) {
+        const movedItem = appData.categories.splice(dragSrcIndex, 1)[0];
+        appData.categories.splice(targetIndex, 0, movedItem);
+        saveData();
+      }
+      return false;
+    }
+
+    function handleDragEnd() {
+      this.classList.remove('dragging');
     }
 
     function addCategory() {
-      const name = document.getElementById('new-cat-name').value.trim();
-      if (name && !appData.categories.includes(name)) {
-        appData.categories.push(name);
-        document.getElementById('new-cat-name').value = '';
-        saveLocalStorage();
-        renderCategoryDragList();
-        renderCategorySelects();
-      }
+      const input = document.getElementById('add-category-input');
+      const val = input.value.trim();
+      if (!val) return;
+      if (appData.categories.includes(val)) return alert('分類已存在');
+
+      appData.categories.push(val);
+      input.value = '';
+      saveData();
     }
 
-    // 需求 14: 刪除分類時提示並移動至「其他」
     function deleteCategory(catName) {
-      if (catName === '其他') return;
-      if (confirm(`刪除分類「${catName}」後，其中的所有菜式將會自動移至「其他」分類。確定刪除？`)) {
+      if (catName === '其他') return alert('「其他」分類不能刪除。');
+
+      // 預先作出通知說明
+      const confirmDelete = confirm(`警告：刪除分類「${catName}」後，該分類下的所有菜式自動移動到「其他」分類。確定刪除？`);
+      
+      if (confirmDelete) {
+        // 將該分類的菜式移至「其他」
         appData.dishes.forEach(d => {
-          if (d.category === catName) d.category = '其他';
+          if (d.category === catName) {
+            d.category = '其他';
+          }
         });
+
+        // 移除分類
         appData.categories = appData.categories.filter(c => c !== catName);
-        saveLocalStorage();
-        renderCategoryDragList();
-        renderCategorySelects();
-        renderDishes();
+        saveData();
       }
     }
 
-    // --- 菜式庫管理 ---
-    function addDish() {
-      const name = document.getElementById('new-dish-name').value.trim();
-      const category = document.getElementById('new-dish-category').value;
-      if (name) {
-        appData.dishes.push({
-          id: Date.now().toString(),
-          name,
-          category,
-          lastCooked: ''
+    /* ------------------- 每週菜單邏輯 ------------------- */
+    let editingMenuId = null;
+
+    function openNewMenuModal() {
+      editingMenuId = null;
+      document.getElementById('modal-title').textContent = '新建每週菜單';
+      document.getElementById('menu-start-date').valueAsDate = getNextMonday(new Date());
+      document.getElementById('menu-dine-count').value = 2;
+      document.getElementById('menu-takeout-count').value = 0;
+      updateModalDayDates();
+      document.getElementById('menu-modal').style.display = 'block';
+    }
+
+    function closeMenuModal() {
+      document.getElementById('menu-modal').style.display = 'none';
+    }
+
+    function getNextMonday(d) {
+      const date = new Date(d);
+      const day = date.getDay();
+      const diff = date.getDate() - day + (day === 0 ? -6 : 1);
+      return new Date(date.setDate(diff));
+    }
+
+    function updateModalDayDates() {
+      const startDateVal = document.getElementById('menu-start-date').value;
+      if (!startDateVal) return;
+
+      const container = document.getElementById('modal-days-container');
+      container.innerHTML = '';
+
+      const startDate = new Date(startDateVal);
+
+      DAYS.forEach((dayName, idx) => {
+        const currentDate = new Date(startDate);
+        currentDate.setDate(startDate.getDate() + idx);
+        const dateStr = currentDate.toISOString().split('T')[0];
+
+        const dayDiv = document.createElement('div');
+        dayDiv.className = 'day-row';
+
+        let optionsHTML = '';
+        appData.dishes.forEach(dish => {
+          optionsHTML += `<option value="${dish.name}">${dish.name} (${dish.category})</option>`;
         });
-        document.getElementById('new-dish-name').value = '';
-        saveLocalStorage();
-        renderDishes();
-      }
-    }
 
-    function renderDishes() {
-      const container = document.getElementById('dishes-container');
-      container.innerHTML = appData.categories.map(cat => {
-        const catDishes = appData.dishes.filter(d => d.category === cat);
-        return `
-          <h4>${cat}</h4>
-          ${catDishes.length === 0 ? '<div style="color:var(--sub-text)">無菜式</div>' : ''}
-          ${catDishes.map(d => `
-            <div style="display:flex; justify-content:space-between; margin:4px 0;">
-              <span>${d.name} <span class="dish-tag">上次烹飪: ${d.lastCooked || '未紀錄'}</span></span>
-            </div>
-          `).join('')}
-        `;
-      }).join('');
-    }
-
-    // --- 每週菜單邏輯 (需求 7, 8, 9, 10) ---
-    function generateWeeklyMenu() {
-      const dateVal = document.getElementById('menu-start-date').value;
-      if (!dateVal) return;
-      
-      const startDate = getMonday(new Date(dateVal));
-      const mondayStr = startDate.toISOString().split('T')[0];
-
-      if (!appData.weeklyMenus[mondayStr]) {
-        // 初始化 7 天菜單 (星期一開始)
-        const days = [];
-        for (let i = 0; i < 7; i++) {
-          const currentDate = new Date(startDate);
-          currentDate.setDate(startDate.getDate() + i);
-          days.push({
-            dateStr: currentDate.toISOString().split('T')[0],
-            dayName: ['星期一', '星期二', '星期三', '星期四', '星期五', '星期六', '星期日'][i],
-            dishes: [],
-            diners: 0,
-            takeouts: 0
-          });
-        }
-        appData.weeklyMenus[mondayStr] = { mondayStr, days };
-        saveLocalStorage();
-      }
-
-      renderWeeklyMenu(mondayStr);
-    }
-
-    function renderWeeklyMenu(mondayStr) {
-      const menu = appData.weeklyMenus[mondayStr];
-      const container = document.getElementById('weekly-container');
-      
-      let html = `<div class="card"><h2>菜單週次: ${mondayStr}</h2>`;
-      
-      menu.days.forEach((day, dayIdx) => {
-        html += `
-          <div class="day-block">
-            <div class="day-title">${day.dayName} (${day.dateStr})</div>
-            <div>
-              <label>用餐人數: <input type="number" value="${day.diners}" style="width:60px;" onchange="updateDayMeta('${mondayStr}', ${dayIdx}, 'diners', this.value)"></label>
-              <label> 外帶人數: <input type="number" value="${day.takeouts}" style="width:60px;" onchange="updateDayMeta('${mondayStr}', ${dayIdx}, 'takeouts', this.value)"></label>
-            </div>
-            <div style="margin-top:6px;">
-              <strong>已選菜式 (分行顯示):</strong>
-              <div id="selected-dishes-${dayIdx}">
-                ${day.dishes.map((dishId, dIdx) => {
-                  const dish = appData.dishes.find(d => d.id === dishId);
-                  return `<div class="dish-list-item">${dish ? dish.name : '已刪除'} <a href="#" onclick="removeDishFromDay('${mondayStr}', ${dayIdx},${dIdx})" style="color:red;margin-left:8px;">刪除</a></div>`;
-                }).join('')}
-              </div>
-            </div>
-            <div style="margin-top:6px;">
-              <select id="select-dish-${dayIdx}">
-                <option value="">-- 選擇菜式加入 --</option>
-                ${appData.dishes.map(d => `<option value="${d.id}">${d.name} (${d.category} - 上次: ${d.lastCooked || '無'})</option>`).join('')}
-              </select>
-              <button class="btn" style="padding:4px 8px; width:auto;" onclick="addDishToDay('${mondayStr}', ${dayIdx})">加入</button>
-            </div>
+        dayDiv.innerHTML = `
+          <div class="day-header">
+            <span>${dayName} (${dateStr})</span>
           </div>
+          <select id="select-day-${idx}" class="form-control" multiple style="height: 80px;">
+            ${optionsHTML}
+          </select>
+          <span style="font-size:0.7rem; color:var(--subtext-color);">按住可多選菜式</span>
         `;
+        container.appendChild(dayDiv);
+      });
+    }
+
+    function saveWeeklyMenu() {
+      const startDateVal = document.getElementById('menu-start-date').value;
+      const dineCount = document.getElementById('menu-dine-count').value;
+      const takeoutCount = document.getElementById('menu-takeout-count').value;
+
+      if (!startDateVal) return alert('請選擇星期一日期');
+
+      const startDate = new Date(startDateVal);
+      const daysData = [];
+
+      DAYS.forEach((dayName, idx) => {
+        const currentDate = new Date(startDate);
+        currentDate.setDate(startDate.getDate() + idx);
+        const dateStr = currentDate.toISOString().split('T')[0];
+
+        const select = document.getElementById(`select-day-${idx}`);
+        const selectedDishes = Array.from(select.selectedOptions).map(opt => opt.value);
+
+        // 更新揀選了菜式的「上一次烹飪日期」
+        selectedDishes.forEach(dishName => {
+          const dishObj = appData.dishes.find(d => d.name === dishName);
+          if (dishObj) {
+            dishObj.lastCooked = dateStr;
+          }
+        });
+
+        daysData.push({
+          dayName: dayName,
+          date: dateStr,
+          dishes: selectedDishes
+        });
       });
 
-      html += `</div>`;
-      container.innerHTML = html;
-      document.getElementById('pdf-export-card').style.display = 'block';
-    }
+      const newMenu = {
+        id: editingMenuId || Date.now().toString(),
+        startDate: startDateVal,
+        dineCount: dineCount,
+        takeoutCount: takeoutCount,
+        days: daysData
+      };
 
-    function updateDayMeta(mondayStr, dayIdx, key, value) {
-      appData.weeklyMenus[mondayStr].days[dayIdx][key] = parseInt(value) || 0;
-      saveLocalStorage();
-    }
-
-    function addDishToDay(mondayStr, dayIdx) {
-      const select = document.getElementById(`select-dish-${dayIdx}`);
-      const dishId = select.value;
-      if (!dishId) return;
-
-      const dayObj = appData.weeklyMenus[mondayStr].days[dayIdx];
-      dayObj.dishes.push(dishId);
-
-      // 更新菜式最後烹飪日期 (需求 7)
-      const dish = appData.dishes.find(d => d.id === dishId);
-      if (dish) {
-        dish.lastCooked = dayObj.dateStr;
+      if (editingMenuId) {
+        const idx = appData.menus.findIndex(m => m.id === editingMenuId);
+        if (idx !== -1) appData.menus[idx] = newMenu;
+      } else {
+        appData.menus.unshift(newMenu);
       }
 
-      saveLocalStorage();
-      renderWeeklyMenu(mondayStr);
+      closeMenuModal();
+      saveData();
     }
 
-    function removeDishFromDay(mondayStr, dayIdx, dishIdx) {
-      appData.weeklyMenus[mondayStr].days[dayIdx].dishes.splice(dishIdx, 1);
-      saveLocalStorage();
-      renderWeeklyMenu(mondayStr);
-    }
+    function renderMenuList() {
+      const container = document.getElementById('menu-list');
+      container.innerHTML = '';
 
-    // --- PDF 匯出功能 (需求 11: 中文 / 印尼文) ---
-    function exportMenuPDF() {
-      const { jsPDF } = window.jspdf;
-      const doc = new jsPDF();
-      const dateVal = document.getElementById('menu-start-date').value;
-      const mondayStr = getMonday(new Date(dateVal)).toISOString().split('T')[0];
-      const menu = appData.weeklyMenus[mondayStr];
-      const lang = document.getElementById('pdf-lang').value;
-
-      if (!menu) {
-        alert('請先載入菜單！');
+      if (appData.menus.length === 0) {
+        container.innerHTML = '<div class="card"><p style="text-align:center; color:var(--subtext-color);">暫無每週菜單，請點擊上方按鈕新建。</p></div>';
         return;
       }
 
-      const dict = {
-        zh: { title: "每週菜單", diners: "用餐人數", takeouts: "外帶人數", dishes: "菜式" },
-        id: { title: "Menu Mingguan", diners: "Jumlah Pemakan", takeouts: "Jumlah Bungkus", dishes: "Menu Makanan" }
-      };
+      appData.menus.forEach(menu => {
+        const card = document.createElement('div');
+        card.className = 'card';
 
-      const t = dict[lang];
-      let y = 20;
+        let daysHTML = '';
+        menu.days.forEach(d => {
+          let dishesList = d.dishes.map(dish => `<span class="dish-line">• ${dish}</span>`).join('');
+          if (!dishesList) dishesList = '<span class="dish-line" style="color:var(--subtext-color);">- 未設定 -</span>';
 
-      doc.setFontSize(18);
-      doc.text(`${t.title} (${mondayStr})`, 14, y);
-      y += 10;
-
-      doc.setFontSize(12);
-      menu.days.forEach(day => {
-        doc.text(`${day.dayName} [${day.dateStr}] - ${t.diners}: ${day.diners}, ${t.takeouts}: ${day.takeouts}`, 14, y);
-        y += 6;
-
-        day.dishes.forEach(dId => {
-          const dish = appData.dishes.find(d => d.id === dId);
-          if (dish) {
-            doc.text(`  - ${dish.name}`, 14, y);
-            y += 6;
-          }
+          daysHTML += `
+            <div class="day-row">
+              <div class="day-header">
+                <span>${d.dayName}</span>
+                <span style="font-size:0.8rem; font-weight:normal; color:var(--subtext-color);">${d.date}</span>
+              </div>
+              <div>${dishesList}</div>
+            </div>
+          `;
         });
-        y += 4;
-      });
 
-      doc.save(`Weekly_Menu_${mondayStr}_${lang}.pdf`);
+        card.innerHTML = `
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+            <h3 style="margin:0;">每週菜單 (${menu.startDate})</h3>
+            <button style="background:none; border:none; color:var(--danger-color); cursor:pointer;" onclick="deleteMenu('${menu.id}')">刪除</button>
+          </div>
+          <div style="font-size:0.85rem; color:var(--subtext-color); margin-bottom:12px;">
+            🍽 用餐人數: ${menu.dineCount} 人 | 🛍 外帶人數: ${menu.takeoutCount} 人
+          </div>
+          ${daysHTML}
+          <div style="display:flex; gap:10px; margin-top:14px;">
+            <button class="btn" onclick="exportPDF('${menu.id}', 'zh')">匯出 PDF (中文)</button>
+            <button class="btn btn-secondary" onclick="exportPDF('${menu.id}', 'id')">匯出 PDF (印尼文)</button>
+          </div>
+        `;
+        container.appendChild(card);
+      });
     }
 
-    // --- 系統設定 (需求 15, 16, 17) ---
+    function deleteMenu(id) {
+      if (confirm('確定刪除此張每週菜單？')) {
+        appData.menus = appData.menus.filter(m => m.id !== id);
+        saveData();
+      }
+    }
+
+    /* ------------------- PDF 匯出 (中文 / 印尼文) ------------------- */
+    function exportPDF(menuId, lang) {
+      const menu = appData.menus.find(m => m.id === menuId);
+      if (!menu) return;
+
+      const pdfArea = document.getElementById('pdf-export-area');
+      const pdfTitle = document.getElementById('pdf-title');
+      const pdfSubinfo = document.getElementById('pdf-subinfo');
+      const pdfThDay = document.getElementById('pdf-th-day');
+      const pdfThDishes = document.getElementById('pdf-th-dishes');
+      const pdfTbody = document.getElementById('pdf-tbody');
+
+      if (lang === 'id') {
+        pdfTitle.textContent = `Menu Mingguan (${menu.startDate})`;
+        pdfSubinfo.textContent = `Jumlah Orang Makan: ${menu.dineCount} | Jumlah Bawa Pulang: ${menu.takeoutCount}`;
+        pdfThDay.textContent = 'Hari / Tanggal';
+        pdfThDishes.textContent = 'Hidangan';
+      } else {
+        pdfTitle.textContent = `每週菜單 (${menu.startDate})`;
+        pdfSubinfo.textContent = `用餐人數：${menu.dineCount} 人 | 外帶人數：${menu.takeoutCount} 人`;
+        pdfThDay.textContent = '日期';
+        pdfThDishes.textContent = '菜式';
+      }
+
+      pdfTbody.innerHTML = '';
+      menu.days.forEach((d, idx) => {
+        const tr = document.createElement('tr');
+        const dayLabel = lang === 'id' ? `${DAYS_ID[idx]} (${d.date})` : `${d.dayName} (${d.date})`;
+        const dishesList = d.dishes.length > 0 ? d.dishes.join('<br>') : '-';
+
+        tr.innerHTML = `
+          <td><strong>${dayLabel}</strong></td>
+          <td>${dishesList}</td>
+        `;
+        pdfTbody.appendChild(tr);
+      });
+
+      pdfArea.style.display = 'block';
+
+      const opt = {
+        margin:       10,
+        filename:     `Weekly_Menu_${menu.startDate}_${lang}.pdf`,
+        image:        { type: 'jpeg', quality: 0.98 },
+        html2canvas:  { scale: 2 },
+        jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+      };
+
+      html2pdf().set(opt).from(pdfArea).save().then(() => {
+        pdfArea.style.display = 'none';
+      });
+    }
+
+    /* ------------------- 設定頁面：頭像、主題、字體、備份 ------------------- */
+    function uploadAvatar(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(evt) {
+        appData.settings.avatar = evt.target.result;
+        saveData();
+        applySettings();
+      };
+      reader.readAsDataURL(file);
+    }
+
     function changeTheme(val) {
-      appData.theme = val;
-      saveLocalStorage();
+      appData.settings.theme = val;
+      saveData();
       applySettings();
     }
 
     function changeFontSize(val) {
-      appData.fontSize = val;
-      saveLocalStorage();
+      appData.settings.fontSize = val;
+      saveData();
       applySettings();
     }
 
-    function uploadAvatar(e) {
-      const file = e.target.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = function(evt) {
-          appData.avatar = evt.target.result;
-          saveLocalStorage();
-          applySettings();
-        };
-        reader.readAsDataURL(file);
-      }
-    }
-
-    // --- 匯出匯入 JSON (需求 5: 支援 iPhone) ---
     function exportData() {
       const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(appData));
       const downloadAnchor = document.createElement('a');
       downloadAnchor.setAttribute("href", dataStr);
-      downloadAnchor.setAttribute("download", `weekly_menu_backup_${new Date().toISOString().split('T')[0]}.json`);
+      downloadAnchor.setAttribute("download", `Weekly_Menu_Backup_${new Date().toISOString().split('T')[0]}.json`);
       document.body.appendChild(downloadAnchor);
       downloadAnchor.click();
       downloadAnchor.remove();
@@ -627,24 +875,25 @@
 
     function importData(e) {
       const file = e.target.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = function(evt) {
-          try {
-            const imported = JSON.parse(evt.target.result);
-            appData = { ...appData, ...imported };
-            saveLocalStorage();
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(evt) {
+        try {
+          const imported = JSON.parse(evt.target.result);
+          if (imported && imported.categories && imported.dishes) {
+            appData = imported;
+            saveData();
             applySettings();
-            renderCategoryDragList();
-            renderCategorySelects();
-            renderDishes();
-            alert('成功匯入資料！');
-          } catch (err) {
+            alert('成功匯入備份資料！');
+          } else {
             alert('檔案格式不正確！');
           }
-        };
-        reader.readAsText(file);
-      }
+        } catch(err) {
+          alert('解析檔案失敗！');
+        }
+      };
+      reader.readAsText(file);
     }
   </script>
 </body>
