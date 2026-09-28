@@ -197,24 +197,23 @@
 
   <!-- 隱藏的 PDF 生成模板 (專用放大 A4 列印樣式) -->
   <div class="hidden">
-    <div id="pdfTemplate" class="p-8 bg-white text-black font-sans space-y-6" style="width: 800px; font-size: 18px;">
-      <div class="text-center border-b-2 border-slate-800 pb-4">
-        <h1 class="text-3xl font-extrabold tracking-wide">每週菜單 (Menu Mingguan)</h1>
-        <p class="text-lg font-bold text-slate-600 mt-1" id="pdfDateRange"></p>
-      </div>
-      <table class="w-full border-collapse border-2 border-slate-800 text-left">
-        <thead>
-          <tr class="bg-slate-100 border-b-2 border-slate-800">
-            <th class="border border-slate-800 p-3 w-1/4">星期 / 日期<br><span class="text-sm font-normal">Hari / Tanggal</span></th>
-            <th class="border border-slate-800 p-3 w-1/6">人數<br><span class="text-sm font-normal">Orang</span></th>
-            <th class="border border-slate-800 p-3">菜式內容<br><span class="text-sm font-normal">Menu Makanan</span></th>
-          </tr>
-        </thead>
-        <tbody id="pdfTableBody"></tbody>
-      </table>
+  <div id="pdfTemplate" class="p-6 bg-white text-black font-sans space-y-4" style="width: 750px; box-sizing: border-box; font-size: 16px;">
+    <div class="text-center border-b-2 border-slate-800 pb-3">
+      <h1 class="text-2xl font-extrabold tracking-wide">每週菜單 (Menu Mingguan)</h1>
+      <p class="text-sm font-bold text-slate-600 mt-1" id="pdfDateRange"></p>
     </div>
+    <table class="w-full border-collapse border-2 border-slate-800 text-left" style="table-layout: fixed;">
+      <thead>
+        <tr class="bg-slate-100 border-b-2 border-slate-800">
+          <th class="border border-slate-800 p-2.5 w-3/12">星期 / 日期<br><span class="text-xs font-normal">Hari / Tanggal</span></th>
+          <th class="border border-slate-800 p-2.5 w-3/12">人數<br><span class="text-xs font-normal">Orang</span></th>
+          <th class="border border-slate-800 p-2.5 w-6/12">菜式內容<br><span class="text-xs font-normal">Menu Makanan</span></th>
+        </tr>
+      </thead>
+      <tbody id="pdfTableBody"></tbody>
+    </table>
   </div>
-
+</div>
   <!-- App 核心邏輯 -->
   <script>
     // 預設 10 個分類
@@ -669,38 +668,54 @@
 
     // 匯出每週菜單為 A4 PDF (含中印雙語對照)
     function exportPDF() {
-      const daysOfWeekZh = ['星期一', '星期二', '星期三', '星期四', '星期五', '星期六', '星期日'];
-      const daysOfWeekIn = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu'];
-      const baseDate = new Date(state.currentMenu.mondayDate);
-      
-      const tbody = document.getElementById('pdfTableBody');
-      tbody.innerHTML = '';
+  const daysOfWeekZh = ['星期一', '星期二', '星期三', '星期四', '星期五', '星期六', '星期日'];
+  const daysOfWeekIn = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu'];
+  const baseDate = new Date(state.currentMenu.mondayDate);
+  
+  const tbody = document.getElementById('pdfTableBody');
+  tbody.innerHTML = '';
 
-      state.currentMenu.days.forEach((d, idx) => {
-        const currentDate = new Date(baseDate);
-        currentDate.setDate(baseDate.getDate() + idx);
-        const dateStr = currentDate.toISOString().split('T')[0];
+  state.currentMenu.days.forEach((d, idx) => {
+    const currentDate = new Date(baseDate);
+    currentDate.setDate(baseDate.getDate() + idx);
+    const dateStr = currentDate.toISOString().split('T')[0];
 
-        const dishesText = d.dishes.map(id => {
-          const dish = state.dishes.find(x => x.id === id);
-          return dish ? `<div style="margin-bottom: 4px;">• <strong>${dish.nameZh}</strong> ${dish.nameIn ? `<span style="color: #666; font-size: 14px;">(${dish.nameIn})</span>` : ''}</div>` : '';
-        }).join('');
+    const dishesText = d.dishes.map(id => {
+      const dish = state.dishes.find(x => x.id === id);
+      return dish ? `<div style="margin-bottom: 3px;">• <strong>${dish.nameZh}</strong> ${dish.nameIn ? `<span style="color: #555; font-size: 13px;">(${dish.nameIn})</span>` : ''}</div>` : '';
+    }).join('');
 
-        const tr = document.createElement('tr');
-        tr.className = "border-b border-slate-800";
-        tr.innerHTML = `
-          <td class="border border-slate-800 p-3 font-bold">
-            ${daysOfWeekZh[idx]} (${daysOfWeekIn[idx]})<br>
-            <span style="font-size: 14px; font-weight: normal; color: #555;">${dateStr}</span>
-          </td>
-          <td class="border border-slate-800 p-3 text-sm">
-            ${d.dineIn ? `堂食 (Makan): ${d.dineIn}人<br>` : ''}
-            ${d.takeOut ? `外帶 (Bungkus): ${d.takeOut}人` : ''}
-          </td>
-          <td class="border border-slate-800 p-3">${dishesText || '<span style="color: #ccc;">-</span>'}</td>
-        `;
-        tbody.appendChild(tr);
-      });
+    const tr = document.createElement('tr');
+    tr.className = "border-b border-slate-800";
+    tr.innerHTML = `
+      <td class="border border-slate-800 p-2.5 font-bold" style="word-wrap: break-word;">
+        ${daysOfWeekZh[idx]} (${daysOfWeekIn[idx]})<br>
+        <span style="font-size: 12px; font-weight: normal; color: #555;">${dateStr}</span>
+      </td>
+      <td class="border border-slate-800 p-2.5 text-xs" style="word-wrap: break-word;">
+        ${d.dineIn ? `堂食 (Makan): ${d.dineIn}人<br>` : ''}
+        ${d.takeOut ? `外帶 (Bungkus): ${d.takeOut}人` : ''}
+      </td>
+      <td class="border border-slate-800 p-2.5 text-sm" style="word-wrap: break-word;">${dishesText || '<span style="color: #ccc;">-</span>'}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+
+  document.getElementById('pdfDateRange').innerText = `起始日期 (Tanggal Mulai): ${state.currentMenu.mondayDate}`;
+
+  const element = document.getElementById('pdfTemplate');
+  
+  // 修改：設定精確的頁面邊距 [上, 左, 下, 右] (單位: mm)
+  const opt = {
+    margin:       [10, 10, 10, 10], // 上左右下皆預留 10mm 邊界
+    filename:     `Weekly_Menu_${state.currentMenu.mondayDate}.pdf`,
+    image:        { type: 'jpeg', quality: 0.98 },
+    html2canvas:  { scale: 2, useCORS: true },
+    jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+  };
+
+  html2pdf().set(opt).from(element).save();
+}
 
       document.getElementById('pdfDateRange').innerText = `起始日期 (Tanggal Mulai): ${state.currentMenu.mondayDate}`;
 
