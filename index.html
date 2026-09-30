@@ -2,938 +2,1022 @@
 <html lang="zh-HK">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>每週菜單</title>
+  <!-- 針對 iPhone 18 Pro Max 等現代 iPhone 優化視口與 Safe Area -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   
-  <!-- PWA 設定 -->
-  <link rel="manifest" id="manifest-placeholder">
+  <title>每週菜單</title>
+
+  <!-- PWA & iOS 主畫面設定 -->
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="每週菜單">
   <link rel="apple-touch-icon" href="icon.png">
+  <link rel="icon" type="image/png" href="icon.png">
+  
+  <!-- Manifest (內嵌 Data URI) -->
+  <link rel="manifest" href='data:application/manifest+json,{"name":"每週菜單","short_name":"每週菜單","start_url":"index.html","display":"standalone","background_color":"#f2f2f7","theme_color":"#f2f2f7","icons":[{"src":"icon.png","sizes":"192x192","type":"image/png"}]}'>
 
-  <!-- 第三方庫：FontAwesome (圖示), HTML2PDF (PDF匯出), SortableJS (拖拉排序), Cropper.js (頭像裁切) -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css">
+  <!-- html2pdf.js CDN (用於匯出 A4 PDF) -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
 
   <style>
+    /* ---------------- basic & Dynamic Font Size ---------------- */
     :root {
-      --bg-color: #f4f4f7;
+      --bg-color: #f2f2f7;
       --card-bg: #ffffff;
-      --text-color: #1c1c1e;
-      --border-color: #e5e5ea;
+      --text-color: #000000;
+      --subtext-color: #8e8e93;
       --primary-color: #007aff;
-      --font-size: 16px;
-      --safe-area-top: env(safe-area-inset-top, 20px);
-      --safe-area-bottom: env(safe-area-inset-bottom, 20px);
+      --border-color: #e5e5ea;
+      --danger-color: #ff3b30;
+      --font-scale: 16px; /* 可透過設定調整 Base Size */
     }
 
     [data-theme="dark"] {
       --bg-color: #000000;
       --card-bg: #1c1c1e;
       --text-color: #ffffff;
+      --subtext-color: #8e8e93;
       --border-color: #38383a;
-      --primary-color: #0a84ff;
     }
 
-    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
     body {
       margin: 0;
       padding: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      background-color: #111;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
-      font-size: var(--font-size);
-    }
-
-    /* iPhone 18 Pro Max 模擬外框與容器 (430px x 932px 比例) */
-    .phone-container {
-      width: 100%;
-      max-width: 430px;
-      height: 100vh;
-      max-height: 932px;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Helvetica Neue", Arial, sans-serif;
+      font-size: var(--font-scale);
       background-color: var(--bg-color);
       color: var(--text-color);
-      display: flex;
-      flex-direction: column;
-      position: relative;
-      overflow: hidden;
-      box-shadow: 0 0 20px rgba(0,0,0,0.5);
+      /* iPhone 底部 Safe Area 邊距 */
+      padding-bottom: calc(65px + env(safe-area-inset-bottom));
+      user-select: none;
     }
 
-    @media (min-width: 450px) {
-      .phone-container {
-        border-radius: 48px;
-        height: 90vh;
-        border: 8px solid #333;
-      }
-    }
-
-    /* 頂部與底部導覽 */
+    /* ---------------- Header & Avatar ---------------- */
     header {
-      padding: calc(var(--safe-area-top) + 10px) 16px 10px;
-      background: var(--card-bg);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background-color: var(--card-bg);
       border-bottom: 1px solid var(--border-color);
+      padding: calc(10px + env(safe-area-inset-top)) 16px 10px 16px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      z-index: 10;
     }
 
-    .avatar-btn {
+    .header-title {
+      font-size: 1.3rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .avatar {
       width: 40px;
       height: 40px;
       border-radius: 50%;
       object-fit: cover;
-      cursor: pointer;
-      border: 2px solid var(--primary-color);
+      background-color: #ccc;
+      border: 1px solid var(--border-color);
     }
 
-    header h1 { font-size: 1.2rem; margin: 0; font-weight: 600; }
-
-    main {
-      flex: 1;
-      overflow-y: auto;
-      padding: 16px;
-      padding-bottom: calc(var(--safe-area-bottom) + 70px);
-    }
-
-    nav {
-      position: absolute;
+    /* ---------------- Navigation Tabs ---------------- */
+    nav.tab-bar {
+      position: fixed;
       bottom: 0;
-      width: 100%;
-      height: calc(50px + var(--safe-area-bottom));
-      padding-bottom: var(--safe-area-bottom);
-      background: var(--card-bg);
+      left: 0;
+      right: 0;
+      height: calc(55px + env(safe-area-inset-bottom));
+      padding-bottom: env(safe-area-inset-bottom);
+      background-color: var(--card-bg);
       border-top: 1px solid var(--border-color);
       display: flex;
       justify-content: space-around;
       align-items: center;
-      z-index: 10;
+      z-index: 1000;
     }
 
-    .nav-item {
+    .tab-item {
       display: flex;
       flex-direction: column;
       align-items: center;
-      color: #8e8e93;
+      color: var(--subtext-color);
       font-size: 0.75rem;
-      text-decoration: none;
       cursor: pointer;
+      flex: 1;
     }
 
-    .nav-item.active { color: var(--primary-color); }
-    .nav-item i { font-size: 1.25rem; margin-bottom: 2px; }
+    .tab-item.active {
+      color: var(--primary-color);
+    }
 
-    /* 通用 UI 組件 */
+    .tab-item svg {
+      width: 24px;
+      height: 24px;
+      fill: currentColor;
+      margin-bottom: 2px;
+    }
+
+    /* ---------------- View Sections ---------------- */
+    .view {
+      display: none;
+      padding: 16px;
+      max-width: 500px; /* iPhone 尺寸極致居中適配 */
+      margin: 0 auto;
+    }
+
+    .view.active {
+      display: block;
+    }
+
+    /* ---------------- UI Components ---------------- */
     .card {
       background: var(--card-bg);
       border-radius: 12px;
-      padding: 14px;
-      margin-bottom: 12px;
-      border: 1px solid var(--border-color);
+      padding: 16px;
+      margin-bottom: 16px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
     }
 
     .btn {
       background: var(--primary-color);
-      color: #fff;
+      color: white;
       border: none;
       padding: 10px 16px;
       border-radius: 8px;
       font-weight: 600;
+      font-size: 1rem;
       cursor: pointer;
       display: inline-flex;
       align-items: center;
+      justify-content: center;
       gap: 6px;
     }
 
-    .btn-icon {
-      background: transparent;
-      border: none;
-      color: var(--primary-color);
-      font-size: 1.25rem;
-      cursor: pointer;
-      padding: 4px 8px;
-    }
-
-    .btn-danger { background: #ff3b30; color: #fff; }
+    .btn-danger { background: var(--danger-color); }
+    .btn-icon { padding: 8px; border-radius: 50%; }
 
     input, select {
       width: 100%;
       padding: 10px;
-      margin-top: 4px;
-      margin-bottom: 10px;
+      margin-top: 6px;
+      margin-bottom: 12px;
       border-radius: 8px;
       border: 1px solid var(--border-color);
-      background: var(--card-bg);
+      background: var(--bg-color);
       color: var(--text-color);
       font-size: 1rem;
     }
 
-    /* 菜色列表與選單項目 */
     .dish-item {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 8px 0;
+      padding: 10px 0;
       border-bottom: 1px solid var(--border-color);
+      cursor: pointer;
     }
-    .dish-item:last-child { border-bottom: none; }
-    .dish-names { display: flex; flex-direction: column; }
-    .dish-zh { font-weight: 500; }
-    .dish-id { font-size: 0.85rem; color: #8e8e93; }
-    .last-cooked { font-size: 0.75rem; color: #ff9500; margin-top: 2px; }
 
-    /* 彈窗 Modal */
+    .dish-item:last-child { border-bottom: none; }
+    
+    .dish-name-id {
+      font-size: 0.85rem;
+      color: var(--subtext-color);
+      margin-top: 2px;
+    }
+
+    .last-cooked {
+      font-size: 0.75rem;
+      color: #ff9500;
+      margin-top: 2px;
+    }
+
+    .badge {
+      background: var(--primary-color);
+      color: white;
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-size: 0.75rem;
+    }
+
+    /* ---------------- PDF Export Specific ---------------- */
+    #pdf-template {
+      display: none;
+      background: white;
+      color: black;
+      padding: 20px;
+      font-family: Arial, sans-serif;
+    }
+
+    .pdf-page {
+      width: 100%;
+      font-size: 18px; /* 加大字體以用盡 A4 */
+    }
+
+    .pdf-header {
+      text-align: center;
+      font-size: 28px;
+      font-weight: bold;
+      margin-bottom: 20px;
+      border-bottom: 2px solid #000;
+      padding-bottom: 10px;
+    }
+
+    .pdf-day-row {
+      border: 1px solid #333;
+      margin-bottom: 12px;
+      padding: 12px;
+      border-radius: 6px;
+    }
+
+    .pdf-day-title {
+      font-weight: bold;
+      font-size: 20px;
+      background: #f0f0f0;
+      padding: 6px;
+      margin-bottom: 8px;
+    }
+
+    .pdf-dish-line {
+      margin-left: 10px;
+      font-size: 18px;
+      line-height: 1.4;
+    }
+
+    /* Avatar Crop Modal */
     .modal {
       display: none;
-      position: absolute;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(0,0,0,0.6);
-      z-index: 100;
+      position: fixed;
+      top: 0; left:0; right:0; bottom:0;
+      background: rgba(0,0,0,0.8);
+      z-index: 2000;
+      flex-direction: column;
       justify-content: center;
       align-items: center;
       padding: 20px;
     }
-    .modal.active { display: flex; }
-    .modal-content {
-      background: var(--card-bg);
-      width: 100%;
-      max-height: 80vh;
-      border-radius: 16px;
-      padding: 20px;
-      overflow-y: auto;
+
+    .crop-container {
+      width: 280px;
+      height: 280px;
+      overflow: hidden;
+      position: relative;
+      background: #000;
+      border-radius: 50%;
+      border: 2px solid white;
     }
 
-    /* 拖拉分類樣式 */
-    .sortable-item {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 10px;
-      background: var(--bg-color);
-      margin-bottom: 6px;
-      border-radius: 6px;
-      cursor: grab;
+    .crop-container img {
+      position: absolute;
+      cursor: move;
+      transform-origin: center;
     }
-
-    /* PDF 隱藏渲染區域 */
-    #pdf-template {
-      display: none;
-      background: #fff;
-      color: #000;
-      padding: 20px;
-      font-size: 16px;
-    }
-    .pdf-page { width: 100%; }
-    .pdf-header { text-align: center; margin-bottom: 20px; }
-    .pdf-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-    .pdf-table th, .pdf-table td { border: 2px solid #000; padding: 10px; text-align: left; vertical-align: top; }
-    .pdf-table th { background-color: #f0f0f0; }
-
-    .day-selector { display: flex; gap: 4px; overflow-x: auto; padding-bottom: 8px; }
-    .day-btn { flex: 1; min-width: 45px; text-align: center; padding: 8px 0; background: var(--bg-color); border-radius: 8px; font-size: 0.8rem; cursor: pointer; }
-    .day-btn.active { background: var(--primary-color); color: white; }
   </style>
 </head>
 <body>
 
-<div class="phone-container">
+  <!-- Header -->
   <header>
-    <h1 id="page-title">每週菜單</h1>
-    <img id="header-avatar" class="avatar-btn" src="https://via.placeholder.com/150" alt="頭像" onclick="switchTab('settings')">
+    <div class="header-title">
+      <img id="app-logo" src="icon.png" alt="Logo" style="width:28px;height:28px;border-radius:6px;" onerror="this.style.display='none'">
+      <span>每週菜單</span>
+    </div>
+    <img id="header-avatar" class="avatar" src="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23999'><path d='M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z'/></svg>">
   </header>
 
-  <main id="app-content">
-    <!-- 動態渲染區域 -->
-  </main>
+  <!-- View 1: 週菜單編輯 (Main) -->
+  <div id="view-menu" class="view active">
+    <div class="card">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+        <h3 style="margin:0;">編輯/建立菜單</h3>
+        <button class="btn btn-icon" onclick="saveCurrentWeeklyMenu()" title="儲存菜單">
+          <svg style="width:20px;height:20px;fill:white" viewBox="0 0 24 24"><path d="M17 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V7l-4-4zm-5 16c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm3-10H5V5h10v4z"/></svg>
+        </button>
+      </div>
 
-  <nav>
-    <div class="nav-item active" onclick="switchTab('weekly')">
-      <i class="fa-solid fa-calendar-week"></i><span>建立菜單</span>
+      <label><b>選擇星期一起始日期：</b></label>
+      <input type="date" id="menu-start-date" onchange="validateMonday(this)">
+
+      <div id="days-container"></div>
     </div>
-    <div class="nav-item" onclick="switchTab('my-menus')">
-      <i class="fa-solid fa-book-open"></i><span>我的菜單</span>
+  </div>
+
+  <!-- View 2: 我的菜單 (Saved Menus) -->
+  <div id="view-saved" class="view">
+    <div class="card">
+      <h3>我的菜單 (<span id="saved-count">0</span>/10)</h3>
+      <div id="saved-list"></div>
     </div>
-    <div class="nav-item" onclick="switchTab('dishes')">
-      <i class="fa-solid fa-utensils"></i><span>菜式庫</span>
+  </div>
+
+  <!-- View 3: 菜式庫 (Dishes) -->
+  <div id="view-dishes" class="view">
+    <div class="card">
+      <button class="btn" style="width:100%; margin-bottom:12px;" onclick="showAddDishModal()">+ 新增菜式</button>
+      <div id="dish-categories-list"></div>
     </div>
-    <div class="nav-item" onclick="switchTab('settings')">
-      <i class="fa-solid fa-gear"></i><span>設定</span>
+  </div>
+
+  <!-- View 4: 設定 (Settings) -->
+  <div id="view-settings" class="view">
+    <div class="card">
+      <h3>介面與系統設定</h3>
+      
+      <label><b>深淺色模式：</b></label>
+      <select id="theme-select" onchange="toggleTheme(this.value)">
+        <option value="light">淺色 (Light)</option>
+        <option value="dark">深色 (Dark)</option>
+      </select>
+
+      <label><b>系統字體大小：</b></label>
+      <select id="font-size-select" onchange="changeFontSize(this.value)">
+        <option value="14px">小 (14px)</option>
+        <option value="16px" selected>預設 (16px)</option>
+        <option value="18px">大 (18px)</option>
+        <option value="20px">特大 (20px)</option>
+      </select>
+
+      <label><b>自訂個人頭像：</b></label>
+      <input type="file" id="avatar-input" accept="image/*" onchange="handleAvatarSelect(event)">
+    </div>
+
+    <div class="card">
+      <h3>分類管理 (拖拉可排序)</h3>
+      <div style="display:flex; gap:8px;">
+        <input type="text" id="new-cat-input" placeholder="新分類名稱" style="margin:0;">
+        <button class="btn" onclick="addNewCategory()">新增</button>
+      </div>
+      <div id="settings-cat-list" style="margin-top:12px;"></div>
+    </div>
+  </div>
+
+  <!-- Modals -->
+  <!-- 1. 新增/修改菜式 Modal -->
+  <div id="dish-modal" class="modal">
+    <div class="card" style="width:100%; max-width:350px;">
+      <h3 id="dish-modal-title">新增菜式</h3>
+      <input type="hidden" id="edit-dish-id">
+      <label>中文菜名：</label>
+      <input type="text" id="dish-name-zh" placeholder="例：煎太陽蛋">
+      <label>印尼文菜名 (預留位置)：</label>
+      <input type="text" id="dish-name-id" placeholder="例：Telur Mata Sapi">
+      <label>所屬分類：</label>
+      <select id="dish-category-select"></select>
+      <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:12px;">
+        <button class="btn btn-danger" id="delete-dish-btn" style="display:none;" onclick="deleteDish()">刪除</button>
+        <button class="btn" style="background:#8e8e93" onclick="closeModal('dish-modal')">取消</button>
+        <button class="btn" onclick="saveDish()">儲存</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. 選擇菜式點選 Modal -->
+  <div id="select-dish-modal" class="modal">
+    <div class="card" style="width:100%; max-width:350px; max-height:80vh; overflow-y:auto;">
+      <h3>選擇菜式 (一點即選)</h3>
+      <div id="select-dish-list"></div>
+      <button class="btn" style="width:100%; background:#8e8e93; margin-top:12px;" onclick="closeModal('select-dish-modal')">關閉</button>
+    </div>
+  </div>
+
+  <!-- 3. 頭像裁剪 Modal -->
+  <div id="crop-modal" class="modal">
+    <h3 style="color:white;">調整頭像位置及大小</h3>
+    <div class="crop-container" id="crop-container">
+      <img id="crop-img" src="">
+    </div>
+    <div style="margin-top:12px;">
+      <label style="color:white;">縮放：</label>
+      <input type="range" id="crop-scale" min="0.5" max="3" step="0.05" value="1" oninput="updateCropTransform()">
+    </div>
+    <div style="display:flex; gap:12px; margin-top:12px;">
+      <button class="btn btn-danger" onclick="closeModal('crop-modal')">取消</button>
+      <button class="btn" onclick="saveCroppedAvatar()">確定儲存</button>
+    </div>
+  </div>
+
+  <!-- PDF Output Printable Template (Hidden) -->
+  <div id="pdf-template">
+    <div class="pdf-page">
+      <div class="pdf-header">每週菜單 / Menu Mingguan</div>
+      <div id="pdf-date-subtitle" style="text-align:center; font-size:20px; margin-bottom:15px; font-weight:bold;"></div>
+      <div id="pdf-days-content"></div>
+    </div>
+  </div>
+
+  <!-- Navigation Tab Bar -->
+  <nav class="tab-bar">
+    <div class="tab-item active" onclick="switchView('menu', this)">
+      <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h14v14zM7 10h2v7H7zm4-3h2v10h-2zm4 6h2v4h-2z"/></svg>
+      <span>編輯菜單</span>
+    </div>
+    <div class="tab-item" onclick="switchView('saved', this)">
+      <svg viewBox="0 0 24 24"><path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H8V4h12v12z"/></svg>
+      <span>我的菜單</span>
+    </div>
+    <div class="tab-item" onclick="switchView('dishes', this)">
+      <svg viewBox="0 0 24 24"><path d="M8.1 11.7c.07.11.12.23.14.35l.28 2.47c.04.37.35.65.72.65h6.52c.37 0 .68-.28.72-.65l.28-2.47c.02-.12.07-.24.14-.35L19 7.5V4c0-.55-.45-1-1-1H6c-.55 0-1 .45-1 1v3.5l3.1 4.2zM11 5h2v2h-2V5z"/></svg>
+      <span>菜式庫</span>
+    </div>
+    <div class="tab-item" onclick="switchView('settings', this)">
+      <svg viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.63 3.6-3.6 3.6z"/></svg>
+      <span>設定</span>
     </div>
   </nav>
 
-  <!-- 全局 Modal -->
-  <div id="modal" class="modal">
-    <div class="modal-content" id="modal-body"></div>
-  </div>
-</div>
+  <script>
+    /* ---------------- 印尼文星期對照 ---------------- */
+    const DAYS_MAP = [
+      { zh: '星期一', id: 'Senin' },
+      { zh: '星期二', id: 'Selasa' },
+      { zh: '星期三', id: 'Rabu' },
+      { zh: '星期四', id: 'Kamis' },
+      { zh: '星期五', id: 'Jumat' },
+      { zh: '星期六', id: 'Sabtu' },
+      { zh: '星期日', id: 'Minggu' }
+    ];
 
-<!-- 隱藏的 PDF 匯出模版 (全 A4 雙語大字體) -->
-<div id="pdf-template">
-  <div class="pdf-page">
-    <div class="pdf-header">
-      <h1 style="font-size: 28px; margin:0;" id="pdf-title">每週菜單 / Menu Mingguan</h1>
-      <h3 style="font-size: 18px; margin: 5px 0;" id="pdf-subtitle"></h3>
-    </div>
-    <table class="pdf-table">
-      <thead>
-        <tr>
-          <th style="width: 25%;">日期 / Tanggal</th>
-          <th style="width: 50%;">菜式 / Menu</th>
-          <th style="width: 25%;">人數 / Orang</th>
-        </tr>
-      </thead>
-      <tbody id="pdf-tbody"></tbody>
-    </table>
-  </div>
-</div>
+    /* ---------------- 預設數據 ---------------- */
+    const DEFAULT_CATEGORIES = ['雞', '牛', '豬', '魚', '海鮮(魚除外)', '疏菜', '湯水', '西式', '罐頭', '其他'];
+    
+    // 預設 5 款菜式（分佈在 3 個分類內）
+    const DEFAULT_DISHES = [
+      { id: '1', zh: '海南雞', idName: 'Nasi Ayam Hainan', cat: '雞', lastCooked: '' },
+      { id: '2', zh: '咖喱牛肉', idName: 'Rendang Sapi', cat: '牛', lastCooked: '' },
+      { id: '3', zh: '炒青菜', idName: 'Tumis Sayur', cat: '疏菜', lastCooked: '' },
+      { id: '4', zh: '白切雞', idName: 'Ayam Rebus', cat: '雞', lastCooked: '' },
+      { id: '5', zh: '蒜蓉炒菜心', idName: 'Tumis Caisim Bawang Putih', cat: '疏菜', lastCooked: '' }
+    ];
 
-<script>
-// --- 初始化資料與狀態 ---
-const DEFAULT_CATEGORIES = ['雞', '牛', '豬', '魚', '海鮮(魚除外)', '疏菜', '湯水', '西式', '罐頭', '其他'];
+    /* ---------------- App 狀態管理 ---------------- */
+    let categories = JSON.parse(localStorage.getItem('menu_categories')) || DEFAULT_CATEGORIES;
+    let dishes = JSON.parse(localStorage.getItem('menu_dishes')) || DEFAULT_DISHES;
+    let savedMenus = JSON.parse(localStorage.getItem('menu_saved')) || [];
+    let currentMenuData = { startDate: '', days: Array(7).fill(null).map(() => ({ dishes: [], dineIn: '', takeOut: '' })) };
+    let activeSelectingDayIndex = null;
 
-const DEFAULT_DISHES = [
-  { id: '1', nameZh: '海南雞', nameId: 'Nasi Ayam Hainan', category: '雞', lastCooked: '' },
-  { id: '2', nameZh: '白切雞', nameId: 'Ayam Rebus', category: '雞', lastCooked: '' },
-  { id: '3', nameZh: '番茄炒蛋', nameId: 'Tumis Tomat Telur', category: '疏菜', lastCooked: '' },
-  { id: '4', nameZh: '清蒸海上鮮', nameId: 'Ikan Kukus', category: '魚', lastCooked: '' },
-  { id: '5', nameZh: '羅宋湯', nameId: 'Sup Borscht', category: '湯水', lastCooked: '' }
-];
+    /* ---------------- 初始化 ---------------- */
+    window.addEventListener('DOMContentLoaded', () => {
+      initSettings();
+      renderDaysStructure();
+      renderDishesView();
+      renderSavedMenus();
+      renderCategorySettings();
+    });
 
-const WEEKDAYS_BILINGUAL = [
-  { zh: '星期一', id: 'Senin' },
-  { zh: '星期二', id: 'Selasa' },
-  { zh: '星期三', id: 'Rabu' },
-  { zh: '星期四', id: 'Kamis' },
-  { zh: '星期五', id: 'Jumat' },
-  { zh: '星期六', id: 'Sabtu' },
-  { zh: '星期日', id: 'Minggu' }
-];
+    /* ---------------- 頁面切換 ---------------- */
+    function switchView(viewName, element) {
+      document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+      document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
+      document.getElementById(`view-${viewName}`).classList.add('active');
+      element.classList.add('active');
+    }
 
-let state = {
-  categories: JSON.parse(localStorage.getItem('categories')) || DEFAULT_CATEGORIES,
-  dishes: JSON.parse(localStorage.getItem('dishes')) || DEFAULT_DISHES,
-  savedMenus: JSON.parse(localStorage.getItem('savedMenus')) || {}, // Key: YYYY-MM-DD
-  theme: localStorage.getItem('theme') || 'light',
-  fontSize: localStorage.getItem('fontSize') || '16',
-  avatar: localStorage.getItem('avatar') || 'https://via.placeholder.com/150',
-  currentTab: 'weekly',
-  
-  // 當前編輯中的菜單
-  editingMenuDate: getNextMonday(new Date()),
-  currentMenuData: createEmptyMenuData()
-};
+    /* ---------------- 日期驗證 (必須為星期一) ---------------- */
+    function validateMonday(inputEl) {
+      if (!inputEl.value) return;
+      const selected = new Date(inputEl.value);
+      // getDay(): 0 是 Sunday, 1 是 Monday
+      if (selected.getDay() !== 1) {
+        alert("只可以選擇星期一作起始日！");
+        inputEl.value = "";
+        currentMenuData.startDate = "";
+        updateDaysDates();
+        return false;
+      }
+      currentMenuData.startDate = inputEl.value;
+      updateDaysDates();
+      return true;
+    }
 
-function createEmptyMenuData() {
-  const days = {};
-  for(let i=0; i<7; i++) {
-    days[i] = { dishes: [], eatIn: '', takeOut: '' };
-  }
-  return days;
-}
+    function updateDaysDates() {
+      const baseDateStr = currentMenuData.startDate;
+      DAYS_MAP.forEach((dayObj, index) => {
+        const dateSpan = document.getElementById(`day-date-${index}`);
+        if (baseDateStr) {
+          const d = new Date(baseDateStr);
+          d.setDate(d.getDate() + index);
+          const dateFormatted = `${d.getMonth() + 1}月${d.getDate()}日`;
+          dateSpan.innerText = `(${dateFormatted})`;
+        } else {
+          dateSpan.innerText = '';
+        }
+      });
+    }
 
-// --- PWA Dynamic Manifest 生成 ---
-const manifestData = {
-  name: "每週菜單",
-  short_name: "每週菜單",
-  start_url: ".",
-  display: "standalone",
-  background_color: "#ffffff",
-  theme_color: "#007aff",
-  icons: [{ src: "icon.png", sizes: "192x192 512x512", type: "image/png" }]
-};
-document.getElementById('manifest-placeholder').setAttribute('href', 'data:application/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(manifestData)));
+    /* ---------------- 渲染 7 天菜單結構 ---------------- */
+    function renderDaysStructure() {
+      const container = document.getElementById('days-container');
+      container.innerHTML = '';
 
-// --- 常理輔助函式 ---
-function saveState() {
-  localStorage.setItem('categories', JSON.stringify(state.categories));
-  localStorage.setItem('dishes', JSON.stringify(state.dishes));
-  localStorage.setItem('savedMenus', JSON.stringify(state.savedMenus));
-  localStorage.setItem('theme', state.theme);
-  localStorage.setItem('fontSize', state.fontSize);
-  localStorage.setItem('avatar', state.avatar);
-}
-
-function applySettings() {
-  document.documentElement.setAttribute('data-theme', state.theme);
-  document.documentElement.style.setProperty('--font-size', state.fontSize + 'px');
-  document.getElementById('header-avatar').src = state.avatar;
-}
-
-function getNextMonday(d) {
-  const date = new Date(d);
-  const day = date.getDay();
-  const diff = date.getDate() - day + (day === 0 ? -6 : 1);
-  const mon = new Date(date.setDate(diff));
-  return mon.toISOString().split('T')[0];
-}
-
-function formatDate(dateStr, addDays) {
-  const d = new Date(dateStr);
-  d.setDate(d.getDate() + addDays);
-  const mm = String(d.getMonth() + 1).padStart(2, '0');
-  const dd = String(d.getDate()).padStart(2, '0');
-  return `${d.getFullYear()}-${mm}-${dd}`;
-}
-
-function showAlert(msg) {
-  alert(msg);
-}
-
-// --- 頁面切換與渲染 ---
-function switchTab(tab) {
-  state.currentTab = tab;
-  document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-  const idx = ['weekly', 'my-menus', 'dishes', 'settings'].indexOf(tab);
-  if(idx !== -1) document.querySelectorAll('.nav-item')[idx].classList.add('active');
-  
-  render();
-}
-
-function render() {
-  applySettings();
-  const main = document.getElementById('app-content');
-  const title = document.getElementById('page-title');
-
-  if (state.currentTab === 'weekly') {
-    title.innerText = '建立每週菜單';
-    renderWeeklyView(main);
-  } else if (state.currentTab === 'my-menus') {
-    title.innerText = '我的菜單';
-    renderMyMenusView(main);
-  } else if (state.currentTab === 'dishes') {
-    title.innerText = '菜式庫';
-    renderDishesView(main);
-  } else if (state.currentTab === 'settings') {
-    title.innerText = '設定';
-    renderSettingsView(main);
-  }
-}
-
-// --- 1. 建立每週菜單 View ---
-let selectedDayIndex = 0;
-
-function renderWeeklyView(container) {
-  const startDate = state.editingMenuDate;
-
-  let html = `
-    <div class="card">
-      <label><b>選擇起始星期一日期：</b></label>
-      <div style="display:flex; align-items:center; gap:8px;">
-        <input type="date" id="monday-picker" value="${startDate}" onchange="handleStartDateChange(this.value)" style="margin-bottom:0; flex:1;">
-        <button class="btn-icon" title="儲存菜單" onclick="saveCurrentMenu()"><i class="fa-solid fa-floppy-disk"></i></button>
-        <button class="btn-icon" title="匯出PDF" onclick="exportPDF('${startDate}')"><i class="fa-solid fa-file-pdf"></i></button>
-      </div>
-    </div>
-
-    <!-- 7天選擇頁籤 -->
-    <div class="day-selector">
-  `;
-
-  for (let i = 0; i < 7; i++) {
-    const dStr = formatDate(startDate, i);
-    html += `
-      <div class="day-btn ${selectedDayIndex === i ? 'active' : ''}" onclick="selectedDayIndex=${i}; render();">
-        <div>${WEEKDAYS_BILINGUAL[i].zh.replace('星期','周')}</div>
-        <div style="font-size:0.65rem;">${dStr.slice(5)}</div>
-      </div>
-    `;
-  }
-
-  html += `</div>`;
-
-  // 顯示選定日期的細節
-  const dayData = state.currentMenuData[selectedDayIndex];
-  const currentDateStr = formatDate(startDate, selectedDayIndex);
-
-  html += `
-    <div class="card">
-      <h3>${WEEKDAYS_BILINGUAL[selectedDayIndex].zh} (${currentDateStr})</h3>
-      
-      <div style="display:flex; gap:10px; margin-bottom:10px;">
-        <div style="flex:1;">
-          <label>用餐人數：</label>
-          <select onchange="state.currentMenuData[${selectedDayIndex}].eatIn = this.value">
-            <option value="">空白</option>
-            ${[0,1,2,3,4,5,6,7,8,9].map(n => `<option value="${n}" ${dayData.eatIn==n?'selected':''}>${n}</option>`).join('')}
-          </select>
-        </div>
-        <div style="flex:1;">
-          <label>外帶人數：</label>
-          <select onchange="state.currentMenuData[${selectedDayIndex}].takeOut = this.value">
-            <option value="">空白</option>
-            ${[0,1,2,3,4,5,6,7,8,9].map(n => `<option value="${n}" ${dayData.takeOut==n?'selected':''}>${n}</option>`).join('')}
-          </select>
-        </div>
-      </div>
-
-      <h4>已選菜式：</h4>
-      <div id="selected-dishes-list">
-        ${dayData.dishes.length === 0 ? '<p style="color:#8e8e93;">未選擇菜式</p>' : ''}
-        ${dayData.dishes.map((d, dIdx) => `
-          <div class="dish-item">
-            <div class="dish-names">
-              <span class="dish-zh">${d.nameZh}</span>
-              <span class="dish-id">${d.nameId}</span>
-            </div>
-            <button class="btn-icon" style="color:#ff3b30;" onclick="removeDishFromDay(${selectedDayIndex},${dIdx})"><i class="fa-solid fa-minus-circle"></i></button>
+      DAYS_MAP.forEach((day, index) => {
+        const dayCard = document.createElement('div');
+        dayCard.style.cssText = "border:1px solid var(--border-color); border-radius:8px; padding:10px; margin-top:10px;";
+        dayCard.innerHTML = `
+          <div style="font-weight:bold; margin-bottom:6px; display:flex; justify-content:space-between;">
+            <span>${day.zh} <span id="day-date-${index}" style="font-weight:normal; font-size:0.85rem; color:var(--subtext-color);"></span></span>
+            <button class="btn" style="padding:2px 8px; font-size:0.8rem;" onclick="openSelectDishModal(${index})">+ 選擇菜式</button>
           </div>
-        `).join('')}
-      </div>
-    </div>
+          
+          <div id="day-dishes-${index}" style="min-height:30px; margin-bottom:8px;"></div>
 
-    <!-- 選擇菜式 (按分類) -->
-    <div class="card">
-      <h4>從菜式庫一點即選：</h4>
-      ${state.categories.map(cat => {
-        const catDishes = state.dishes.filter(d => d.category === cat);
-        if (catDishes.length === 0) return '';
-        return `
-          <div style="margin-bottom:10px;">
-            <div style="font-weight:600; font-size:0.9rem; color:var(--primary-color);">${cat}</div>${catDishes.map(d => `
-              <div class="dish-item" onclick="addDishToDay(${selectedDayIndex}, '${d.id}')" style="cursor:pointer;">
-                <div class="dish-names">
-                  <span class="dish-zh">${d.nameZh}</span>
-                  <span class="dish-id">${d.nameId}</span>
-                  ${d.lastCooked ? `<span class="last-cooked">上次烹飪: ${d.lastCooked}</span>` : ''}
-                </div>
-                <i class="fa-solid fa-plus-circle" style="color:var(--primary-color);"></i>
-              </div>
-            `).join('')}
+          <div style="display:flex; gap:10px;">
+            <div style="flex:1;">
+              <label style="font-size:0.8rem;">用餐人數：</label>
+              <select style="margin-top:2px; margin-bottom:0;" onchange="updatePeople(${index}, 'dineIn', this.value)" id="day-dine-${index}">
+                <option value="">空白</option>
+                ${[0,1,2,3,4,5,6,7,8,9].map(n => `<option value="${n}">${n}</option>`).join('')}
+              </select>
+            </div>
+            <div style="flex:1;">
+              <label style="font-size:0.8rem;">外帶人數：</label>
+              <select style="margin-top:2px; margin-bottom:0;" onchange="updatePeople(${index}, 'takeOut', this.value)" id="day-take-${index}">
+                <option value="">空白</option>
+                ${[0,1,2,3,4,5,6,7,8,9].map(n => `<option value="${n}">${n}</option>`).join('')}
+              </select>
+            </div>
           </div>
         `;
-      }).join('')}
-    </div>
-  `;
-
-  container.innerHTML = html;
-}
-
-function handleStartDateChange(val) {
-  const chosen = new Date(val);
-  if (chosen.getDay() !== 1) { // 1 代表星期一
-    showAlert('只可以選擇星期一作起始日！');
-    document.getElementById('monday-picker').value = state.editingMenuDate;
-  } else {
-    state.editingMenuDate = val;
-    // 如果已經有此日期的菜單，載入它
-    if (state.savedMenus[val]) {
-      state.currentMenuData = JSON.parse(JSON.stringify(state.savedMenus[val]));
-    } else {
-      state.currentMenuData = createEmptyMenuData();
+        container.appendChild(dayCard);
+      });
     }
-    render();
-  }
-}
 
-function addDishToDay(dayIdx, dishId) {
-  const dish = state.dishes.find(d => d.id === dishId);
-  if (dish) {
-    state.currentMenuData[dayIdx].dishes.push(dish);
-    render();
-  }
-}
-
-function removeDishFromDay(dayIdx, dishIdx) {
-  state.currentMenuData[dayIdx].dishes.splice(dishIdx, 1);
-  render();
-}
-
-function saveCurrentMenu() {
-  const dateKey = state.editingMenuDate;
-  const count = Object.keys(state.savedMenus).length;
-
-  if (!state.savedMenus[dateKey] && count >= 10) {
-    showAlert('儲存失敗：最多可儲存 10 張每週菜單！請先刪除舊菜單。');
-    return;
-  }
-
-  if (state.savedMenus[dateKey]) {
-    openReplaceModal(dateKey);
-  } else {
-    executeSaveMenu(dateKey);
-  }
-}
-
-function openReplaceModal(dateKey) {
-  const modal = document.getElementById('modal');
-  const body = document.getElementById('modal-body');
-  body.innerHTML = `
-    <h3>菜單已存在</h3>
-    <p>日期 ${dateKey} 的菜單已經存在，請選擇處理方式：</p>
-    <button class="btn" style="width:100%; margin-bottom:10px;" onclick="executeSaveMenu('${dateKey}'); closeModal();">取代現有菜單</button>
-    <button class="btn" style="width:100%; background:#8e8e93;" onclick="promptNewDate('${dateKey}');">另擇日期</button>
-  `;
-  modal.classList.add('active');
-}
-
-function promptNewDate(oldDate) {
-  closeModal();
-  const newDate = prompt("請輸入新的星期一日期 (YYYY-MM-DD)：", oldDate);
-  if (newDate) {
-    const d = new Date(newDate);
-    if (d.getDay() !== 1) {
-      showAlert('只可以選擇星期一作起始日！');
-    } else {
-      state.editingMenuDate = newDate;
-      saveCurrentMenu();
+    function updatePeople(dayIndex, type, val) {
+      currentMenuData.days[dayIndex][type] = val;
     }
-  }
-}
 
-function executeSaveMenu(dateKey) {
-  // 更新菜色上次烹飪日期
-  for (let day in state.currentMenuData) {
-    const currentDate = formatDate(dateKey, parseInt(day));
-    state.currentMenuData[day].dishes.forEach(d => {
-      const targetDish = state.dishes.find(td => td.id === d.id);
-      if (targetDish) {
-        targetDish.lastCooked = currentDate;
-      }
-    });
-  }
+    /* ---------------- 選擇菜式 Modal (一點即選) ---------------- */
+    function openSelectDishModal(dayIndex) {
+      activeSelectingDayIndex = dayIndex;
+      const listContainer = document.getElementById('select-dish-list');
+      listContainer.innerHTML = '';
 
-  state.savedMenus[dateKey] = JSON.parse(JSON.stringify(state.currentMenuData));
-  saveState();
-  showAlert(`菜單 [${dateKey}] 已成功儲存！`);
-  render();
-}
+      categories.forEach(cat => {
+        const catDishes = dishes.filter(d => d.cat === cat);
+        if (catDishes.length === 0) return;
 
-// --- 2. 我的菜單 View ---
-function renderMyMenusView(container) {
-  const keys = Object.keys(state.savedMenus).sort().reverse();
+        const catTitle = document.createElement('div');
+        catTitle.style.cssText = "font-weight:bold; margin-top:10px; border-bottom:1px solid var(--border-color); color:var(--primary-color);";
+        catTitle.innerText = cat;
+        listContainer.appendChild(catTitle);
 
-  if (keys.length === 0) {
-    container.innerHTML = `<div class="card"><p>目前沒有已儲存的菜單。</p></div>`;
-    return;
-  }
-
-  let html = '';
-  keys.forEach(dateKey => {
-    html += `
-      <div class="card">
-        <div style="display:flex; justify-content:space-between; align-items:center;">
-          <h3>菜單日期：${dateKey}</h3>
-          <div>
-            <button class="btn-icon" onclick="loadSavedMenu('${dateKey}')"><i class="fa-solid fa-pen-to-square"></i></button>
-            <button class="btn-icon" onclick="exportPDF('${dateKey}')"><i class="fa-solid fa-file-pdf"></i></button>
-            <button class="btn-icon" style="color:#ff3b30;" onclick="deleteSavedMenu('${dateKey}')"><i class="fa-solid fa-trash"></i></button>
-          </div>
-        </div>
-      </div>
-    `;
-  });
-
-  container.innerHTML = html;
-}
-
-function loadSavedMenu(dateKey) {
-  state.editingMenuDate = dateKey;
-  state.currentMenuData = JSON.parse(JSON.stringify(state.savedMenus[dateKey]));
-  switchTab('weekly');
-}
-
-function deleteSavedMenu(dateKey) {
-  if (confirm(`確定要刪除 ${dateKey} 的菜單嗎？`)) {
-    delete state.savedMenus[dateKey];
-    saveState();
-    render();
-  }
-}
-
-// --- 3. 菜式庫 View ---
-function renderDishesView(container) {
-  let html = `
-    <button class="btn" style="width:100%; margin-bottom:12px;" onclick="openDishModal()"><i class="fa-solid fa-plus"></i> 新增菜式</button>
-  `;
-
-  state.categories.forEach(cat => {
-    const catDishes = state.dishes.filter(d => d.category === cat);
-    html += `
-      <div class="card">
-        <h4>${cat} (${catDishes.length})</h4>
-        ${catDishes.length === 0 ? '<p style="font-size:0.8rem; color:#8e8e93;">無菜式</p>' : ''}
-        ${catDishes.map(d => `
-          <div class="dish-item">
-            <div class="dish-names">
-              <span class="dish-zh">${d.nameZh}</span>
-              <span class="dish-id">${d.nameId}</span>
-            </div>
+        catDishes.forEach(d => {
+          const item = document.createElement('div');
+          item.className = 'dish-item';
+          item.onclick = () => selectDishForDay(d);
+          item.innerHTML = `
             <div>
-              <button class="btn-icon" onclick="openDishModal('${d.id}')"><i class="fa-solid fa-pen"></i></button>
-              <button class="btn-icon" style="color:#ff3b30;" onclick="deleteDish('${d.id}')"><i class="fa-solid fa-trash"></i></button>
+              <div>${d.zh}</div>
+              <div class="dish-name-id">${d.idName || ''}</div>
+              ${d.lastCooked ? `<div class="last-cooked">上一次烹飪日期：${d.lastCooked}</div>` : ''}
+            </div>
+            <span class="badge">選擇</span>
+          `;
+          listContainer.appendChild(item);
+        });
+      });
+
+      document.getElementById('select-dish-modal').style.display = 'flex';
+    }
+
+    function selectDishForDay(dish) {
+      if (activeSelectingDayIndex === null) return;
+      currentMenuData.days[activeSelectingDayIndex].dishes.push(dish);
+      
+      // 更新上一次烹飪日期 (紀錄為當天選取)
+      if (currentMenuData.startDate) {
+        const d = new Date(currentMenuData.startDate);
+        d.setDate(d.getDate() + activeSelectingDayIndex);
+        dish.lastCooked = `${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}`;
+        localStorage.setItem('menu_dishes', JSON.stringify(dishes));
+      }
+
+      renderDayDishesUI(activeSelectingDayIndex);
+      closeModal('select-dish-modal');
+    }
+
+    function renderDayDishesUI(dayIndex) {
+      const el = document.getElementById(`day-dishes-${dayIndex}`);
+      const list = currentMenuData.days[dayIndex].dishes;
+      if (list.length === 0) {
+        el.innerHTML = '<span style="color:var(--subtext-color); font-size:0.85rem;">未選擇菜式</span>';
+        return;
+      }
+      el.innerHTML = list.map((d, i) => `
+        <div style="display:flex; justify-content:space-between; align-items:center; background:var(--bg-color); padding:4px 8px; border-radius:4px; margin-top:4px;">
+          <div>${d.zh} <small style="color:var(--subtext-color);">${d.idName || ''}</small></div>
+          <span style="color:var(--danger-color); cursor:pointer; font-weight:bold;" onclick="removeDishFromDay(${dayIndex}, ${i})">✕</span>
+        </div>
+      `).join('');
+    }
+
+    function removeDishFromDay(dayIndex, dishIndex) {
+      currentMenuData.days[dayIndex].dishes.splice(dishIndex, 1);
+      renderDayDishesUI(dayIndex);
+    }
+
+    /* ---------------- 儲存每週菜單 (最高 10 張) ---------------- */
+    function saveCurrentWeeklyMenu() {
+      if (!currentMenuData.startDate) {
+        alert("請先選擇星期一作起始日！");
+        return;
+      }
+
+      const existingIndex = savedMenus.findIndex(m => m.startDate === currentMenuData.startDate);
+      
+      if (existingIndex > -1) {
+        const choice = confirm("此日期的菜單已存在！\n按「確定」取代該菜單，或按「取消」另擇日期。");
+        if (!choice) {
+          alert("請重新選擇星期一作起始日。");
+          return;
+        } else {
+          savedMenus[existingIndex] = JSON.parse(JSON.stringify(currentMenuData));
+        }
+      } else {
+        if (savedMenus.length >= 10) {
+          alert("已達儲存上限 (最多可儲存 10 張每週菜單)！請刪除舊菜單後再試。");
+          return;
+        }
+        savedMenus.push(JSON.parse(JSON.stringify(currentMenuData)));
+      }
+
+      localStorage.setItem('menu_saved', JSON.stringify(savedMenus));
+      alert("儲存成功！");
+      renderSavedMenus();
+    }
+
+    /* ---------------- 我的菜單 View ---------------- */
+    function renderSavedMenus() {
+      document.getElementById('saved-count').innerText = savedMenus.length;
+      const container = document.getElementById('saved-list');
+      container.innerHTML = '';
+
+      if (savedMenus.length === 0) {
+        container.innerHTML = '<div style="color:var(--subtext-color); text-align:center;">暫無已儲存的菜單</div>';
+        return;
+      }
+
+      savedMenus.forEach((m, idx) => {
+        const card = document.createElement('div');
+        card.style.cssText = "border:1px solid var(--border-color); border-radius:8px; padding:12px; margin-bottom:10px;";
+        card.innerHTML = `
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <b>星期一日期：${m.startDate}</b>
+            <div style="display:flex; gap:6px;">
+              <button class="btn btn-icon" title="匯出PDF" onclick="exportPDF(${idx})">
+                <svg style="width:18px;height:18px;fill:white" viewBox="0 0 24 24"><path d="M19 8h-4V3H9v5H5l7 7 7-7zm-4 8v2H9v-2h6z"/></svg>
+              </button>
+              <button class="btn" style="padding:4px 8px; font-size:0.8rem;" onclick="loadMenuForEdit(${idx})">修改</button>
+              <button class="btn btn-danger" style="padding:4px 8px; font-size:0.8rem;" onclick="deleteSavedMenu(${idx})">刪除</button>
             </div>
           </div>
-        `).join('')}
-      </div>
-    `;
-  });
-
-  container.innerHTML = html;
-}
-
-function openDishModal(dishId = null) {
-  const dish = state.dishes.find(d => d.id === dishId) || { nameZh: '', nameId: '', category: state.categories[0] };
-  const modal = document.getElementById('modal');
-  const body = document.getElementById('modal-body');
-
-  body.innerHTML = `
-    <h3>${dishId ? '修改菜式' : '新增菜式'}</h3>
-    <label>中文名稱：</label>
-    <input type="text" id="dish-zh" value="${dish.nameZh}">
-    <label>印尼文名稱 (Bahasa Indonesia)：</label>
-    <input type="text" id="dish-id" value="${dish.nameId}" placeholder="預留填寫印尼文">
-    <label>分類：</label>
-    <select id="dish-cat">
-      ${state.categories.map(c => `<option value="${c}" ${c===dish.category?'selected':''}>${c}</option>`).join('')}
-    </select>
-    <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:15px;">
-      <button class="btn" style="background:#8e8e93;" onclick="closeModal()">取消</button>
-      <button class="btn" onclick="saveDish('${dishId}')">儲存</button>
-    </div>
-  `;
-  modal.classList.add('active');
-}
-
-function saveDish(dishId) {
-  const nameZh = document.getElementById('dish-zh').value.trim();
-  const nameId = document.getElementById('dish-id').value.trim();
-  const category = document.getElementById('dish-cat').value;
-
-  if (!nameZh) {
-    showAlert('請輸入菜式中文名稱');
-    return;
-  }
-
-  if (dishId && dishId !== 'null') {
-    const dish = state.dishes.find(d => d.id === dishId);
-    if (dish) {
-      dish.nameZh = nameZh;
-      dish.nameId = nameId;
-      dish.category = category;
+        `;
+        container.appendChild(card);
+      });
     }
-  } else {
-    state.dishes.push({
-      id: Date.now().toString(),
-      nameZh,
-      nameId,
-      category,
-      lastCooked: ''
-    });
-  }
 
-  saveState();
-  closeModal();
-  render();
-}
+    function loadMenuForEdit(idx) {
+      currentMenuData = JSON.parse(JSON.stringify(savedMenus[idx]));
+      document.getElementById('menu-start-date').value = currentMenuData.startDate;
+      updateDaysDates();
+      DAYS_MAP.forEach((_, dayIdx) => {
+        renderDayDishesUI(dayIdx);
+        document.getElementById(`day-dine-${dayIdx}`).value = currentMenuData.days[dayIdx].dineIn || '';
+        document.getElementById(`day-take-${dayIdx}`).value = currentMenuData.days[dayIdx].takeOut || '';
+      });
+      switchView('menu', document.querySelectorAll('.tab-item')[0]);
+    }
 
-function deleteDish(dishId) {
-  if (confirm('確定要刪除此菜式？')) {
-    state.dishes = state.dishes.filter(d => d.id !== dishId);
-    saveState();
-    render();
-  }
-}
+    function deleteSavedMenu(idx) {
+      if (confirm("確定刪除此張每週菜單？")) {
+        savedMenus.splice(idx, 1);
+        localStorage.setItem('menu_saved', JSON.stringify(savedMenus));
+        renderSavedMenus();
+      }
+    }
 
-// --- 4. 設定 View ---
-function renderSettingsView(container) {
-  let html = `
-    <!-- 深淺色模式 -->
-    <div class="card">
-      <h4>主題模式</h4>
-      <select onchange="state.theme = this.value; saveState(); render();">
-        <option value="light" ${state.theme==='light'?'selected':''}>淺色模式 (Light)</option>
-        <option value="dark" ${state.theme==='dark'?'selected':''}>深色模式 (Dark)</option>
-      </select>
-    </div>
+    /* ---------------- 菜式庫 View ---------------- */
+    function renderDishesView() {
+      const container = document.getElementById('dish-categories-list');
+      container.innerHTML = '';
 
-    <!-- 字體大小 -->
-    <div class="card">
-      <h4>自訂字體大小 (${state.fontSize}px)</h4>
-      <input type="range" min="12" max="22" value="${state.fontSize}" onchange="state.fontSize = this.value; saveState(); render();">
-    </div>
+      categories.forEach(cat => {
+        const catGroup = document.createElement('div');
+        catGroup.style.marginBottom = '12px';
+        catGroup.innerHTML = `<div style="font-weight:bold; color:var(--primary-color); border-bottom:1px solid var(--border-color); padding-bottom:4px;">${cat}</div>`;
 
-    <!-- 自訂頭像 -->
-    <div class="card">
-      <h4>自訂頭像</h4>
-      <input type="file" id="avatar-input" accept="image/*" onchange="handleAvatarUpload(event)">
-    </div>
+        const catDishes = dishes.filter(d => d.cat === cat);
+        catDishes.forEach(d => {
+          const dishRow = document.createElement('div');
+          dishRow.className = 'dish-item';
+          dishRow.onclick = () => showEditDishModal(d);
+          dishRow.innerHTML = `
+            <div>
+              <div>${d.zh}</div>
+              <div class="dish-name-id">${d.idName || '未填寫印尼文'}</div>
+            </div>
+            <span style="font-size:0.8rem; color:var(--subtext-color);">編輯 ❯</span>
+          `;
+          catGroup.appendChild(dishRow);
+        });
 
-    <!-- 分類管理 & 拖拉排序 -->
-    <div class="card">
-      <h4>分類管理 (可拖動排序)</h4>
-      <div id="sortable-categories">
-        ${state.categories.map((cat, idx) => `
-          <div class="sortable-item" data-id="${cat}">
-            <span><i class="fa-solid fa-bars" style="margin-right:8px; color:#8e8e93;"></i>${cat}</span>${cat !== '其他' ? `<button class="btn-icon" style="color:#ff3b30;" onclick="deleteCategory('${cat}')"><i class="fa-solid fa-xmark"></i></button>` : ''}
+        container.appendChild(catGroup);
+      });
+    }
+
+    function showAddDishModal() {
+      document.getElementById('dish-modal-title').innerText = '新增菜式';
+      document.getElementById('edit-dish-id').value = '';
+      document.getElementById('dish-name-zh').value = '';
+      document.getElementById('dish-name-id').value = '';
+      document.getElementById('delete-dish-btn').style.display = 'none';
+      populateCatSelect('dish-category-select');
+      document.getElementById('dish-modal').style.display = 'flex';
+    }
+
+    function showEditDishModal(dish) {
+      document.getElementById('dish-modal-title').innerText = '修改菜式';
+      document.getElementById('edit-dish-id').value = dish.id;
+      document.getElementById('dish-name-zh').value = dish.zh;
+      document.getElementById('dish-name-id').value = dish.idName || '';
+      document.getElementById('delete-dish-btn').style.display = 'inline-block';
+      populateCatSelect('dish-category-select', dish.cat);
+      document.getElementById('dish-modal').style.display = 'flex';
+    }
+
+    function populateCatSelect(selectId, selectedValue = '') {
+      const sel = document.getElementById(selectId);
+      sel.innerHTML = categories.map(c => `<option value="${c}" ${c === selectedValue ? 'selected' : ''}>${c}</option>`).join('');
+    }
+
+    function saveDish() {
+      const id = document.getElementById('edit-dish-id').value;
+      const zh = document.getElementById('dish-name-zh').value.trim();
+      const idName = document.getElementById('dish-name-id').value.trim();
+      const cat = document.getElementById('dish-category-select').value;
+
+      if (!zh) { alert("請輸入中文菜名！"); return; }
+
+      if (id) {
+        // 修改
+        const d = dishes.find(item => item.id === id);
+        if (d) { d.zh = zh; d.idName = idName; d.cat = cat; }
+      } else {
+        // 新增
+        dishes.push({ id: Date.now().toString(), zh, idName, cat, lastCooked: '' });
+      }
+
+      localStorage.setItem('menu_dishes', JSON.stringify(dishes));
+      renderDishesView();
+      closeModal('dish-modal');
+    }
+
+    function deleteDish() {
+      const id = document.getElementById('edit-dish-id').value;
+      if (confirm("確定刪除此菜式？")) {
+        dishes = dishes.filter(d => d.id !== id);
+        localStorage.setItem('menu_dishes', JSON.stringify(dishes));
+        renderDishesView();
+        closeModal('dish-modal');
+      }
+    }
+
+    /* ---------------- 設定 View & 分類拖拉/重新分類 ---------------- */
+    function renderCategorySettings() {
+      const container = document.getElementById('settings-cat-list');
+      container.innerHTML = '';
+
+      categories.forEach((cat, index) => {
+        const item = document.createElement('div');
+        item.style.cssText = "display:flex; justify-content:space-between; align-items:center; padding:8px; background:var(--bg-color); margin-bottom:6px; border-radius:6px;";
+        item.draggable = true;
+        item.dataset.index = index;
+
+        item.innerHTML = `
+          <span>☰ ${cat}</span>
+          <div>
+            ${cat !== '其他' ? `<button class="btn btn-danger" style="padding:2px 6px; font-size:0.75rem;" onclick="deleteCategory('${cat}')">刪除</button>` : '<small>(預設)</small>'}
           </div>
-        `).join('')}
-      </div>
-      <button class="btn" style="width:100%; margin-top:10px;" onclick="addNewCategory()"><i class="fa-solid fa-plus"></i> 新增分類</button>
-    </div>
-  `;
+        `;
 
-  container.innerHTML = html;
+        // 簡單 Drag & Drop 排序
+        item.ondragstart = (e) => e.dataTransfer.setData('text/plain', index);
+        item.ondragover = (e) => e.preventDefault();
+        item.ondrop = (e) => {
+          e.preventDefault();
+          const fromIdx = e.dataTransfer.getData('text/plain');
+          const toIdx = index;
+          const moved = categories.splice(fromIdx, 1)[0];
+          categories.splice(toIdx, 0, moved);
+          saveCategories();
+        };
 
-  // 初始化 SortableJS
-  const el = document.getElementById('sortable-categories');
-  if (el) {
-    Sortable.create(el, {
-      animation: 150,
-      onEnd: function () {
-        const order = Array.from(el.children).map(child => child.getAttribute('data-id'));
-        state.categories = order;
-        saveState();
+        container.appendChild(item);
+      });
+    }
+
+    function addNewCategory() {
+      const val = document.getElementById('new-cat-input').value.trim();
+      if (!val) return;
+      if (categories.includes(val)) { alert("分類已存在！"); return; }
+      categories.push(val);
+      document.getElementById('new-cat-input').value = '';
+      saveCategories();
+    }
+
+    function deleteCategory(cat) {
+      if (cat === '其他') return;
+      alert(`刪除分類「${cat}」時，分類內的所有菜式項目會自動移到「其他」分類！`);
+      
+      // 自動轉移到「其他」
+      dishes.forEach(d => { if (d.cat === cat) d.cat = '其他'; });
+      categories = categories.filter(c => c !== cat);
+
+      localStorage.setItem('menu_dishes', JSON.stringify(dishes));
+      saveCategories();
+    }
+
+    function saveCategories() {
+      localStorage.setItem('menu_categories', JSON.stringify(categories));
+      renderCategorySettings();
+      renderDishesView();
+    }
+
+    /* ---------------- 樣式設定 (主題、字體大小、頭像) ---------------- */
+    function toggleTheme(theme) {
+      document.documentElement.setAttribute('data-theme', theme);
+      localStorage.setItem('menu_theme', theme);
+    }
+
+    function changeFontSize(size) {
+      document.documentElement.style.setProperty('--font-scale', size);
+      localStorage.setItem('menu_font_size', size);
+    }
+
+    function initSettings() {
+      const savedTheme = localStorage.getItem('menu_theme') || 'light';
+      document.getElementById('theme-select').value = savedTheme;
+      toggleTheme(savedTheme);
+
+      const savedFont = localStorage.getItem('menu_font_size') || '16px';
+      document.getElementById('font-size-select').value = savedFont;
+      changeFontSize(savedFont);
+
+      const savedAvatar = localStorage.getItem('menu_avatar');
+      if (savedAvatar) {
+        document.getElementById('header-avatar').src = savedAvatar;
+      }
+    }
+
+    /* ---------------- 頭像裁切 (放大/縮小/任意選擇) ---------------- */
+    let cropImgObj = null;
+    let cropState = { scale: 1, x: 0, y: 0, isDragging: false, startX: 0, startY: 0 };
+
+    function handleAvatarSelect(evt) {
+      const file = evt.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const img = document.getElementById('crop-img');
+        img.src = e.target.result;
+        cropState = { scale: 1, x: 0, y: 0, isDragging: false, startX: 0, startY: 0 };
+        document.getElementById('crop-scale').value = 1;
+        updateCropTransform();
+        document.getElementById('crop-modal').style.display = 'flex';
+      };
+      reader.readAsDataURL(file);
+    }
+
+    const cropContainer = document.getElementById('crop-container');
+    const cropImg = document.getElementById('crop-img');
+
+    cropContainer.addEventListener('mousedown', (e) => {
+      cropState.isDragging = true;
+      cropState.startX = e.clientX - cropState.x;
+      cropState.startY = e.clientY - cropState.y;
+    });
+
+    window.addEventListener('mousemove', (e) => {
+      if (!cropState.isDragging) return;
+      cropState.x = e.clientX - cropState.startX;
+      cropState.y = e.clientY - cropState.startY;
+      updateCropTransform();
+    });
+
+    window.addEventListener('mouseup', () => cropState.isDragging = false);
+
+    // 觸控支援 (Touch Events)
+    cropContainer.addEventListener('touchstart', (e) => {
+      if(e.touches.length === 1) {
+        cropState.isDragging = true;
+        cropState.startX = e.touches[0].clientX - cropState.x;
+        cropState.startY = e.touches[0].clientY - cropState.y;
       }
     });
-  }
-}
 
-function addNewCategory() {
-  const name = prompt('請輸入新分類名稱：');
-  if (name && name.trim()) {
-    if (state.categories.includes(name.trim())) {
-      showAlert('分類名稱已存在！');
-      return;
+    window.addEventListener('touchmove', (e) => {
+      if (!cropState.isDragging || e.touches.length !== 1) return;
+      cropState.x = e.touches[0].clientX - cropState.startX;
+      cropState.y = e.touches[0].clientY - cropState.startY;
+      updateCropTransform();
+    });
+
+    window.addEventListener('touchend', () => cropState.isDragging = false);
+
+    function updateCropTransform() {
+      cropState.scale = document.getElementById('crop-scale').value;
+      cropImg.style.transform = `translate(${cropState.x}px, ${cropState.y}px) scale(${cropState.scale})`;
     }
-    state.categories.push(name.trim());
-    saveState();
-    render();
-  }
-}
 
-function deleteCategory(cat) {
-  if (cat === '其他') {
-    showAlert('「其他」分類不能刪除！');
-    return;
-  }
+    function saveCroppedAvatar() {
+      const canvas = document.createElement('canvas');
+      canvas.width = 150;
+      canvas.height = 150;
+      const ctx = canvas.getContext('2d');
 
-  showAlert(`警告：刪除「${cat}」分類後，該分類內的所有菜式將會自動移動到「其他」分類！`);
+      // 簡化擷取至 Canvas
+      const img = document.getElementById('crop-img');
+      ctx.beginPath();
+      ctx.arc(75, 75, 75, 0, Math.PI * 2);
+      ctx.clip();
+      ctx.drawImage(img, 0, 0, 150, 150);
 
-  if (confirm(`確定要刪除分類「${cat}」嗎？`)) {
-    // 移至 其他
-    state.dishes.forEach(d => {
-      if (d.category === cat) d.category = '其他';
-    });
-    state.categories = state.categories.filter(c => c !== cat);
-    saveState();
-    render();
-  }
-}
+      const dataUrl = canvas.toDataURL('image/png');
+      document.getElementById('header-avatar').src = dataUrl;
+      localStorage.setItem('menu_avatar', dataUrl);
+      closeModal('crop-modal');
+    }
 
-// --- 頭像圖片選擇與裁切 (Cropper.js) ---
-let cropper = null;
-function handleAvatarUpload(e) {
-  const file = e.target.files[0];
-  if (!file) return;
+    /* ---------------- 匯出 PDF 功能 (雙語中/印, 大字體 A4 滿版) ---------------- */
+    function exportPDF(savedMenuIndex) {
+      const menu = savedMenus[savedMenuIndex];
+      const pdfContent = document.getElementById('pdf-days-content');
+      pdfContent.innerHTML = '';
 
-  const reader = new FileReader();
-  reader.onload = function (event) {
-    const modal = document.getElementById('modal');
-    const body = document.getElementById('modal-body');
+      // 計算日期範圍
+      const startDate = new Date(menu.startDate);
+      const endDate = new Date(menu.startDate);
+      endDate.setDate(endDate.getDate() + 6);
 
-    body.innerHTML = `
-      <h3>裁切頭像</h3>
-      <div style="max-height: 300px; width: 100%;">
-        <img id="crop-image" src="${event.target.result}" style="max-width:100%;">
-      </div>
-      <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:15px;">
-        <button class="btn" style="background:#8e8e93;" onclick="closeModal()">取消</button>
-        <button class="btn" onclick="saveCroppedAvatar()">完成</button>
-      </div>
-    `;
-    modal.classList.add('active');
+      document.getElementById('pdf-date-subtitle').innerText = 
+        `${startDate.getFullYear()}-${startDate.getMonth()+1}-${startDate.getDate()} s/d ${endDate.getFullYear()}-${endDate.getMonth()+1}-${endDate.getDate()}`;
 
-    const image = document.getElementById('crop-image');
-    cropper = new Cropper(image, {
-      aspectRatio: 1,
-      viewMode: 1,
-    });
-  };
-  reader.readAsDataURL(file);
-}
+      DAYS_MAP.forEach((dayObj, i) => {
+        const d = new Date(menu.startDate);
+        d.setDate(d.getDate() + i);
+        const dayData = menu.days[i];
 
-function saveCroppedAvatar() {
-  if (cropper) {
-    const canvas = cropper.getCroppedCanvas({ width: 200, height: 200 });
-    state.avatar = canvas.toDataURL();
-    saveState();
-    closeModal();
-    render();
-  }
-}
+        const dayRow = document.createElement('div');
+        dayRow.className = 'pdf-day-row';
 
-// --- PDF 匯出功能 (HTML2PDF) ---
-function exportPDF(dateKey) {
-  const menuData = state.savedMenus[dateKey] || (dateKey === state.editingMenuDate ? state.currentMenuData : null);
+        let dishesHtml = dayData.dishes.length > 0 
+          ? dayData.dishes.map(dish => `<div class="pdf-dish-line">• ${dish.zh} / ${dish.idName || '無印尼文'}</div>`).join('') 
+          : '<div class="pdf-dish-line" style="color:#666;">- 未選擇菜式 / Tidak ada menu -</div>';
 
-  if (!menuData) {
-    showAlert('找不到可匯出的菜單資料！');
-    return;
-  }
+        const dineInText = dayData.dineIn !== '' ? `${dayData.dineIn} 人 / Orang` : '空白';
+        const takeOutText = dayData.takeOut !== '' ? `${dayData.takeOut} 人 / Orang` : '空白';
 
-  document.getElementById('pdf-subtitle').innerText = `起始日期 / Tanggal Mulai: ${dateKey}`;
-  const tbody = document.getElementById('pdf-tbody');
-  tbody.innerHTML = '';
+        dayRow.innerHTML = `
+          <div class="pdf-day-title">
+            ${dayObj.zh} (${dayObj.id}) - ${d.getMonth()+1}月${d.getDate()}日
+          </div>
+          ${dishesHtml}
+          <div style="margin-top:8px; font-size:16px; border-top:1px dashed #ccc; padding-top:4px;">
+            <b>用餐人數 / Makan di rumah:</b> ${dineInText} | 
+            <b>外帶人數 / Bungkus:</b> ${takeOutText}
+          </div>
+        `;
+        pdfContent.appendChild(dayRow);
+      });
 
-  for (let i = 0; i < 7; i++) {
-    const dayData = menuData[i] || { dishes: [], eatIn: '', takeOut: '' };
-    const dateStr = formatDate(dateKey, i);
-    const dayInfo = WEEKDAYS_BILINGUAL[i];
+      const element = document.getElementById('pdf-template');
+      element.style.display = 'block';
 
-    // 每項菜式分行顯示
-    const dishesHtml = dayData.dishes.length > 0 
-      ? dayData.dishes.map(d => `<div style="margin-bottom:4px;"><b>${d.nameZh}</b><br><span style="font-size:14px; color:#555;">${d.nameId || ''}</span></div>`).join('')
-      : '-';
+      const opt = {
+        margin:       10,
+        filename:     `Weekly_Menu_${menu.startDate}.pdf`,
+        image:        { type: 'jpeg', quality: 0.98 },
+        html2canvas:  { scale: 2 },
+        jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+      };
 
-    const eatInText = dayData.eatIn !== '' ? `${dayData.eatIn} 人` : '-';
-    const takeOutText = dayData.takeOut !== '' ? `${dayData.takeOut} 人` : '-';
+      html2pdf().set(opt).from(element).save().then(() => {
+        element.style.display = 'none';
+      });
+    }
 
-    const tr = document.createElement('tr');
-    tr.innerHTML = `
-      <td><b>${dayInfo.zh}</b><br>${dayInfo.id}<br><small>${dateStr}</small></td>
-      <td>${dishesHtml}</td>
-      <td>
-        堂食 / Makan: ${eatInText}<br>
-        外帶 / Bungkus: ${takeOutText}
-      </td>
-    `;
-    tbody.appendChild(tr);
-  }
-
-  const element = document.getElementById('pdf-template');
-  element.style.display = 'block';
-
-  const opt = {
-    margin:       10,
-    filename:     `Weekly_Menu_${dateKey}.pdf`,
-    image:        { type: 'jpeg', quality: 0.98 },
-    html2canvas:  { scale: 2 },
-    jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
-  };
-
-  html2pdf().set(opt).from(element).save().then(() => {
-    element.style.display = 'none';
-  });
-}
-
-function closeModal() {
-  document.getElementById('modal').classList.remove('active');
-  if (cropper) {
-    cropper.destroy();
-    cropper = null;
-  }
-}
-
-// 啟動 App
-switchTab('weekly');
-</script>
+    /* ---------------- 通用 Modal 關閉 ---------------- */
+    function closeModal(modalId) {
+      document.getElementById(modalId).style.display = 'none';
+    }
+  </script>
 </body>
 </html>
