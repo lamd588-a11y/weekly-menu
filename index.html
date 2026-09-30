@@ -32,8 +32,9 @@
       --primary: #007AFF;
       --danger: #FF3B30;
       --font-scale: 16px;
-      --safe-area-top: env(safe-area-inset-top, 20px);
-      --safe-area-bottom: env(safe-area-inset-bottom, 20px);
+      /* 適應 iPhone 18 Pro Max 的 Safe Area */
+      --safe-area-top: env(safe-area-inset-top, 59px);
+      --safe-area-bottom: env(safe-area-inset-bottom, 34px);
     }
 
     [data-theme="dark"] {
@@ -55,9 +56,12 @@
       -webkit-user-select: none;
     }
 
-    /* iPhone 18 Pro Max 邊框適應 (功能 3) */
+    /* iPhone 18 Pro Max 邊框與 Safe Area 適應 (功能 3) */
     .app-container {
-      display: flex; flex-direction: column; height: 100vh;
+      display: flex; 
+      flex-direction: column; 
+      height: 100vh;
+      height: -webkit-fill-available;
       padding-top: var(--safe-area-top);
       padding-bottom: calc(60px + var(--safe-area-bottom));
     }
@@ -74,12 +78,12 @@
     .tab-content { flex: 1; overflow-y: auto; display: none; padding: 16px; }
     .tab-content.active { display: block; }
 
-    /* 設定頁面固定頂部區域 */
+    /* iPhone 18 Pro Max 設定頁面固定頂部區域 */
     .sticky-card {
       position: sticky;
       top: 0;
       z-index: 10;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
     }
 
     nav.tab-bar {
@@ -173,7 +177,7 @@
 
   <!-- 4. 設定頁面 (功能 25, 26, 27, 28, 29, 30) -->
   <div id="tab-settings" class="tab-content">
-    <!-- 加入 sticky-card 樣式固定頂部 -->
+    <!-- 加入適應 iPhone 18 Pro Max Safe Area 的 sticky-card 樣式 -->
     <div class="card sticky-card">
       <h4>自訂頭像 (功能 29)</h4>
       <input type="file" id="avatar-input" accept="image/*" onchange="loadAvatarCrop(event)">
