@@ -74,6 +74,14 @@
     .tab-content { flex: 1; overflow-y: auto; display: none; padding: 16px; }
     .tab-content.active { display: block; }
 
+    /* 設定頁面固定頂部區域 */
+    .sticky-card {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    }
+
     nav.tab-bar {
       position: fixed; bottom: 0; left: 0; right: 0;
       height: calc(50px + var(--safe-area-bottom));
@@ -165,7 +173,8 @@
 
   <!-- 4. 設定頁面 (功能 25, 26, 27, 28, 29, 30) -->
   <div id="tab-settings" class="tab-content">
-    <div class="card">
+    <!-- 加入 sticky-card 樣式固定頂部 -->
+    <div class="card sticky-card">
       <h4>自訂頭像 (功能 29)</h4>
       <input type="file" id="avatar-input" accept="image/*" onchange="loadAvatarCrop(event)">
       <div id="crop-modal-controls" style="display:none; margin-top:10px; text-align:center;">
