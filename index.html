@@ -2,7 +2,6 @@
 <html lang="zh-HK">
 <head>
   <meta charset="UTF-8">
-  <!-- 針對 iPhone 18 Pro Max 等現代 iPhone 優化視口與 Safe Area -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   
   <title>每週菜單</title>
@@ -14,14 +13,12 @@
   <link rel="apple-touch-icon" href="icon.png">
   <link rel="icon" type="image/png" href="icon.png">
   
-  <!-- Manifest (內嵌 Data URI) -->
   <link rel="manifest" href='data:application/manifest+json,{"name":"每週菜單","short_name":"每週菜單","start_url":"index.html","display":"standalone","background_color":"#f2f2f7","theme_color":"#f2f2f7","icons":[{"src":"icon.png","sizes":"192x192","type":"image/png"}]}'>
 
-  <!-- html2pdf.js CDN (用於匯出 A4 PDF) -->
+  <!-- html2pdf.js CDN -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
   <style>
-    /* ---------------- basic & Dynamic Font Size ---------------- */
     :root {
       --bg-color: #f2f2f7;
       --card-bg: #ffffff;
@@ -30,7 +27,7 @@
       --primary-color: #007aff;
       --border-color: #e5e5ea;
       --danger-color: #ff3b30;
-      --font-scale: 16px; /* 可透過設定調整 Base Size */
+      --font-scale: 16px;
     }
 
     [data-theme="dark"] {
@@ -53,12 +50,10 @@
       font-size: var(--font-scale);
       background-color: var(--bg-color);
       color: var(--text-color);
-      /* iPhone 底部 Safe Area 邊距 */
       padding-bottom: calc(65px + env(safe-area-inset-bottom));
       user-select: none;
     }
 
-    /* ---------------- Header & Avatar ---------------- */
     header {
       position: sticky;
       top: 0;
@@ -88,7 +83,6 @@
       border: 1px solid var(--border-color);
     }
 
-    /* ---------------- Navigation Tabs ---------------- */
     nav.tab-bar {
       position: fixed;
       bottom: 0;
@@ -125,11 +119,10 @@
       margin-bottom: 2px;
     }
 
-    /* ---------------- View Sections ---------------- */
     .view {
       display: none;
       padding: 16px;
-      max-width: 500px; /* iPhone 尺寸極致居中適配 */
+      max-width: 500px;
       margin: 0 auto;
     }
 
@@ -137,7 +130,6 @@
       display: block;
     }
 
-    /* ---------------- UI Components ---------------- */
     .card {
       background: var(--card-bg);
       border-radius: 12px;
@@ -162,8 +154,28 @@
     }
 
     .btn-danger { background: var(--danger-color); }
-    .btn-icon { padding: 8px; border-radius: 50%; }
+    
+    /* 修正 2: 增加 Icon 圖標的固定寬高與縮放，確保所有瀏覽器都能正常顯示圖標 */
+    .btn-icon { 
+      padding: 8px; 
+      border-radius: 50%;
+      width: 36px;
+      height: 36px;
+      min-width: 36px;
+      min-height: 36px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
 
+    .btn-icon svg {
+      width: 20px;
+      height: 20px;
+      fill: #ffffff;
+      flex-shrink: 0;
+    }
+
+    /* 修正 1: 日期選擇器 iOS Safari 點擊與樣式優化 */
     input, select {
       width: 100%;
       padding: 10px;
@@ -174,6 +186,16 @@
       background: var(--bg-color);
       color: var(--text-color);
       font-size: 1rem;
+      -webkit-appearance: none;
+      appearance: none;
+    }
+
+    /* 解決 iOS 日期輸入框無法順暢彈出月曆的問題 */
+    input[type="date"] {
+      min-height: 44px;
+      display: block;
+      position: relative;
+      background-color: var(--card-bg);
     }
 
     .dish-item {
@@ -207,7 +229,6 @@
       font-size: 0.75rem;
     }
 
-    /* ---------------- PDF Export Specific ---------------- */
     #pdf-template {
       display: none;
       background: white;
@@ -218,7 +239,7 @@
 
     .pdf-page {
       width: 100%;
-      font-size: 18px; /* 加大字體以用盡 A4 */
+      font-size: 18px;
     }
 
     .pdf-header {
@@ -251,7 +272,6 @@
       line-height: 1.4;
     }
 
-    /* Avatar Crop Modal */
     .modal {
       display: none;
       position: fixed;
@@ -298,12 +318,13 @@
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
         <h3 style="margin:0;">編輯/建立菜單</h3>
         <button class="btn btn-icon" onclick="saveCurrentWeeklyMenu()" title="儲存菜單">
-          <svg style="width:20px;height:20px;fill:white" viewBox="0 0 24 24"><path d="M17 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V7l-4-4zm-5 16c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm3-10H5V5h10v4z"/></svg>
+          <svg viewBox="0 0 24 24"><path d="M17 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V7l-4-4zm-5 16c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm3-10H5V5h10v4z"/></svg>
         </button>
       </div>
 
       <label><b>選擇星期一起始日期：</b></label>
-      <input type="date" id="menu-start-date" onchange="validateMonday(this)">
+      <!-- 修正 1: 加上 touchstart / click 手動觸發 showPicker()，確保所有 iOS/Android 均能一點即跳出日曆 -->
+      <input type="date" id="menu-start-date" onchange="validateMonday(this)" onclick="try{this.showPicker()}catch(e){}">
 
       <div id="days-container"></div>
     </div>
@@ -359,7 +380,6 @@
   </div>
 
   <!-- Modals -->
-  <!-- 1. 新增/修改菜式 Modal -->
   <div id="dish-modal" class="modal">
     <div class="card" style="width:100%; max-width:350px;">
       <h3 id="dish-modal-title">新增菜式</h3>
@@ -378,7 +398,6 @@
     </div>
   </div>
 
-  <!-- 2. 選擇菜式點選 Modal -->
   <div id="select-dish-modal" class="modal">
     <div class="card" style="width:100%; max-width:350px; max-height:80vh; overflow-y:auto;">
       <h3>選擇菜式 (一點即選)</h3>
@@ -387,7 +406,6 @@
     </div>
   </div>
 
-  <!-- 3. 頭像裁剪 Modal -->
   <div id="crop-modal" class="modal">
     <h3 style="color:white;">調整頭像位置及大小</h3>
     <div class="crop-container" id="crop-container">
@@ -403,7 +421,7 @@
     </div>
   </div>
 
-  <!-- PDF Output Printable Template (Hidden) -->
+  <!-- PDF Printable Template -->
   <div id="pdf-template">
     <div class="pdf-page">
       <div class="pdf-header">每週菜單 / Menu Mingguan</div>
@@ -412,7 +430,7 @@
     </div>
   </div>
 
-  <!-- Navigation Tab Bar -->
+  <!-- Tab Bar Navigation -->
   <nav class="tab-bar">
     <div class="tab-item active" onclick="switchView('menu', this)">
       <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h14v14zM7 10h2v7H7zm4-3h2v10h-2zm4 6h2v4h-2z"/></svg>
@@ -433,7 +451,6 @@
   </nav>
 
   <script>
-    /* ---------------- 印尼文星期對照 ---------------- */
     const DAYS_MAP = [
       { zh: '星期一', id: 'Senin' },
       { zh: '星期二', id: 'Selasa' },
@@ -444,10 +461,8 @@
       { zh: '星期日', id: 'Minggu' }
     ];
 
-    /* ---------------- 預設數據 ---------------- */
     const DEFAULT_CATEGORIES = ['雞', '牛', '豬', '魚', '海鮮(魚除外)', '疏菜', '湯水', '西式', '罐頭', '其他'];
     
-    // 預設 5 款菜式（分佈在 3 個分類內）
     const DEFAULT_DISHES = [
       { id: '1', zh: '海南雞', idName: 'Nasi Ayam Hainan', cat: '雞', lastCooked: '' },
       { id: '2', zh: '咖喱牛肉', idName: 'Rendang Sapi', cat: '牛', lastCooked: '' },
@@ -456,14 +471,12 @@
       { id: '5', zh: '蒜蓉炒菜心', idName: 'Tumis Caisim Bawang Putih', cat: '疏菜', lastCooked: '' }
     ];
 
-    /* ---------------- App 狀態管理 ---------------- */
     let categories = JSON.parse(localStorage.getItem('menu_categories')) || DEFAULT_CATEGORIES;
     let dishes = JSON.parse(localStorage.getItem('menu_dishes')) || DEFAULT_DISHES;
     let savedMenus = JSON.parse(localStorage.getItem('menu_saved')) || [];
     let currentMenuData = { startDate: '', days: Array(7).fill(null).map(() => ({ dishes: [], dineIn: '', takeOut: '' })) };
     let activeSelectingDayIndex = null;
 
-    /* ---------------- 初始化 ---------------- */
     window.addEventListener('DOMContentLoaded', () => {
       initSettings();
       renderDaysStructure();
@@ -472,7 +485,6 @@
       renderCategorySettings();
     });
 
-    /* ---------------- 頁面切換 ---------------- */
     function switchView(viewName, element) {
       document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
       document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
@@ -480,11 +492,9 @@
       element.classList.add('active');
     }
 
-    /* ---------------- 日期驗證 (必須為星期一) ---------------- */
     function validateMonday(inputEl) {
       if (!inputEl.value) return;
-      const selected = new Date(inputEl.value);
-      // getDay(): 0 是 Sunday, 1 是 Monday
+      const selected = new Date(inputEl.value + 'T00:00:00');
       if (selected.getDay() !== 1) {
         alert("只可以選擇星期一作起始日！");
         inputEl.value = "";
@@ -502,7 +512,7 @@
       DAYS_MAP.forEach((dayObj, index) => {
         const dateSpan = document.getElementById(`day-date-${index}`);
         if (baseDateStr) {
-          const d = new Date(baseDateStr);
+          const d = new Date(baseDateStr + 'T00:00:00');
           d.setDate(d.getDate() + index);
           const dateFormatted = `${d.getMonth() + 1}月${d.getDate()}日`;
           dateSpan.innerText = `(${dateFormatted})`;
@@ -512,7 +522,6 @@
       });
     }
 
-    /* ---------------- 渲染 7 天菜單結構 ---------------- */
     function renderDaysStructure() {
       const container = document.getElementById('days-container');
       container.innerHTML = '';
@@ -553,7 +562,6 @@
       currentMenuData.days[dayIndex][type] = val;
     }
 
-    /* ---------------- 選擇菜式 Modal (一點即選) ---------------- */
     function openSelectDishModal(dayIndex) {
       activeSelectingDayIndex = dayIndex;
       const listContainer = document.getElementById('select-dish-list');
@@ -591,9 +599,8 @@
       if (activeSelectingDayIndex === null) return;
       currentMenuData.days[activeSelectingDayIndex].dishes.push(dish);
       
-      // 更新上一次烹飪日期 (紀錄為當天選取)
       if (currentMenuData.startDate) {
-        const d = new Date(currentMenuData.startDate);
+        const d = new Date(currentMenuData.startDate + 'T00:00:00');
         d.setDate(d.getDate() + activeSelectingDayIndex);
         dish.lastCooked = `${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}`;
         localStorage.setItem('menu_dishes', JSON.stringify(dishes));
@@ -623,7 +630,6 @@
       renderDayDishesUI(dayIndex);
     }
 
-    /* ---------------- 儲存每週菜單 (最高 10 張) ---------------- */
     function saveCurrentWeeklyMenu() {
       if (!currentMenuData.startDate) {
         alert("請先選擇星期一作起始日！");
@@ -653,7 +659,7 @@
       renderSavedMenus();
     }
 
-    /* ---------------- 我的菜單 View ---------------- */
+    /* 修正 2: 在「我的菜單」中顯示正確的白色 SVG 匯出 PDF 按鈕 */
     function renderSavedMenus() {
       document.getElementById('saved-count').innerText = savedMenus.length;
       const container = document.getElementById('saved-list');
@@ -670,9 +676,9 @@
         card.innerHTML = `
           <div style="display:flex; justify-content:space-between; align-items:center;">
             <b>星期一日期：${m.startDate}</b>
-            <div style="display:flex; gap:6px;">
+            <div style="display:flex; gap:6px; align-items:center;">
               <button class="btn btn-icon" title="匯出PDF" onclick="exportPDF(${idx})">
-                <svg style="width:18px;height:18px;fill:white" viewBox="0 0 24 24"><path d="M19 8h-4V3H9v5H5l7 7 7-7zm-4 8v2H9v-2h6z"/></svg>
+                <svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
               </button>
               <button class="btn" style="padding:4px 8px; font-size:0.8rem;" onclick="loadMenuForEdit(${idx})">修改</button>
               <button class="btn btn-danger" style="padding:4px 8px; font-size:0.8rem;" onclick="deleteSavedMenu(${idx})">刪除</button>
@@ -703,7 +709,6 @@
       }
     }
 
-    /* ---------------- 菜式庫 View ---------------- */
     function renderDishesView() {
       const container = document.getElementById('dish-categories-list');
       container.innerHTML = '';
@@ -766,11 +771,9 @@
       if (!zh) { alert("請輸入中文菜名！"); return; }
 
       if (id) {
-        // 修改
         const d = dishes.find(item => item.id === id);
         if (d) { d.zh = zh; d.idName = idName; d.cat = cat; }
       } else {
-        // 新增
         dishes.push({ id: Date.now().toString(), zh, idName, cat, lastCooked: '' });
       }
 
@@ -789,7 +792,6 @@
       }
     }
 
-    /* ---------------- 設定 View & 分類拖拉/重新分類 ---------------- */
     function renderCategorySettings() {
       const container = document.getElementById('settings-cat-list');
       container.innerHTML = '';
@@ -807,7 +809,6 @@
           </div>
         `;
 
-        // 簡單 Drag & Drop 排序
         item.ondragstart = (e) => e.dataTransfer.setData('text/plain', index);
         item.ondragover = (e) => e.preventDefault();
         item.ondrop = (e) => {
@@ -836,7 +837,6 @@
       if (cat === '其他') return;
       alert(`刪除分類「${cat}」時，分類內的所有菜式項目會自動移到「其他」分類！`);
       
-      // 自動轉移到「其他」
       dishes.forEach(d => { if (d.cat === cat) d.cat = '其他'; });
       categories = categories.filter(c => c !== cat);
 
@@ -850,7 +850,6 @@
       renderDishesView();
     }
 
-    /* ---------------- 樣式設定 (主題、字體大小、頭像) ---------------- */
     function toggleTheme(theme) {
       document.documentElement.setAttribute('data-theme', theme);
       localStorage.setItem('menu_theme', theme);
@@ -876,7 +875,6 @@
       }
     }
 
-    /* ---------------- 頭像裁切 (放大/縮小/任意選擇) ---------------- */
     let cropImgObj = null;
     let cropState = { scale: 1, x: 0, y: 0, isDragging: false, startX: 0, startY: 0 };
 
@@ -914,7 +912,6 @@
 
     window.addEventListener('mouseup', () => cropState.isDragging = false);
 
-    // 觸控支援 (Touch Events)
     cropContainer.addEventListener('touchstart', (e) => {
       if(e.touches.length === 1) {
         cropState.isDragging = true;
@@ -943,7 +940,6 @@
       canvas.height = 150;
       const ctx = canvas.getContext('2d');
 
-      // 簡化擷取至 Canvas
       const img = document.getElementById('crop-img');
       ctx.beginPath();
       ctx.arc(75, 75, 75, 0, Math.PI * 2);
@@ -956,22 +952,20 @@
       closeModal('crop-modal');
     }
 
-    /* ---------------- 匯出 PDF 功能 (雙語中/印, 大字體 A4 滿版) ---------------- */
     function exportPDF(savedMenuIndex) {
       const menu = savedMenus[savedMenuIndex];
       const pdfContent = document.getElementById('pdf-days-content');
       pdfContent.innerHTML = '';
 
-      // 計算日期範圍
-      const startDate = new Date(menu.startDate);
-      const endDate = new Date(menu.startDate);
+      const startDate = new Date(menu.startDate + 'T00:00:00');
+      const endDate = new Date(menu.startDate + 'T00:00:00');
       endDate.setDate(endDate.getDate() + 6);
 
       document.getElementById('pdf-date-subtitle').innerText = 
         `${startDate.getFullYear()}-${startDate.getMonth()+1}-${startDate.getDate()} s/d ${endDate.getFullYear()}-${endDate.getMonth()+1}-${endDate.getDate()}`;
 
       DAYS_MAP.forEach((dayObj, i) => {
-        const d = new Date(menu.startDate);
+        const d = new Date(menu.startDate + 'T00:00:00');
         d.setDate(d.getDate() + i);
         const dayData = menu.days[i];
 
@@ -1014,7 +1008,6 @@
       });
     }
 
-    /* ---------------- 通用 Modal 關閉 ---------------- */
     function closeModal(modalId) {
       document.getElementById(modalId).style.display = 'none';
     }
