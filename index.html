@@ -2,220 +2,125 @@
 <html lang="zh-HK">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
+<link rel="apple-touch-icon" href="icon.png">
+<link rel="icon" href="icon.png">
+<link rel="manifest" href="manifest.json">
 <title>每週菜單</title>
 <style>
-:root{--bg:#f8f7f4;--card:#ffffff;--text:#1a1a1a;--muted:#8a8a8a;--primary:#ff6b35;--border:#ece9e3;--radius:18px;--font:16px}
-.dark{--bg:#0a0a0a;--card:#181818;--text:#f5f5f5;--muted:#9a9a9a;--border:#2a2a2a}
-*{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"PingFang HK",sans-serif;font-size:var(--font);padding-bottom:110px;padding-top:env(safe-area-inset-top)}
-.header{position:sticky;top:0;z-index:10;background:var(--card);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:14px 18px;padding-top:calc(14px + env(safe-area-inset-top))}
-.avatar{width:42px;height:42px;border-radius:50%;background:#ddd;object-fit:cover;border:2px solid var(--primary)}
-.page{padding:16px;max-width:600px;margin:0 auto}
-.card{background:var(--card);border-radius:var(--radius);border:1px solid var(--border);padding:14px;margin-bottom:12px}
-.row{display:flex;gap:8px;align-items:center}
-.btn{border:none;border-radius:12px;padding:10px 14px;background:var(--primary);color:#fff;font-weight:600}
+:root{--bg:#f8f7f4;--card:#fff;--text:#1a1a1a;--muted:#8a8a8a;--primary:#ff6b35;--border:#ece9e3;--radius:18px;--font:16px}
+.dark{--bg:#0a0a0a;--card:#181818;--text:#f5f5f5;--border:#2a2a2a}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,PingFang HK,sans-serif;font-size:var(--font);padding-bottom:110px}
+.header{position:sticky;top:0;z-index:10;background:var(--card);border-bottom:1px solid var(--border);display:flex;justify-content:space-between;padding:14px 18px}
+.avatar{width:42px;height:42px;border-radius:50%;object-fit:cover;border:2px solid var(--primary)}
+.page{padding:16px;max-width:600px;margin:0 auto}.card{background:var(--card);border-radius:18px;border:1px solid var(--border);padding:14px;margin-bottom:12px}
+.row{display:flex;gap:8px;align-items:center}.btn{border:none;border-radius:12px;padding:10px 14px;background:var(--primary);color:#fff;font-weight:600}
 .btn-ghost{background:var(--bg);color:var(--text);border:1px solid var(--border);border-radius:12px;padding:10px 14px}
 .btn-icon{width:44px;height:44px;display:grid;place-items:center;font-size:22px;border-radius:12px;border:1px solid var(--border);background:var(--bg)}
 .btn-icon.big{width:52px;height:52px;font-size:26px}
-.cat-header{display:flex;justify-content:space-between;align-items:center;cursor:pointer;padding:6px 0}
-.dish{display:flex;flex-direction:column;padding:10px 0;border-top:1px dashed var(--border)}
-.dish-top{display:flex;justify-content:space-between;align-items:center}
+.cat-header{display:flex;justify-content:space-between;cursor:pointer;padding:6px 0}
+.dish{padding:10px 0;border-top:1px dashed var(--border)}.dish-top{display:flex;justify-content:space-between}
 .note{margin-top:6px;background:var(--bg);padding:8px;border-radius:8px;font-size:0.9em;white-space:pre-wrap}
 select,input,textarea{width:100%;padding:10px;border-radius:10px;border:1px solid var(--border);background:var(--bg);color:var(--text)}
 .bottom-nav{position:fixed;bottom:0;left:0;right:0;background:var(--card);border-top:1px solid var(--border);display:flex;justify-content:space-around;padding:8px 0 24px}
-.nav-item{flex:1;display:flex;flex-direction:column;align-items:center;font-size:11px;color:var(--muted);cursor:pointer}
-.nav-item.active{color:var(--primary)}
-.modal{position:fixed;inset:0;background:rgba(0,0,0,0.5);display:none;z-index:50;align-items:flex-end}
-.modal.open{display:flex}
+.nav-item{flex:1;display:flex;flex-direction:column;align-items:center;font-size:11px;color:var(--muted);cursor:pointer}.nav-item.active{color:var(--primary)}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;z-index:50;align-items:flex-end}.modal.open{display:flex}
 .modal-box{background:var(--card);width:100%;max-height:85vh;overflow:auto;border-radius:24px 24px 0 0;padding:16px}
-.tag{font-size:12px;color:var(--muted)}
-.last-cook{font-size:10px;color:var(--primary)}
+.tag{font-size:12px;color:var(--muted)}.last-cook{font-size:10px;color:var(--primary)}
+#pdfOverlay{position:fixed;inset:0;background:#fff;z-index:9999;overflow:auto;padding:20mm}
+@media print{#pdfOverlay.no-print{display:none} @page{size:A4;margin:20mm}}
 </style>
 </head>
 <body>
-<div class="header">
-<div class="row"><img id="hdrAvatar" class="avatar" src="icon.png" alt="avatar"><div><div style="font-weight:800">每週菜單</div><div class="tag">Mingguan Menu</div></div></div>
-<div class="row"><button class="btn-ghost btn-icon" onclick="toggleTheme()">🌓</button></div>
-</div>
+<div class="header"><div class="row"><img id="hdrAvatar" class="avatar" src="icon.png"><div><div style="font-weight:800">每週菜單</div><div class="tag">Mingguan Menu</div></div></div><button class="btn-ghost btn-icon" onclick="toggleTheme()">🌓</button></div>
 
 <div id="p-weekly" class="page">
-<div class="card row" style="justify-content:space-between">
-<input type="date" id="mondayPicker" style="flex:1">
-<button class="btn-icon big" onclick="saveWeekly()" title="儲存">💾</button>
-<button class="btn-icon big" onclick="exportPDF()" title="匯出PDF">📄</button>
-</div>
-<div class="row" style="margin-bottom:10px">
-<button class="btn-ghost" style="flex:1" onclick="toggleAllDays(true)">一鍵打開全部 Buka</button>
-<button class="btn-ghost" style="flex:1" onclick="toggleAllDays(false)">一鍵關閉全部 Tutup</button>
-</div>
+<div class="card row" style="justify-content:space-between"><input type="date" id="mondayPicker" style="flex:1"><button class="btn-icon big" onclick="saveWeekly()">💾</button><button class="btn-icon big" onclick="exportPDF()">📄</button></div>
+<div class="row" style="margin-bottom:10px"><button class="btn-ghost" style="flex:1" onclick="toggleAllDays(true)">一鍵打開全部</button><button class="btn-ghost" style="flex:1" onclick="toggleAllDays(false)">一鍵關閉全部</button></div>
 <div id="weekContainer"></div>
 </div>
 
 <div id="p-library" class="page" style="display:none">
-<div class="card">
-<div class="row"><button class="btn" onclick="openAddDish()">＋ 新增菜式</button><button class="btn-ghost" onclick="exportLibrary()">匯出</button><button class="btn-ghost" onclick="document.getElementById('importFile').click()">匯入</button><input type="file" id="importFile" style="display:none" accept=".json" onchange="importLibrary(event)"></div>
-<div class="row" style="margin-top:10px"><button class="btn-ghost" style="flex:1" onclick="toggleAllCats(true)">一鍵打開所有分類</button><button class="btn-ghost" style="flex:1" onclick="toggleAllCats(false)">一鍵關閉所有分類</button></div>
-</div>
-<div id="libContainer"></div>
-</div>
-
+<div class="card"><div class="row"><button class="btn" onclick="openAddDish()">＋新增</button><button class="btn-ghost" onclick="exportLibrary()">匯出</button><button class="btn-ghost" onclick="document.getElementById('importFile').click()">匯入</button><input type="file" id="importFile" style="display:none" onchange="importLibrary(event)"></div>
+<div class="row" style="margin-top:10px"><button class="btn-ghost" style="flex:1" onclick="toggleAllCats(true)">一鍵打開所有分類</button><button class="btn-ghost" style="flex:1" onclick="toggleAllCats(false)">一鍵關閉所有分類</button></div></div>
+<div id="libContainer"></div></div>
 <div id="p-mymenus" class="page" style="display:none"><div id="myMenuList"></div></div>
-
 <div id="p-settings" class="page" style="display:none">
-<div class="card"><h4>頭像 Avatar - 可放大縮小選擇</h4><input type="file" id="avatarFile" accept="image/*"><div style="margin-top:10px"><label>縮放 Zoom</label><input type="range" id="zoom" min="0.5" max="3" step="0.1" value="1"><canvas id="avatarCanvas" width="200" height="200" style="border-radius:50%;border:1px solid var(--border);display:block;margin-top:10px"></canvas></div><button class="btn" onclick="saveAvatar()" style="margin-top:10px">儲存頭像</button></div>
-<div class="card"><h4>分類管理 Kategori - 拖拉排序</h4><div id="catSettings"></div><div class="row" style="margin-top:10px"><input id="newCatName" placeholder="新增分類名稱"><button class="btn" onclick="addCategory()">新增</button></div><p class="tag">刪除分類時項目自動移到「其他 Lainnya」並通知</p></div>
-<div class="card"><h4>外觀 Tampilan</h4><div class="row"><span>深淺色 Dark/Light</span><button class="btn-ghost" onclick="toggleTheme()">切換</button></div><div style="margin-top:10px"><label>字體大小: <span id="fontVal">16</span>px</label><input type="range" min="12" max="22" value="16" oninput="setFontSize(this.value)"></div></div>
+<div class="card"><h4>頭像可縮放</h4><input type="file" id="avatarFile" accept="image/*"><input type="range" id="zoom" min="0.5" max="3" step="0.1" value="1"><canvas id="avatarCanvas" width="200" height="200" style="border-radius:50%;border:1px solid var(--border)"></canvas><button class="btn" onclick="saveAvatar()">儲存頭像</button></div>
+<div class="card"><h4>分類拖拉排序</h4><div id="catSettings"></div><div class="row"><input id="newCatName" placeholder="新增分類"><button class="btn" onclick="addCategory()">新增</button></div></div>
+<div class="card"><h4>外觀</h4><div class="row"><span>深淺色</span><button class="btn-ghost" onclick="toggleTheme()">切換</button></div><label>字體大小:<span id="fontVal">16</span>px</label><input type="range" min="12" max="22" value="16" oninput="setFontSize(this.value)" id="fontRange"></div>
 </div>
 
-<div class="bottom-nav">
-<div class="nav-item active" onclick="switchPage('weekly')"><span>📅</span>每週</div>
-<div class="nav-item" onclick="switchPage('library')"><span>📚</span>菜式庫</div>
-<div class="nav-item" onclick="switchPage('mymenus')"><span>🗂️</span>我的菜單</div>
-<div class="nav-item" onclick="switchPage('settings')"><span>⚙️</span>設定</div>
-</div>
+<div class="bottom-nav"><div class="nav-item active" onclick="switchPage('weekly')"><span>📅</span>每週</div><div class="nav-item" onclick="switchPage('library')"><span>📚</span>菜式庫</div><div class="nav-item" onclick="switchPage('mymenus')"><span>🗂️</span>我的菜單</div><div class="nav-item" onclick="switchPage('settings')"><span>⚙️</span>設定</div></div>
 
-<div class="modal" id="dishModal" onclick="if(event.target==this)closeDishModal()"><div class="modal-box"><h3>選擇菜色 Pilih Masakan - 一點即選</h3><div id="modalCats"></div></div></div>
-<div class="modal" id="addDishModal" onclick="if(event.target==this)closeAddDish()"><div class="modal-box">
-<h3>新增/修改菜式</h3>
-<input id="d_name" placeholder="菜式名稱 (中文)">
-<input id="d_id" placeholder="印尼文 Indonesian" style="margin-top:8px">
-<textarea id="d_note" placeholder="備註 / 烹調方法" style="margin-top:8px"></textarea>
-<select id="d_cat" style="margin-top:8px"></select>
-<button class="btn" style="margin-top:10px;width:100%" onclick="saveDish()">儲存</button>
-<input type="hidden" id="d_editId">
-</div></div>
+<div class="modal" id="dishModal" onclick="if(event.target==this)closeDishModal()"><div class="modal-box"><h3>選擇菜色 一點即選</h3><div id="modalCats"></div></div></div>
+<div class="modal" id="addDishModal"><div class="modal-box"><h3>新增/修改</h3><input id="d_name" placeholder="菜式名稱"><input id="d_id" placeholder="印尼文" style="margin-top:8px"><textarea id="d_note" placeholder="備註/烹調方法" style="margin-top:8px"></textarea><select id="d_cat" style="margin-top:8px"></select><button class="btn" style="width:100%;margin-top:10px" onclick="saveDish()">儲存</button><input type="hidden" id="d_editId"></div></div>
 
 <script>
+// *** 修正版 V2.1 ***
 const defaultCats=["雞 Ayam","牛 Sapi","豬 Babi","魚 Ikan","蔬菜 Sayur","湯水 Sup","西式 Barat","罐頭 Kaleng","其他 Lainnya"];
 let cats=JSON.parse(localStorage.getItem('cats')||'null')||defaultCats.slice();
 let dishes=JSON.parse(localStorage.getItem('dishes')||'null')||[
-{id:1,name:"豉油雞",indo:"Ayam Kecap",note:"1. 雞洗淨抹乾\n2. 豉油、糖、薑蔥煮滾\n3. 放雞慢火煮30分鐘，期間淋汁",cat:"雞 Ayam"},
-{id:2,name:"麻油雞",indo:"Ayam Minyak Wijen",note:"薑片爆香，雞件炒至金黃，加米酒、麻油、杞子燜煮20分鐘",cat:"雞 Ayam"},
-{id:3,name:"紅燒牛肉",indo:"Semur Sapi",note:"牛肉汆水，爆香洋蔥蒜，加入醬油、八角、桂皮燉1.5小時至腍",cat:"牛 Sapi"},
-{id:4,name:"蒸鯇魚",indo:"Ikan Gurame Kukus",note:"魚洗淨加薑蔥鹽，蒸8分鐘，倒掉魚水，淋豉油滾油加蔥絲",cat:"魚 Ikan"},
-{id:5,name:"番茄炒蛋",indo:"Tumis Tomat Telur",note:"蛋加鹽打勻先炒起，番茄炒軟加糖鹽，再回鍋蛋快速翻炒",cat:"蔬菜 Sayur"},
-];
+{id:1,name:"豉油雞",indo:"Ayam Kecap",note:"1.雞洗淨抹乾\n2.豉油糖薑蔥煮滾\n3.放雞慢火煮30分",cat:"雞 Ayam"},
+{id:2,name:"麻油雞",indo:"Ayam Minyak Wijen",note:"薑爆香雞炒金黃加米酒麻油燜20分",cat:"雞 Ayam"},
+{id:3,name:"紅燒牛肉",indo:"Semur Sapi",note:"牛肉汆水加醬油八角桂皮燉1.5小時",cat:"牛 Sapi"},
+{id:4,name:"蒸鯇魚",indo:"Ikan Kukus",note:"加薑蔥蒸8分淋豉油滾油",cat:"魚 Ikan"},
+{id:5,name:"番茄炒蛋",indo:"Tumis Tomat Telur",note:"蛋先炒起番茄炒軟回鍋",cat:"蔬菜 Sayur"}];
 let weeklyMenus=JSON.parse(localStorage.getItem('weeklyMenus')||'[]');
-let currentWeek={monday:null,days:[]};
-let lastCook={};
-let activeDayIndex=null;
-const weekMapCN=["一","二","三","四","五","六","日"];
-const weekMapID=["Senin","Selasa","Rabu","Kamis","Jumat","Sabtu","Minggu"];
-function init(){
- if(!localStorage.getItem('dishes')) localStorage.setItem('dishes',JSON.stringify(dishes));
- lastCook=JSON.parse(localStorage.getItem('lastCook')||'{}');
- loadAvatar();
- document.getElementById('mondayPicker').addEventListener('change',onMondayChange);
- let today=new Date(); let mon=getMonday(today); document.getElementById('mondayPicker').valueAsDate=mon;
- onMondayChange({target:{valueAsDate:mon}});
- renderLibrary(); renderSettings(); renderMyMenus();
-}
-function getMonday(d){ let date=new Date(d); let day=date.getDay(); let diff=date.getDate()-day+(day==0?-6:1); return new Date(date.setDate(diff)); }
-function formatDate(d){ if(typeof d==='string') return d; let y=d.getFullYear(), m=String(d.getMonth()+1).padStart(2,'0'), dd=String(d.getDate()).padStart(2,'0'); return `${y}-${m}-${dd}`; }
-function onMondayChange(e){
- let d=e.target.valueAsDate; if(!d) return;
- if(d.getDay()!==1){ alert("只可以選擇星期一作起始日\nHanya bisa memilih hari Senin sebagai awal"); let mon=getMonday(d); document.getElementById('mondayPicker').valueAsDate=mon; d=mon; }
- currentWeek.monday=d; currentWeek.days=[];
- for(let i=0;i<7;i++){ let day=new Date(d); day.setDate(d.getDate()+i); currentWeek.days.push({date:day, dishes:[], diners:0, takeaway:0, open:true}); }
- renderWeek();
-}
-function renderWeek(){
- let c=document.getElementById('weekContainer'); c.innerHTML='';
- currentWeek.days.forEach((dayObj, idx)=>{
-   let dateStr=formatDate(dayObj.date); let cn=`星期${weekMapCN[idx]}`, id=weekMapID[idx];
-   let html=`<div class="card"><div class="cat-header" onclick="let b=this.parentElement.querySelector('.day-body');b.style.display=b.style.display=='none'?'block':'none'"><b>${cn} ${dateStr}<br><span class="tag">${id} ${dateStr}</span></b><span>${dayObj.dishes.length}道菜</span></div>
-   <div class="day-body"><div class="row" style="margin:8px 0"><label>用餐</label><select onchange="currentWeek.days[${idx}].diners=parseInt(this.value)">${[...Array(10).keys()].map(n=>`<option ${dayObj.diners==n?'selected':''}>${n}</option>`).join('')}</select><label>外帶</label><select onchange="currentWeek.days[${idx}].takeaway=parseInt(this.value)">${[...Array(10).keys()].map(n=>`<option ${dayObj.takeaway==n?'selected':''}>${n}</option>`).join('')}</select></div>
-   <div>${dayObj.dishes.map((d,i)=>`<div class="dish"><div class="dish-top" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display=='none'?'block':'none'"><span><b>${d.name}</b> <span class="tag">${d.indo||''}</span></span><button class="btn-ghost" onclick="removeDishFromDay(${idx},${i});event.stopPropagation()">✕</button></div><div class="note" style="display:none">${d.note||''}</div></div>`).join('')||'<p class="tag">尚未選擇 Belum pilih</p>'}</div>
-   <button class="btn" style="width:100%;margin-top:8px" onclick="openDishModal(${idx})">選擇菜色 Pilih</button></div></div>`;
-   c.innerHTML+=html;
- });
-}
-function toggleAllDays(open){ document.querySelectorAll('.day-body').forEach(el=>el.style.display=open?'block':'none'); }
-function openDishModal(dayIdx){ activeDayIndex=dayIdx; document.getElementById('dishModal').classList.add('open'); renderModalCats(); }
-function closeDishModal(){ document.getElementById('dishModal').classList.remove('open'); }
-function renderModalCats(){
- let box=document.getElementById('modalCats'); box.innerHTML='';
- cats.forEach(cat=>{
-  let catDishes=dishes.filter(d=>d.cat===cat);
-  let html=`<div class="card"><div class="cat-header" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display=='none'?'block':'none'"><b>${cat}</b><span>▼</span></div><div>`;
-  catDishes.forEach(d=>{
-   let last=lastCook[d.id]?`上次: ${lastCook[d.id]} Terakhir: ${lastCook[d.id]}`:'';
-   html+=`<div class="dish" style="cursor:pointer" onclick="pickDish(${d.id})"><div class="dish-top"><span>${d.name} <span class="tag">${d.indo||''}</span></span><span class="last-cook">${last}</span></div></div>`;
-  });
-  html+=`</div></div>`;
-  box.innerHTML+=html;
- });
-}
-function pickDish(id){ let d=dishes.find(x=>x.id===id); if(activeDayIndex===null) return; currentWeek.days[activeDayIndex].dishes.push({...d}); lastCook[id]=formatDate(new Date()); localStorage.setItem('lastCook',JSON.stringify(lastCook)); renderWeek(); closeDishModal(); }
-function removeDishFromDay(dayIdx,dishIdx){ currentWeek.days[dayIdx].dishes.splice(dishIdx,1); renderWeek(); }
-function toggleAllCats(open){ document.querySelectorAll('#libContainer.cat-body').forEach(el=>el.style.display=open?'block':'none'); }
-function renderLibrary(){
- let c=document.getElementById('libContainer'); c.innerHTML=''; let sel=document.getElementById('d_cat'); if(sel){ sel.innerHTML=cats.map(cat=>`<option>${cat}</option>`).join(''); }
- cats.forEach(cat=>{
-  let catDishes=dishes.filter(d=>d.cat===cat);
-  let html=`<div class="card"><div class="cat-header" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display=='none'?'block':'none'"><b>${cat} (${catDishes.length})</b><span>▼</span></div><div class="cat-body">`;
-  catDishes.forEach(d=>{
-   html+=`<div class="dish"><div class="dish-top" onclick="this.parentElement.querySelector('.note').style.display=this.parentElement.querySelector('.note').style.display=='none'?'block':'none'"><span><b>${d.name}</b> <span class="tag">${d.indo||''}</span></span><span class="row"><button class="btn-ghost" onclick="editDish(${d.id});event.stopPropagation()">✏️</button><button class="btn-ghost" onclick="deleteDish(${d.id});event.stopPropagation()">🗑️</button></span></div><div class="note" style="display:none">${d.note||''}</div><div class="row" style="margin-top:4px"><select onchange="reCat(${d.id},this.value)" style="font-size:12px">${cats.map(cc=>`<option ${cc===d.cat?'selected':''}>${cc}</option>`).join('')}</select></div></div>`;
-  });
-  html+=`</div></div>`;
-  c.innerHTML+=html;
- });
-}
-function openAddDish(){ document.getElementById('addDishModal').classList.add('open'); document.getElementById('d_editId').value=''; document.getElementById('d_name').value=''; document.getElementById('d_id').value=''; document.getElementById('d_note').value=''; }
-function closeAddDish(){ document.getElementById('addDishModal').classList.remove('open'); }
-function saveDish(){
- let id=document.getElementById('d_editId').value; let name=document.getElementById('d_name').value.trim(); let indo=document.getElementById('d_id').value.trim(); let note=document.getElementById('d_note').value.trim(); let cat=document.getElementById('d_cat').value;
- if(!name){ alert('請輸入菜式名稱'); return; }
- if(id){ let d=dishes.find(x=>x.id==id); d.name=name; d.indo=indo; d.note=note; d.cat=cat; } else { dishes.push({id:Date.now(),name,indo,note,cat}); }
- localStorage.setItem('dishes',JSON.stringify(dishes)); renderLibrary(); closeAddDish();
-}
-function editDish(id){ let d=dishes.find(x=>x.id===id); openAddDish(); document.getElementById('d_editId').value=d.id; document.getElementById('d_name').value=d.name; document.getElementById('d_id').value=d.indo||''; document.getElementById('d_note').value=d.note||''; document.getElementById('d_cat').value=d.cat; }
-function deleteDish(id){ if(confirm('確定刪除?')){ dishes=dishes.filter(x=>x.id!==id); localStorage.setItem('dishes',JSON.stringify(dishes)); renderLibrary(); } }
-function reCat(id,newCat){ let d=dishes.find(x=>x.id===id); d.cat=newCat; localStorage.setItem('dishes',JSON.stringify(dishes)); renderLibrary(); }
-function exportLibrary(){ let blob=new Blob([JSON.stringify({cats,dishes},null,2)],{type:'application/json'}); let a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='菜式庫.json'; a.click(); }
-function importLibrary(e){ let f=e.target.files[0]; if(!f) return; let r=new FileReader(); r.onload=ev=>{ try{ let data=JSON.parse(ev.target.result); if(data.cats) cats=data.cats; if(data.dishes) dishes=data.dishes; localStorage.setItem('cats',JSON.stringify(cats)); localStorage.setItem('dishes',JSON.stringify(dishes)); renderLibrary(); renderSettings(); alert('匯入成功'); }catch{ alert('檔案格式錯誤'); } }; r.readAsText(f); }
-function saveWeekly(){
- if(!currentWeek.monday){ alert('請選擇星期一'); return; }
- if(weeklyMenus.length>=10 &&!weeklyMenus.find(m=>m.monday===formatDate(currentWeek.monday))){ alert('最多儲存10張每週菜單 Maks 10 menu'); return; }
- let fname=formatDate(currentWeek.monday); let existing=weeklyMenus.findIndex(m=>m.monday===fname);
- if(existing>=0){ let choice=confirm('菜單已存在，按確定取代，按取消另擇日期\nMenu sudah ada, OK=ganti, Cancel=pilih tanggal lain'); if(!choice){ let newDate=prompt('請輸入新的星期一日期 YYYY-MM-DD\nMasukkan tanggal Senin baru'); if(!newDate) return; let nd=new Date(newDate); if(isNaN(nd)|| nd.getDay()!==1){ alert('只可以選擇星期一作起始日'); return; } fname=formatDate(nd); currentWeek.monday=nd; } else { weeklyMenus.splice(existing,1); } }
- let toSave={monday:fname, days:currentWeek.days.map(d=>({date:formatDate(d.date),dishes:d.dishes,diners:d.diners,takeaway:d.takeaway}))};
- let idx=weeklyMenus.findIndex(m=>m.monday===fname); if(idx>=0) weeklyMenus[idx]=toSave; else weeklyMenus.push(toSave);
- localStorage.setItem('weeklyMenus',JSON.stringify(weeklyMenus)); renderMyMenus(); alert('已儲存到我的菜單: '+fname);
-}
-function renderMyMenus(){
- let c=document.getElementById('myMenuList'); if(!c) return; c.innerHTML=weeklyMenus.map((m,idx)=>`<div class="card"><div class="cat-header" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display=='none'?'block':'none'"><b>${m.monday} (星期一 Senin)</b><span>▼</span></div><div>${m.days.map((d,i)=>`<div style="border-top:1px dashed var(--border);padding:6px 0"><b>星期${weekMapCN[i]} ${weekMapID[i]} ${d.date} - 用餐${d.diners} 外帶${d.takeaway}</b>${d.dishes.map(dd=>`<div class="dish"><div class="dish-top" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display=='none'?'block':'none'"><span>${dd.name} <span class="tag">${dd.indo||''}</span></span></div><div class="note" style="display:none">${dd.note||''}</div></div>`).join('')}</div>`).join('')}<div class="row" style="margin-top:10px"><button class="btn-ghost" onclick="loadMenu(${idx})">修改 Edit</button><button class="btn-ghost" onclick="deleteMenu(${idx})">刪除 Hapus</button><button class="btn-icon big" onclick="exportPDFSingle(${idx})">📄</button></div></div></div>`).join('')||'<p class="tag">暫無菜單</p>';
-}
-function loadMenu(idx){ let m=weeklyMenus[idx]; document.getElementById('mondayPicker').value=m.monday; let mon=new Date(m.monday); currentWeek.monday=mon; currentWeek.days=m.days.map((d,i)=>{ let day=new Date(d.date); return {date:day,dishes:d.dishes,diners:d.diners,takeaway:d.takeaway,open:true}; }); switchPage('weekly'); renderWeek(); }
-function deleteMenu(idx){ if(confirm('確定刪除此菜單?')){ weeklyMenus.splice(idx,1); localStorage.setItem('weeklyMenus',JSON.stringify(weeklyMenus)); renderMyMenus(); } }
-function exportPDF(){ exportPDFCurrent(); }
-function exportPDFCurrent(){
- let w=window.open('','_blank'); if(!w) return;
- let html=`<html><head><meta charset="utf-8"><style>@page{size:A4;margin:12mm}body{font-family:-apple-system,sans-serif;font-size:20px;line-height:1.4}h1{font-size:28px;text-align:center}.day{border:2px solid #000;padding:12px;margin-bottom:12px;page-break-inside:avoid}.dish{border-bottom:1px dashed #999;padding:6px 0;font-size:18px}</style></head><body><h1>每週菜單 Mingguan Menu - ${formatDate(currentWeek.monday)} 星期一 Senin</h1>`;
- currentWeek.days.forEach((d,i)=>{ html+=`<div class="day"><b>星期${weekMapCN[i]} ${weekMapID[i]} - ${formatDate(d.date)} - 用餐人數 Jumlah Makan: ${d.diners} 外帶人數 Bawa Pulang: ${d.takeaway}</b>${d.dishes.map(dd=>`<div class="dish">${dd.name} / ${dd.indo||''}<br><small>備註 Catatan: ${dd.note||''}</small></div>`).join('')}</div>`; });
- html+=`</body></html>`; w.document.write(html); w.document.close(); w.print();
-}
-function exportPDFSingle(idx){ let m=weeklyMenus[idx]; let w=window.open('','_blank'); let html=`<html><head><meta charset="utf-8"><style>@page{size:A4;margin:12mm}body{font-family:sans-serif;font-size:20px}.day{border:2px solid #000;padding:12px;margin-bottom:12px}</style></head><body><h1>每週菜單 Mingguan Menu - ${m.monday} 星期一 Senin</h1>`;
- m.days.forEach((d,i)=>{ html+=`<div class="day"><b>星期${weekMapCN[i]} ${weekMapID[i]} - ${d.date} - 用餐 ${d.diners} 外帶 ${d.takeaway}</b>${d.dishes.map(dd=>`<div>${dd.name} / ${dd.indo||''}<br><small>備註: ${dd.note||''}</small></div>`).join('')}</div>`; });
- html+=`</body></html>`; w.document.write(html); w.document.close(); w.print();
-}
-function switchPage(p){ document.querySelectorAll('.page').forEach(el=>el.style.display='none'); document.getElementById('p-'+p).style.display='block'; document.querySelectorAll('.nav-item').forEach((el,i)=>{ el.classList.remove('active'); if(['weekly','library','mymenus','settings'][i]===p) el.classList.add('active'); }); if(p==='library') renderLibrary(); if(p==='mymenus') renderMyMenus(); if(p==='settings') renderSettings(); }
-function renderSettings(){
- let c=document.getElementById('catSettings'); if(!c) return; c.innerHTML=cats.map((cat,i)=>`<div class="row card" draggable="true" ondragstart="dragStart(event,${i})" ondragover="event.preventDefault()" ondrop="drop(event,${i})" style="cursor:grab"><span>${cat}</span><button class="btn-ghost" onclick="deleteCat(${i})">刪除</button></div>`).join('');
-}
-let dragIdx=null; function dragStart(e,i){ dragIdx=i; } function drop(e,i){ if(dragIdx===null) return; let item=cats.splice(dragIdx,1)[0]; cats.splice(i,0,item); localStorage.setItem('cats',JSON.stringify(cats)); renderSettings(); renderLibrary(); dragIdx=null; }
-function addCategory(){ let name=document.getElementById('newCatName').value.trim(); if(!name) return; cats.push(name); localStorage.setItem('cats',JSON.stringify(cats)); document.getElementById('newCatName').value=''; renderSettings(); renderLibrary(); }
-function deleteCat(i){ let cat=cats[i]; if(!confirm(`刪除分類「${cat}」? 內所有項目會移到「其他 Lainnya」`)) return; dishes.forEach(d=>{ if(d.cat===cat) d.cat='其他 Lainnya'; }); if(!cats.includes('其他 Lainnya')) cats.push('其他 Lainnya'); cats.splice(i,1); localStorage.setItem('cats',JSON.stringify(cats)); localStorage.setItem('dishes',JSON.stringify(dishes)); renderSettings(); renderLibrary(); alert('已移到「其他」'); }
-function toggleTheme(){ document.body.classList.toggle('dark'); localStorage.setItem('theme',document.body.classList.contains('dark')?'dark':'light'); }
-function setFontSize(v){ document.documentElement.style.setProperty('--font',v+'px'); document.getElementById('fontVal').innerText=v; localStorage.setItem('fontSize',v); }
-function loadAvatar(){ let av=localStorage.getItem('avatar'); if(av) document.getElementById('hdrAvatar').src=av; let th=localStorage.getItem('theme'); if(th==='dark') document.body.classList.add('dark'); let fs=localStorage.getItem('fontSize'); if(fs){ setFontSize(fs); } }
-let img=new Image(), scale=1, offX=0, offY=0;
-document.getElementById('avatarFile')?.addEventListener('change',e=>{ let f=e.target.files[0]; if(!f) return; let r=new FileReader(); r.onload=ev=>{ img.src=ev.target.result; img.onload=drawAvatar; }; r.readAsDataURL(f); });
-document.getElementById('zoom')?.addEventListener('input',e=>{ scale=parseFloat(e.target.value); drawAvatar(); });
-function drawAvatar(){ let c=document.getElementById('avatarCanvas'); let ctx=c.getContext('2d'); ctx.clearRect(0,0,200,200); let w=img.width*scale, h=img.height*scale; ctx.drawImage(img, (200-w)/2+offX, (200-h)/2+offY, w, h); }
-function saveAvatar(){ let c=document.getElementById('avatarCanvas'); let data=c.toDataURL(); localStorage.setItem('avatar',data); document.getElementById('hdrAvatar').src=data; alert('頭像已儲存'); }
+let currentWeek={monday:null,days:[]};let lastCook={};let activeDayIndex=null;
+const weekMapCN=["一","二","三","四","五","六","日"],weekMapID=["Senin","Selasa","Rabu","Kamis","Jumat","Sabtu","Minggu"];
+function init(){lastCook=JSON.parse(localStorage.getItem('lastCook')||'{}');loadAvatar();
+document.getElementById('mondayPicker').addEventListener('change',onMondayChange);
+let mon=getMonday(new Date());document.getElementById('mondayPicker').valueAsDate=mon;onMondayChange({target:{valueAsDate:mon}});
+renderLibrary();renderSettings();renderMyMenus();}
+function getMonday(d){let date=new Date(d),day=date.getDay(),diff=date.getDate()-day+(day==0?-6:1);return new Date(date.setDate(diff));}
+function formatDate(d){if(typeof d==='string')return d;let y=d.getFullYear(),m=String(d.getMonth()+1).padStart(2,'0'),dd=String(d.getDate()).padStart(2,'0');return `${y}-${m}-${dd}`;}
+function onMondayChange(e){let d=e.target.valueAsDate;if(!d)return;if(d.getDay()!==1){alert("只可以選擇星期一作起始日");let mon=getMonday(d);document.getElementById('mondayPicker').valueAsDate=mon;d=mon;}currentWeek.monday=d;currentWeek.days=[];for(let i=0;i<7;i++){let day=new Date(d);day.setDate(d.getDate()+i);currentWeek.days.push({date:day,dishes:[],diners:0,takeaway:0});}renderWeek();}
+function renderWeek(){let c=document.getElementById('weekContainer');c.innerHTML='';currentWeek.days.forEach((dayObj,idx)=>{let dateStr=formatDate(dayObj.date);c.innerHTML+=`<div class="card"><div class="cat-header" onclick="let b=this.parentElement.querySelector('.day-body');b.style.display=b.style.display=='none'?'block':'none'"><b>星期${weekMapCN[idx]} ${dateStr}<br><span class="tag">${weekMapID[idx]} ${dateStr}</span></b><span>${dayObj.dishes.length}道</span></div><div class="day-body"><div class="row" style="margin:8px 0"><label>用餐</label><select onchange="currentWeek.days[${idx}].diners=+this.value">${[...Array(10).keys()].map(n=>`<option ${dayObj.diners==n?'selected':''}>${n}</option>`).join('')}</select><label>外帶</label><select onchange="currentWeek.days[${idx}].takeaway=+this.value">${[...Array(10).keys()].map(n=>`<option ${dayObj.takeaway==n?'selected':''}>${n}</option>`).join('')}</select></div><div>${dayObj.dishes.map((d,i)=>`<div class="dish"><div class="dish-top" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display=='none'?'block':'none'"><span><b>${d.name}</b> <span class="tag">${d.indo||''}</span></span><button class="btn-ghost" onclick="removeDishFromDay(${idx},${i});event.stopPropagation()">✕</button></div><div class="note" style="display:none">${d.note||''}</div></div>`).join('')||'<p class="tag">尚未選擇</p>'}</div><button class="btn" style="width:100%;margin-top:8px" onclick="openDishModal(${idx})">選擇菜色</button></div></div>`;});}
+function toggleAllDays(open){document.querySelectorAll('.day-body').forEach(el=>el.style.display=open?'block':'none');}
+function openDishModal(i){activeDayIndex=i;document.getElementById('dishModal').classList.add('open');renderModalCats();}
+function closeDishModal(){document.getElementById('dishModal').classList.remove('open');}
+function renderModalCats(){let box=document.getElementById('modalCats');box.innerHTML='';cats.forEach(cat=>{let catDishes=dishes.filter(d=>d.cat===cat);let h=`<div class="card"><div class="cat-header" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display=='none'?'block':'none'"><b>${cat}</b><span>▼</span></div><div>`;catDishes.forEach(d=>{h+=`<div class="dish" style="cursor:pointer" onclick="pickDish(${d.id})"><div class="dish-top"><span>${d.name} <span class="tag">${d.indo||''}</span></span><span class="last-cook">${lastCook[d.id]?'上次:'+lastCook[d.id]:''}</span></div></div>`;});h+=`</div></div>`;box.innerHTML+=h;});}
+function pickDish(id){let d=dishes.find(x=>x.id===id);if(activeDayIndex===null)return;currentWeek.days[activeDayIndex].dishes.push({...d});lastCook[id]=formatDate(new Date());localStorage.setItem('lastCook',JSON.stringify(lastCook));renderWeek();closeDishModal();}
+function removeDishFromDay(a,b){currentWeek.days[a].dishes.splice(b,1);renderWeek();}
+// 修正3: 正確selector
+function toggleAllCats(open){document.querySelectorAll('#libContainer.cat-body').forEach(el=>el.style.display=open?'block':'none');}
+function renderLibrary(){let c=document.getElementById('libContainer');c.innerHTML='';let sel=document.getElementById('d_cat');if(sel)sel.innerHTML=cats.map(cat=>`<option>${cat}</option>`).join('');cats.forEach(cat=>{let cd=dishes.filter(d=>d.cat===cat);let h=`<div class="card"><div class="cat-header" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display=='none'?'block':'none'"><b>${cat} (${cd.length})</b><span>▼</span></div><div class="cat-body">`;cd.forEach(d=>{h+=`<div class="dish"><div class="dish-top" onclick="this.parentElement.querySelector('.note').style.display=this.parentElement.querySelector('.note').style.display=='none'?'block':'none'"><span><b>${d.name}</b> <span class="tag">${d.indo||''}</span></span><span class="row"><button class="btn-ghost" onclick="editDish(${d.id});event.stopPropagation()">✏️</button><button class="btn-ghost" onclick="deleteDish(${d.id});event.stopPropagation()">🗑️</button></span></div><div class="note" style="display:none">${d.note||''}</div><select onchange="reCat(${d.id},this.value)" style="font-size:12px;margin-top:4px">${cats.map(cc=>`<option ${cc===d.cat?'selected':''}>${cc}</option>`).join('')}</select></div>`;});h+=`</div></div>`;c.innerHTML+=h;});}
+function openAddDish(){document.getElementById('addDishModal').classList.add('open');document.getElementById('d_editId').value='';document.getElementById('d_name').value='';document.getElementById('d_id').value='';document.getElementById('d_note').value='';}
+function closeAddDish(){document.getElementById('addDishModal').classList.remove('open');}
+function saveDish(){let id=document.getElementById('d_editId').value,name=document.getElementById('d_name').value.trim(),indo=document.getElementById('d_id').value.trim(),note=document.getElementById('d_note').value.trim(),cat=document.getElementById('d_cat').value;if(!name)return alert('請輸入菜式名稱');if(id){let d=dishes.find(x=>x.id==id);d.name=name;d.indo=indo;d.note=note;d.cat=cat;}else dishes.push({id:Date.now(),name,indo,note,cat});localStorage.setItem('dishes',JSON.stringify(dishes));renderLibrary();closeAddDish();}
+function editDish(id){let d=dishes.find(x=>x.id===id);openAddDish();document.getElementById('d_editId').value=d.id;document.getElementById('d_name').value=d.name;document.getElementById('d_id').value=d.indo||'';document.getElementById('d_note').value=d.note||'';document.getElementById('d_cat').value=d.cat;}
+function deleteDish(id){if(confirm('確定刪除?')){dishes=dishes.filter(x=>x.id!==id);localStorage.setItem('dishes',JSON.stringify(dishes));renderLibrary();}}
+function reCat(id,nc){let d=dishes.find(x=>x.id===id);d.cat=nc;localStorage.setItem('dishes',JSON.stringify(dishes));renderLibrary();}
+function exportLibrary(){let b=new Blob([JSON.stringify({cats,dishes},null,2)],{type:'application/json'});let a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='菜式庫.json';a.click();}
+function importLibrary(e){let f=e.target.files[0];if(!f)return;let r=new FileReader();r.onload=ev=>{try{let data=JSON.parse(ev.target.result);if(data.cats)cats=data.cats;if(data.dishes)dishes=data.dishes;localStorage.setItem('cats',JSON.stringify(cats));localStorage.setItem('dishes',JSON.stringify(dishes));renderLibrary();renderSettings();alert('匯入成功');}catch{alert('格式錯誤');}};r.readAsText(f);}
+function saveWeekly(){if(!currentWeek.monday)return alert('請選星期一');if(weeklyMenus.length>=10&&!weeklyMenus.find(m=>m.monday===formatDate(currentWeek.monday)))return alert('最多10張');let fname=formatDate(currentWeek.monday);let ex=weeklyMenus.findIndex(m=>m.monday===fname);if(ex>=0){let c=confirm('菜單已存在，確定取代？');if(!c){let nd=prompt('輸入新星期一 YYYY-MM-DD');if(!nd)return;let d=new Date(nd);if(d.getDay()!==1)return alert('只可以選星期一');fname=formatDate(d);currentWeek.monday=d;}else weeklyMenus.splice(ex,1);}let toSave={monday:fname,days:currentWeek.days.map(d=>({date:formatDate(d.date),dishes:d.dishes,diners:d.diners,takeaway:d.takeaway}))};let idx=weeklyMenus.findIndex(m=>m.monday===fname);if(idx>=0)weeklyMenus[idx]=toSave;else weeklyMenus.push(toSave);localStorage.setItem('weeklyMenus',JSON.stringify(weeklyMenus));renderMyMenus();alert('已儲存:'+fname);}
+function renderMyMenus(){let c=document.getElementById('myMenuList');c.innerHTML=weeklyMenus.map((m,i)=>`<div class="card"><div class="cat-header" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display=='none'?'block':'none'"><b>${m.monday} 星期一 Senin</b><span>▼</span></div><div>${m.days.map((d,di)=>`<div style="border-top:1px dashed var(--border);padding:6px 0"><b>星期${weekMapCN[di]} ${weekMapID[di]} ${d.date} 用餐${d.diners}外帶${d.takeaway}</b>${d.dishes.map(dd=>`<div class="dish"><div class="dish-top" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display=='none'?'block':'none'"><span>${dd.name} ${dd.indo||''}</span></div><div class="note" style="display:none">${dd.note||''}</div></div>`).join('')}</div>`).join('')}<div class="row"><button class="btn-ghost" onclick="loadMenu(${i})">修改</button><button class="btn-ghost" onclick="deleteMenu(${i})">刪除</button><button class="btn-icon big" onclick="exportPDFSingle(${i})">📄</button></div></div></div>`).join('')||'<p class="tag">暫無</p>';}
+function loadMenu(idx){let m=weeklyMenus[idx];document.getElementById('mondayPicker').value=m.monday;let mon=new Date(m.monday);currentWeek.monday=mon;currentWeek.days=m.days.map(d=>({date:new Date(d.date),dishes:d.dishes,diners:d.diners,takeaway:d.takeaway}));switchPage('weekly');renderWeek();}
+function deleteMenu(idx){if(confirm('確定刪除?')){weeklyMenus.splice(idx,1);localStorage.setItem('weeklyMenus',JSON.stringify(weeklyMenus));renderMyMenus();}}
+
+// 修正1+2: PDF內建關閉按鈕，邊界20mm
+function createPDFOverlay(inner){let old=document.getElementById('pdfOverlay');if(old)old.remove();let div=document.createElement('div');div.id='pdfOverlay';div.innerHTML=`<div class="no-print row" style="position:sticky;top:0;background:white;padding:12px;border-bottom:1px solid #ccc;z-index:10"><button class="btn" onclick="document.getElementById('pdfOverlay').remove()">✕ 關閉 Tutup</button><button class="btn" onclick="window.print()">🖨️ 列印 Cetak</button></div>${inner}`;document.body.appendChild(div);}
+function exportPDF(){let h=`<h1 style="text-align:center">每週菜單 Mingguan Menu - ${formatDate(currentWeek.monday)} 星期一 Senin</h1>`;currentWeek.days.forEach((d,i)=>{h+=`<div style="border:2px solid #000;padding:14px;margin-bottom:14px"><b>星期${weekMapCN[i]} ${weekMapID[i]} - ${formatDate(d.date)} 用餐:${d.diners} 外帶:${d.takeaway}</b>${d.dishes.map(dd=>`<div style="border-bottom:1px dashed #999;padding:6px 0">${dd.name} / ${dd.indo||''}<br><small>備註:${dd.note||''}</small></div>`).join('')}</div>`;});createPDFOverlay(h);}
+function exportPDFSingle(idx){let m=weeklyMenus[idx];let h=`<h1>每週菜單 Mingguan Menu - ${m.monday} 星期一 Senin</h1>`;m.days.forEach((d,i)=>{h+=`<div style="border:2px solid #000;padding:14px;margin-bottom:14px"><b>星期${weekMapCN[i]} ${weekMapID[i]} - ${d.date} 用餐${d.diners}外帶${d.takeaway}</b>${d.dishes.map(dd=>`<div>${dd.name} / ${dd.indo||''}<br><small>${dd.note||''}</small></div>`).join('')}</div>`;});createPDFOverlay(h);}
+
+function switchPage(p){document.querySelectorAll('.page').forEach(el=>el.style.display='none');document.getElementById('p-'+p).style.display='block';document.querySelectorAll('.nav-item').forEach((el,i)=>{el.classList.remove('active');if(['weekly','library','mymenus','settings'][i]===p)el.classList.add('active');});}
+function renderSettings(){let c=document.getElementById('catSettings');c.innerHTML=cats.map((cat,i)=>`<div class="row card" draggable="true" ondragstart="dragStart(event,${i})" ondragover="event.preventDefault()" ondrop="drop(event,${i})"><span>${cat}</span><button class="btn-ghost" onclick="deleteCat(${i})">刪除</button></div>`).join('');}
+let dragIdx=null;function dragStart(e,i){dragIdx=i;}function drop(e,i){if(dragIdx===null)return;let it=cats.splice(dragIdx,1)[0];cats.splice(i,0,item=cats.splice(i,0,it)[0]); // fix reorder
+cats=JSON.parse(localStorage.getItem('cats')||'null')||cats; // fallback
+// simple reorder
+let item=cats.splice(dragIdx,1)[0];cats.splice(i,0,item);localStorage.setItem('cats',JSON.stringify(cats));renderSettings();renderLibrary();dragIdx=null;}
+function addCategory(){let n=document.getElementById('newCatName').value.trim();if(!n)return;cats.push(n);localStorage.setItem('cats',JSON.stringify(cats));document.getElementById('newCatName').value='';renderSettings();renderLibrary();}
+function deleteCat(i){let cat=cats[i];if(!confirm(`刪除「${cat}」?會移到其他`))return;dishes.forEach(d=>{if(d.cat===cat)d.cat='其他 Lainnya';});if(!cats.includes('其他 Lainnya'))cats.push('其他 Lainnya');cats.splice(i,1);localStorage.setItem('cats',JSON.stringify(cats));localStorage.setItem('dishes',JSON.stringify(dishes));renderSettings();renderLibrary();}
+function toggleTheme(){document.body.classList.toggle('dark');localStorage.setItem('theme',document.body.classList.contains('dark')?'dark':'light');}
+// 修正4: 字體大小套用到全部
+function setFontSize(v){document.documentElement.style.setProperty('--font',v+'px');document.body.style.fontSize=v+'px';document.getElementById('fontVal').innerText=v;localStorage.setItem('fontSize',v);}
+function loadAvatar(){let av=localStorage.getItem('avatar');if(av)document.getElementById('hdrAvatar').src=av;let th=localStorage.getItem('theme');if(th==='dark')document.body.classList.add('dark');let fs=localStorage.getItem('fontSize');if(fs){setFontSize(fs);document.getElementById('fontRange').value=fs;}}
+let img=new Image(),scale=1;document.getElementById('avatarFile')?.addEventListener('change',e=>{let f=e.target.files[0];if(!f)return;let r=new FileReader();r.onload=ev=>{img.src=ev.target.result;img.onload=drawAvatar;};r.readAsDataURL(f);});
+document.getElementById('zoom')?.addEventListener('input',e=>{scale=+e.target.value;drawAvatar();});
+function drawAvatar(){let c=document.getElementById('avatarCanvas'),ctx=c.getContext('2d');ctx.clearRect(0,0,200,200);let w=img.width*scale,h=img.height*scale;ctx.drawImage(img,(200-w)/2,(200-h)/2,w,h);}
+function saveAvatar(){let c=document.getElementById('avatarCanvas');let d=c.toDataURL();localStorage.setItem('avatar',d);document.getElementById('hdrAvatar').src=d;alert('頭像已儲存');}
 init();
 </script>
 </body>
