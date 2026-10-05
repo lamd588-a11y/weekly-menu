@@ -1,0 +1,9 @@
+{
+  "name": "每週菜單",
+  "short_name": "每週菜單",
+  "display": "standalone",
+  "background_color": "#f8f7f4",
+  "theme_color": "#ff6b35",
+  "start_url": "./index.html",
+  "icons": [{"src":"icon.png","sizes":"512x512","type":"image/png"}]
+}
