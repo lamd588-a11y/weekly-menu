@@ -26,7 +26,7 @@
       --text-color: #2c3e50;
       --primary-color: #2196F3;
       --border-color: #e0e0e0;
-      --font-scale: 1.15;
+      --font-scale: 1.1;
       --base-font-size: 18px;
     }
 
@@ -114,7 +114,7 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      font-size: 0.85em;
+      font-size: 0.8em;
       font-weight: bold;
       color: #757575;
       cursor: pointer;
@@ -132,7 +132,7 @@
     /* Main Container */
     .container {
       padding: 16px;
-      max-width: 600px;
+      max-width: 500px; /* Scaled for iPhone 18 Pro Max width viewing */
       margin: 0 auto;
     }
 
@@ -331,7 +331,7 @@
       color: var(--text-color);
     }
 
-    /* Menu Control Bar Inline */
+    /* Menu Top Control Bar Inline */
     .menu-controls-inline {
       display: flex;
       align-items: center;
@@ -420,7 +420,7 @@
       </div>
 
       <div class="category-grid" id="category-grid">
-        <!-- Dynamic Grid -->
+        <!-- 3x3 Grid JS Dynamic -->
       </div>
 
       <div id="library-accordion-list">
@@ -436,7 +436,7 @@
 
     <!-- PAGE 2: 每週菜單 -->
     <div id="page-menu" class="page">
-      <!-- Inline Bar: Date, Save Icon, Export PDF Icon -->
+      <!-- Inline Bar: Select Date, Save Icon, Export PDF Icon -->
       <div class="menu-controls-inline">
         <input type="date" id="menu-start-date" onchange="handleDateChange(this)">
         <button class="btn" title="儲存每週菜單" onclick="saveCurrentWeeklyMenu()">💾</button>
@@ -480,7 +480,7 @@
       </div>
 
       <div class="form-group">
-        <label>自訂頭像 (選擇照片並裁切)</label>
+        <label>自訂頭像 (可選擇照片並裁切)</label>
         <input type="file" id="avatar-input" accept="image/*" onchange="loadAvatarImage(event)">
         <div id="crop-area" style="display:none; margin-top:10px;">
           <canvas id="avatar-crop-canvas"></canvas>
@@ -492,7 +492,7 @@
       </div>
 
       <div class="form-group">
-        <label>分類管理 (拖拽改變排序 / 編輯 / 刪除)</label>
+        <label>分類管理 (拖拖改變排序 / 編輯 / 刪除)</label>
         <div class="btn-bar">
           <button class="btn btn-small" onclick="addNewCategoryPrompt()">➕ 新增分類</button>
         </div>
@@ -568,7 +568,7 @@
     </div>
   </div>
 
-  <!-- PDF Print Output Template -->
+  <!-- PDF Print Output Canvas/HTML -->
   <div id="pdf-template"></div>
 
   <script>
@@ -597,7 +597,7 @@
     let dishes = JSON.parse(localStorage.getItem('wm_dishes')) || DEFAULT_DISHES;
     let mySavedMenus = JSON.parse(localStorage.getItem('wm_saved_menus')) || [];
 
-    // Current Weekly Menu State
+    // Current Active Menu State
     let currentWeeklyMenu = {
       startDate: getNextMonday(new Date()),
       days: Array.from({ length: 7 }, (_, i) => ({
@@ -610,7 +610,7 @@
 
     let selectedDayForAddingDish = null;
 
-    // Get Next Monday YYYY-MM-DD Helper
+    // Helper: Get Next Monday YYYY-MM-DD
     function getNextMonday(d) {
       let date = new Date(d);
       let day = date.getDay();
@@ -627,13 +627,14 @@
 
     // Init App
     document.addEventListener('DOMContentLoaded', () => {
+      initCategories();
       renderLibraryGrid();
       renderLibraryAccordion();
       initMenuPage();
       renderSavedMenus();
       renderSettingsCategoryList();
       
-      // Theme & font scale loading
+      // Load saved theme & font scale
       if(localStorage.getItem('wm_theme') === 'dark') document.body.setAttribute('data-theme', 'dark');
       if(localStorage.getItem('wm_font_scale')) {
         document.documentElement.style.setProperty('--font-scale', localStorage.getItem('wm_font_scale'));
@@ -659,7 +660,7 @@
       if(navEl) navEl.classList.add('active');
     }
 
-    /* --- PAGE 1: 菜式庫 --- */
+    /* --- PAGE 1: 菜式庫 logic --- */
     function renderLibraryGrid() {
       const grid = document.getElementById('category-grid');
       grid.innerHTML = categories.map(cat => `
@@ -792,33 +793,15 @@
       }
     }
 
-    /* JSON Export/Import (Blob 修復版) */
+    /* JSON Export/Import */
     function exportJSON() {
-      try {
-        const dataObj = {
-          categories: categories || [],
-          dishes: dishes || [],
-          mySavedMenus: mySavedMenus || []
-        };
-        
-        const jsonString = JSON.stringify(dataObj, null, 2);
-        const blob = new Blob([jsonString], { type: 'application/json;charset=utf-8;' });
-        const url = URL.createObjectURL(blob);
-        
-        const downloadAnchor = document.createElement('a');
-        downloadAnchor.href = url;
-        downloadAnchor.download = `weekly_menu_backup_${new Date().toISOString().split('T')[0]}.json`;
-        document.body.appendChild(downloadAnchor);
-        downloadAnchor.click();
-        
-        setTimeout(() => {
-          document.body.removeChild(downloadAnchor);
-          URL.revokeObjectURL(url);
-        }, 100);
-
-      } catch (err) {
-        alert('匯出失敗：' + err.message);
-      }
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify({ categories, dishes, mySavedMenus }));
+      const downloadAnchor = document.createElement('a');
+      downloadAnchor.setAttribute("href", dataStr);
+      downloadAnchor.setAttribute("download", "weekly_menu_backup.json");
+      document.body.appendChild(downloadAnchor);
+      downloadAnchor.click();
+      downloadAnchor.remove();
     }
 
     function importJSON(e) {
@@ -840,7 +823,7 @@
       reader.readAsText(file);
     }
 
-    /* --- PAGE 2: 每週菜單 --- */
+    /* --- PAGE 2: 每週菜單 logic --- */
     const WEEKDAYS_ZH = ['星期一', '星期二', '星期三', '星期四', '星期五', '星期六', '星期日'];
     const WEEKDAYS_INDO = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu'];
 
@@ -1007,7 +990,7 @@
       alert(`菜單【${currentWeeklyMenu.startDate}】已成功儲存！`);
     }
 
-    /* --- PAGE 3: 我的菜單 --- */
+    /* --- PAGE 3: 我的菜單 logic --- */
     function renderSavedMenus() {
       const container = document.getElementById('my-menus-list');
       if(mySavedMenus.length === 0) {
@@ -1109,7 +1092,7 @@
       });
     }
 
-    /* --- PAGE 4: 設定 --- */
+    /* --- PAGE 4: 設定 logic --- */
     function toggleTheme() {
       if(document.body.getAttribute('data-theme') === 'dark') {
         document.body.removeAttribute('data-theme');
@@ -1125,7 +1108,7 @@
       localStorage.setItem('wm_font_scale', val);
     }
 
-    /* Category Management */
+    /* Category Reorder & Management */
     function renderSettingsCategoryList() {
       const container = document.getElementById('settings-category-list');
       container.innerHTML = categories.map((cat, idx) => `
@@ -1185,12 +1168,14 @@
       
       alert(`刪除分類【${cat.name}】後，該分類內的所有菜式將會自動移至「其他」分類。`);
 
+      // Find or create 'other' category
       let otherCat = categories.find(c => c.id === 'cat_other');
       if(!otherCat) {
         otherCat = { id: 'cat_other', name: '其他', icon: '🍱' };
         categories.push(otherCat);
       }
 
+      // Reassign dishes
       dishes.forEach(d => {
         if(d.catId === id) d.catId = 'cat_other';
       });
