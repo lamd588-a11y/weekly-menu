@@ -1,809 +1,450 @@
 <!DOCTYPE html>
-<html lang="zh-HK" class="h-full">
+<html lang="zh-HK">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>每週菜單</title>
-  
-  <!-- PWA 設定 -->
-  <link rel="manifest" href="manifest.json">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="每週菜單">
-  <link rel="apple-touch-icon" href="icon.png">
-
-  <!-- Tailwind CSS & FontAwesome -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      darkMode: 'class',
-      theme: {
-        extend: {
-          fontSize: {
-            'senior-sm': '1.125rem',
-            'senior-base': '1.25rem',
-            'senior-lg': '1.5rem',
-            'senior-xl': '1.875rem',
-          }
-        }
-      }
-    }
-  </script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  
-  <!-- Alpine.js & PDFMake -->
-  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
-
-  <style>
-    [x-cloak] { display: none !important; }
-    /* 針對長者優化的動態字型 */
-    .text-dynamic-base { font-size: calc(1.25rem * var(--font-scale, 1)); }
-    .text-dynamic-lg { font-size: calc(1.5rem * var(--font-scale, 1)); }
-    .text-dynamic-xl { font-size: calc(1.875rem * var(--font-scale, 1)); }
-    /* iOS 避開 Home Bar 底部安全區域 */
-    .pb-safe { padding-bottom: calc(env(safe-area-inset-bottom) + 5rem); }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=5,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="每週菜單">
+<meta name="theme-color" content="#ff6b35">
+<link rel="apple-touch-icon" href="icon.png">
+<link rel="icon" href="icon.png">
+<link rel="manifest" href="manifest.json">
+<title>每週菜單</title>
+<style>
+:root{--bg:#fdf8f0;--card:#fff;--text:#1a1a1a;--muted:#8a8a8a;--primary:#ff6b35;--border:#f0e6d8;--r:20px;--fs:18px}
+.dark{--bg:#111;--card:#1e1e1e;--text:#f5f5f5;--border:#333;--muted:#aaa}
+html{font-size:var(--fs)}*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"PingFang HK",sans-serif;font-size:1rem;padding-bottom:130px;line-height:1.5}
+.top{position:sticky;top:0;z-index:5;background:var(--card);border-bottom:1px solid var(--border);padding:14px 16px;padding-top:calc(12px + env(safe-area-inset-top));display:flex;justify-content:space-between;align-items:center}
+.avatar{width:54px;height:54px;border-radius:50%;border:3px solid var(--primary);object-fit:cover}
+.page{max-width:500px;margin:0 auto;padding:16px;display:none}.page.active{display:block}
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:14px;margin-bottom:14px}
+.row{display:flex;gap:10px;align-items:center}.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+.bigBtn{flex:1;padding:16px;border-radius:16px;border:none;background:var(--primary);color:#fff;font-size:1.1rem;font-weight:800}
+.ghost{flex:1;padding:14px;border-radius:14px;border:1.5px solid var(--border);background:var(--bg);color:var(--text);font-size:1rem;font-weight:700}
+.iconBtn{width:56px;height:56px;display:grid;place-items:center;border-radius:16px;border:1.5px solid var(--border);background:var(--card);font-size:28px}
+.catBox{aspect-ratio:1;border-radius:22px;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;padding:10px;cursor:pointer;border:2.5px solid #111;position:relative;overflow:hidden}
+.catBox.emoji{font-size:56px;filter:drop-shadow(0 2px 4px rgba(0,0,0,.2))}.catBox.label{margin-top:6px;background:#fff;color:#111;padding:4px 10px;border-radius:12px;font-weight:800;font-size:.95rem;border:1.5px solid #111}
+.weekGrid{display:grid;grid-template-columns:1fr 1fr;gap:14px;justify-items:center}
+.weekGrid.full{grid-column:1 / -1; display:grid; grid-template-columns:1fr 1fr 1fr; gap:14px; width:100%}
+.dayBox{aspect-ratio:1;width:100%;max-width:220px;border-radius:22px;border:2.5px solid #111;display:flex;flex-direction:column;justify-content:center;align-items:center;cursor:pointer;background:var(--card);text-align:center;padding:8px}
+.dayBox.d1{font-size:2.2rem}.dayBox.d2{font-weight:800;margin-top:4px}
+.bottom{position:fixed;bottom:0;left:0;right:0;background:var(--card);border-top:1.5px solid var(--border);display:flex;justify-content:space-around;padding:14px 0 34px;z-index:20}
+.nav{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;color:var(--muted);font-size:13px;cursor:pointer}.nav.active{color:var(--primary)}.nav.ic{font-size:36px;line-height:1}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;z-index:100;align-items:center;justify-content:center;padding:16px}.modal.open{display:flex}
+.sheet{background:var(--card);width:100%;max-width:520px;max-height:88vh;overflow:auto;border-radius:28px;padding:0;border:2px solid #111}
+.sheetHead{position:sticky;top:0;background:var(--card);padding:14px 16px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;z-index:2}
+.x{width:44px;height:44px;border-radius:50%;border:1.5px solid var(--border);display:grid;place-items:center;font-size:22px;background:var(--bg);cursor:pointer}
+.dishRow{display:flex;justify-content:space-between;align-items:center;padding:14px;border-bottom:1px dashed var(--border);gap:8px}
+.dishRow b{font-size:1.1rem}.act{display:flex;gap:6px}.act button{width:44px;height:44px;border-radius:12px;border:1.5px solid var(--border);background:var(--bg);font-size:18px}
+select,input,textarea{width:100%;padding:14px;border-radius:14px;border:1.5px solid var(--border);background:var(--bg);color:var(--text);font-size:1rem}
+#pdfWrap{position:fixed;inset:0;background:#eee;z-index:200;overflow:auto;display:none}#pdfWrap.open{display:block}
+.pdfTool{position:sticky;top:0;background:#fff;padding:12px 16px;display:flex;gap:10px;border-bottom:1px solid #ccc}
+.pdfPage{width:210mm;background:#fff;margin:0 auto;padding:18mm 14mm;min-height:297mm}
+@media screen and (max-width:800px){.pdfPage{width:100%;padding:6vw}}
+.pdfTitle{font-size:22pt;font-weight:900;text-align:center}.pdfSub{font-size:12pt;text-align:center;color:#666;margin-bottom:12px}
+.pdfDay{border:1.8px solid #111;border-radius:12px;margin-bottom:14px;page-break-inside:avoid}
+.pdfDayH{background:#111;color:#fff;padding:8px 12px;display:flex;justify-content:space-between;font-weight:800}
+.pdfDish{padding:10px 12px;border-top:1px dashed #aaa}
+</style>
 </head>
-<body x-data="app()" x-init="initApp()" :class="{'dark bg-gray-900 text-white': darkMode, 'bg-slate-50 text-slate-900': !darkMode}" class="h-full flex flex-col font-sans select-none" :style="'--font-scale: ' + fontScale">
+<body>
 
-  <!-- 頂部列：僅主頁顯示頭像 -->
-  <header x-show="currentTab === 'home'" class="p-4 bg-emerald-600 dark:bg-emerald-800 text-white flex justify-between items-center shadow-md">
-    <div class="flex items-center space-x-3">
-      <img :src="avatar || 'https://via.placeholder.com/150'" class="w-14 h-14 rounded-full border-2 border-white object-cover">
-      <div>
-        <h1 class="text-dynamic-lg font-bold">歡迎使用</h1>
-        <p class="text-sm opacity-90">規劃本週美味佳餚</p>
-      </div>
-    </div>
-  </header>
+<div class="top">
+  <div class="row"><img id="avatarTop" class="avatar" src="icon.png"><div><div style="font-weight:900;font-size:1.2rem">每週菜單</div><div style="font-size:.85rem;color:var(--muted)">Mingguan Menu</div></div></div>
+  <div id="fontInfo" style="font-size:.9rem;color:var(--muted)"></div>
+</div>
 
-  <!-- 主內容區 -->
-  <main class="flex-1 overflow-y-auto p-4 pb-safe">
+<div id="p-weekly" class="page active">
+  <div class="card row"><input type="date" id="mondayPicker"><button class="iconBtn" onclick="saveWeekly()" title="儲存">💾</button><button class="iconBtn" onclick="exportWeeklyPDF()" title="PDF">📄</button></div>
+  <div id="weeklyGrid" class="weekGrid"></div>
+</div>
 
-    <!-- 1. 每週菜單頁 (Home/Menu) -->
-    <div x-show="currentTab === 'home'" x-cloak class="space-y-4">
-      <!-- 頂部控制行：選擇日期、儲存、匯出PDF (純圖示) -->
-      <div class="flex items-center space-x-2 bg-white dark:bg-gray-800 p-3 rounded-2xl shadow">
-        <label class="text-dynamic-base font-bold whitespace-nowrap">週一：</label>
-        <input type="date" x-model="selectedMonday" @change="validateMonday($event)" class="flex-1 p-2 rounded-xl border border-gray-300 dark:bg-gray-700 dark:border-gray-600 text-dynamic-base">
-        <button @click="saveCurrentMenu()" class="p-3 bg-emerald-500 text-white rounded-xl text-dynamic-lg active:scale-95 transition" title="儲存菜單">
-          <i class="fa-solid fa-floppy-disk"></i>
-        </button>
-        <button @click="exportPDF()" class="p-3 bg-red-500 text-white rounded-xl text-dynamic-lg active:scale-95 transition" title="匯出PDF">
-          <i class="fa-solid fa-file-pdf"></i>
-        </button>
-      </div>
+<div id="p-library" class="page">
+  <div class="card row"><button class="ghost" onclick="exportLib()">匯出</button><button class="ghost" onclick="document.getElementById('importFile').click()">匯入</button><button class="bigBtn" onclick="openAdd()">新增菜式</button><input type="file" id="importFile" accept=".json" style="display:none"></div>
+  <div class="row3" id="catGrid"></div>
+</div>
 
-      <!-- 星期 1 至 7 大正方形網格 -->
-      <div class="grid grid-cols-2 gap-4">
-        <!-- 一、二 -->
-        <template x-for="dayIdx in [0, 1]" :key="dayIdx">
-          <div @click="openDayModal(dayIdx)" class="aspect-square bg-emerald-100 dark:bg-emerald-900/40 border-2 border-emerald-500 rounded-3xl p-3 flex flex-col justify-between items-center shadow-lg active:scale-95 transition cursor-pointer">
-            <span class="text-dynamic-lg font-black text-emerald-800 dark:text-emerald-300" x-text="daysHeader[dayIdx].name"></span>
-            <div class="text-5xl my-1" x-text="daysHeader[dayIdx].icon"></div>
-            <span class="text-dynamic-base text-slate-600 dark:text-slate-300 font-bold" x-text="(weeklyMenu[dayIdx]?.dishes.length || 0) + ' 道菜'"></span>
-          </div>
-        </template>
-        <!-- 三、四 -->
-        <template x-for="dayIdx in [2, 3]" :key="dayIdx">
-          <div @click="openDayModal(dayIdx)" class="aspect-square bg-emerald-100 dark:bg-emerald-900/40 border-2 border-emerald-500 rounded-3xl p-3 flex flex-col justify-between items-center shadow-lg active:scale-95 transition cursor-pointer">
-            <span class="text-dynamic-lg font-black text-emerald-800 dark:text-emerald-300" x-text="daysHeader[dayIdx].name"></span>
-            <div class="text-5xl my-1" x-text="daysHeader[dayIdx].icon"></div>
-            <span class="text-dynamic-base text-slate-600 dark:text-slate-300 font-bold" x-text="(weeklyMenu[dayIdx]?.dishes.length || 0) + ' 道菜'"></span>
-          </div>
-        </template>
-      </div>
-      <!-- 五、六、日 (每行居中/網格顯示) -->
-      <div class="grid grid-cols-3 gap-3">
-        <template x-for="dayIdx in [4, 5, 6]" :key="dayIdx">
-          <div @click="openDayModal(dayIdx)" class="aspect-square bg-emerald-100 dark:bg-emerald-900/40 border-2 border-emerald-500 rounded-3xl p-2 flex flex-col justify-between items-center shadow-lg active:scale-95 transition cursor-pointer">
-            <span class="text-dynamic-base font-black text-emerald-800 dark:text-emerald-300" x-text="daysHeader[dayIdx].name"></span>
-            <div class="text-4xl my-1" x-text="daysHeader[dayIdx].icon"></div>
-            <span class="text-sm text-slate-600 dark:text-slate-300 font-bold" x-text="(weeklyMenu[dayIdx]?.dishes.length || 0) + ' 道菜'"></span>
-          </div>
-        </template>
-      </div>
-    </div>
+<div id="p-mymenus" class="page"><div id="myList"></div></div>
 
-    <!-- 2. 菜式庫頁 (Recipes) -->
-    <div x-show="currentTab === 'recipes'" x-cloak class="space-y-4">
-      <!-- 頂部按鈕行：匯出、匯入、新增菜式 -->
-      <div class="grid grid-cols-3 gap-2">
-        <button @click="exportRecipesJSON()" class="p-3 bg-blue-600 text-white rounded-2xl text-dynamic-base font-bold shadow active:scale-95">匯出</button>
-        <button @click="$refs.importFileInput.click()" class="p-3 bg-indigo-600 text-white rounded-2xl text-dynamic-base font-bold shadow active:scale-95">匯入</button>
-        <input type="file" x-ref="importFileInput" @change="importRecipesJSON($event)" accept=".json" class="hidden">
-        <button @click="showAddDishModal = true" class="p-3 bg-emerald-600 text-white rounded-2xl text-dynamic-base font-bold shadow active:scale-95">新增菜式</button>
-      </div>
+<div id="p-settings" class="page">
+  <div class="card"><h3>分類排序</h3><div id="catOrder"></div><div class="row" style="margin-top:10px"><input id="newCat" placeholder="新分類名稱"><button class="bigBtn" onclick="addCat()">新增</button></div></div>
+  <div class="card"><h3>外觀</h3><div class="row"><span>深淺色</span><button class="ghost" onclick="toggleTheme()">切換</button></div><div style="margin-top:12px"><label>字體大小 <span id="fsVal">18</span>px</label><input type="range" id="fsRange" min="14" max="26" value="18" oninput="setFS(this.value)"></div></div>
+  <div class="card"><h3>頭像設定</h3><input type="file" id="avatarFile" accept="image/*"><div style="position:relative;width:260px;height:260px;margin:12px auto;border-radius:50%;overflow:hidden;border:3px solid var(--primary);background:#000;touch-action:none"><canvas id="avCanvas" width="600" height="600" style="width:100%;height:100%"></canvas></div><div class="row"><span>縮放</span><input type="range" id="avZoom" min="0.2" max="4" step="0.05" value="1" style="flex:1"><button class="ghost" onclick="resetAv()">重置</button></div><button class="bigBtn" style="width:100%;margin-top:8px" onclick="saveAv()">儲存頭像</button></div>
+</div>
 
-      <!-- 分類大正方形，每行 3 個 -->
-      <div class="grid grid-cols-3 gap-3">
-        <template x-for="cat in categories" :key="cat.id">
-          <div @click="activeCategory = cat; showCatDishesModal = true" class="aspect-square bg-orange-100 dark:bg-orange-900/40 border-2 border-orange-400 rounded-3xl p-2 flex flex-col justify-between items-center shadow active:scale-95 transition cursor-pointer">
-            <span class="text-dynamic-base font-bold text-orange-900 dark:text-orange-200" x-text="cat.name"></span>
-            <div class="text-4xl" x-text="cat.icon"></div>
-            <span class="text-xs text-slate-500 dark:text-slate-400" x-text="getCategoryDishCount(cat.name) + ' 款'"></span>
-          </div>
-        </template>
-      </div>
-    </div>
+<div class="bottom">
+  <div class="nav active" onclick="go('weekly')"><span class="ic">📅</span><span>每週</span></div>
+  <div class="nav" onclick="go('library')"><span class="ic">📚</span><span>菜式庫</span></div>
+  <div class="nav" onclick="go('mymenus')"><span class="ic">🗂️</span><span>我的菜單</span></div>
+  <div class="nav" onclick="go('settings')"><span class="ic">⚙️</span><span>設定</span></div>
+</div>
 
-    <!-- 3. 我的菜單頁 (Saved Menus) -->
-    <div x-show="currentTab === 'myMenus'" x-cloak class="space-y-4">
-      <h2 class="text-dynamic-xl font-bold mb-2">已儲存菜單 (最多10張)</h2>
-      <template x-for="(menu, idx) in savedMenus" :key="menu.date">
-        <div class="bg-white dark:bg-gray-800 rounded-2xl p-4 shadow border border-gray-200 dark:border-gray-700 space-y-3">
-          <div class="flex justify-between items-center border-b pb-2">
-            <span class="text-dynamic-lg font-bold text-emerald-600 dark:text-emerald-400" x-text="'週一日期：' + menu.date"></span>
-            <div class="space-x-2">
-              <button @click="loadSavedMenuToCurrent(menu)" class="px-3 py-1 bg-blue-500 text-white rounded-xl text-sm">載入/修改</button>
-              <button @click="deleteSavedMenu(idx)" class="px-3 py-1 bg-red-500 text-white rounded-xl text-sm">刪除</button>
-            </div>
-          </div>
-          <!-- 菜單詳情 -->
-          <div class="space-y-2">
-            <template x-for="(day, dIdx) in menu.days" :key="dIdx">
-              <div class="text-dynamic-base">
-                <span class="font-bold text-orange-600 dark:text-orange-400" x-text="daysHeader[dIdx].name + '：'"></span>
-                <span x-text="' (用餐:' + day.diners + '人, 外帶:' + day.takeout + '人)'" class="text-sm text-gray-500"></span>
-                <div class="pl-4 space-y-1 mt-1">
-                  <template x-for="dish in day.dishes" :key="dish.id">
-                    <div x-data="{ openNote: false }" class="border-l-2 border-emerald-400 pl-2">
-                      <div @click="openNote = !openNote" class="cursor-pointer font-medium flex justify-between items-center">
-                        <div>
-                          <span x-text="dish.name"></span> / <span class="text-emerald-600 dark:text-emerald-400" x-text="dish.indoName"></span>
-                        </div>
-                        <i class="fa-solid text-xs" :class="openNote ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
-                      </div>
-                      <div x-show="openNote" class="text-sm bg-slate-100 dark:bg-gray-700 p-2 rounded-lg mt-1 space-y-1">
-                        <p x-text="'中文備註：' + (dish.note || '無')"></p>
-                        <p x-text="'印尼文：' + (dish.indoNote || '無')"></p>
-                      </div>
-                    </div>
-                  </template>
-                </div>
-              </div>
-            </template>
-          </div>
-        </div>
-      </template>
-    </div>
+<div class="modal" id="catModal"><div class="sheet"><div class="sheetHead"><b id="catTitle">分類</b><div class="x" onclick="closeM('catModal')">✕</div></div><div id="catDishes"></div></div></div>
+<div class="modal" id="dishNoteModal"><div class="sheet"><div class="sheetHead"><b>備註 Catatan</b><div class="x" onclick="closeM('dishNoteModal')">✕</div></div><div style="padding:16px;white-space:pre-wrap;font-size:1.1rem" id="noteContent"></div></div></div>
+<div class="modal" id="weekModal"><div class="sheet"><div class="sheetHead"><b id="weekTitle">日期</b><div class="x" onclick="closeM('weekModal')">✕</div></div><div style="padding:16px"><div class="row"><label>用餐 Makan</label><select id="diners"></select><label>外帶 Bungkus</label><select id="takeaway"></select></div><div id="selectedDishes" style="margin-top:12px"></div><button class="bigBtn" style="width:100%;margin-top:12px" onclick="openDishPicker()">選擇菜式 Pilih Menu</button></div></div></div>
+<div class="modal" id="pickModal"><div class="sheet"><div class="sheetHead"><b>分類 Kategori</b><div class="x" onclick="closeM('pickModal')">✕</div></div><div id="pickCats" class="row3" style="padding:12px"></div></div></div>
+<div class="modal" id="pickDishModal"><div class="sheet"><div class="sheetHead"><b>菜式 Menu</b><div class="x" onclick="closeM('pickDishModal')">✕</div></div><div id="pickDishes"></div></div></div>
+<div class="modal" id="addModal"><div class="sheet"><div class="sheetHead"><b>新增/修改菜式</b><div class="x" onclick="closeM('addModal')">✕</div></div><div style="padding:16px"><input id="f_name" placeholder="中文菜名"><input id="f_indo" placeholder="印尼文 Nama Indonesia" style="margin-top:10px"><textarea id="f_note" placeholder="備註 + 烹調方法 (中+印) Catatan + Cara masak" style="margin-top:10px;height:120px"></textarea><select id="f_cat" style="margin-top:10px"></select><input type="hidden" id="f_id"><button class="bigBtn" style="width:100%;margin-top:12px" onclick="saveDish()">儲存 Simpan</button></div></div></div>
+<div class="modal" id="dateForDishModal"><div class="sheet"><div class="sheetHead"><b>加入到哪一天？</b><div class="x" onclick="closeM('dateForDishModal')">✕</div></div><div style="padding:16px"><input type="date" id="anyDate"><button class="bigBtn" style="width:100%;margin-top:10px" onclick="confirmAddToDay()">確認加入</button></div></div></div>
 
-    <!-- 4. 設定頁 (Settings) -->
-    <div x-show="currentTab === 'settings'" x-cloak class="space-y-6">
-      <!-- 深淺色轉換 -->
-      <div class="bg-white dark:bg-gray-800 p-4 rounded-2xl shadow flex justify-between items-center">
-        <span class="text-dynamic-lg font-bold">深色模式</span>
-        <button @click="darkMode = !darkMode" class="px-4 py-2 bg-slate-200 dark:bg-gray-600 rounded-xl text-dynamic-base font-bold">
-          <span x-text="darkMode ? '已開啟' : '已關閉'"></span>
-        </button>
-      </div>
+<div id="pdfWrap"><div class="pdfTool"><button class="bigBtn" onclick="closePDF()">✕ 關閉</button><button class="ghost" onclick="downloadPDF()">💾 儲存</button><button class="ghost" onclick="sharePDF()">📤 傳送</button></div><div class="pdfPage" id="pdfContent"></div></div>
 
-      <!-- 自訂字體大小 -->
-      <div class="bg-white dark:bg-gray-800 p-4 rounded-2xl shadow space-y-2">
-        <span class="text-dynamic-lg font-bold">字體縮放</span>
-        <div class="flex items-center space-x-4">
-          <input type="range" min="0.8" max="1.5" step="0.1" x-model="fontScale" class="w-full">
-          <span class="text-dynamic-base font-bold" x-text="Math.round(fontScale * 100) + '%'"></span>
-        </div>
-      </div>
+<script>
+const CAT_META={
+"雞 Ayam":{bg:"#ffeb8a",emoji:"🐔"},
+"牛 Sapi":{bg:"#d7b899",emoji:"🐮"},
+"豬 Babi":{bg:"#ffb3c1",emoji:"🐷"},
+"魚 Ikan":{bg:"#8ecfff",emoji:"🐟"},
+"蔬菜 Sayur":{bg:"#a8e6a3",emoji:"🥬"},
+"湯水 Sup":{bg:"#ffcc7a",emoji:"🍲"},
+"西式 Barat":{bg:"#e2c499",emoji:"🍔"},
+"罐頭 Kaleng":{bg:"#9ec6ff",emoji:"🥫"},
+"其他 Lainnya":{bg:"#d8b4fe",emoji:"🍱"}
+};
+let cats=JSON.parse(localStorage.getItem('cats')||'null')||Object.keys(CAT_META);
+let dishes=JSON.parse(localStorage.getItem('dishes')||'null')||[];
+let weeklyMenus=JSON.parse(localStorage.getItem('weeklyMenus')||'[]');
+let currentWeek={monday:null,days:[]};
+let lastCook=JSON.parse(localStorage.getItem('lastCook')||'{}');
+let editingDayIndex=null, pendingDishId=null;
 
-      <!-- 自訂頭像 -->
-      <div class="bg-white dark:bg-gray-800 p-4 rounded-2xl shadow space-y-3">
-        <span class="text-dynamic-lg font-bold block">自訂頭像</span>
-        <input type="file" @change="uploadAvatar($event)" accept="image/*" class="text-dynamic-base">
-      </div>
+function defaultDishes(){
+ if(dishes.length) return dishes;
+ const data=[
+["雞 Ayam",[
+["豉油雞","Ayam Kecap","中文：雞洗淨抹乾，豉油2湯匙、老抽1湯匙、糖1茶匙、薑蔥蒜爆香，加水浸半雞，慢火煮30分焗10分斬件。\nIndonesia: Cuci ayam, tumis jahe daun bawang bawang putih, tambah kecap asin 2 sdm, kecap hitam 1 sdm, gula 1 sdt, air, masak ayam 30 menit api kecil."],
+["白切雞","Ayam Rebus Putih","中文：雞汆水，薑蔥水浸煮20分焗15分，冰水浸至涼，斬件點薑蔥油。\nIndonesia: Rebus ayam sebentar, masak dalam air jahe daun bawang 20 menit, diamkan 15 menit, rendam air es, potong, siram minyak jahe daun bawang."],
+["麻油雞","Ayam Minyak Wijen","中文：薑爆香，雞炒金黃，加米酒2湯匙、麻油1湯匙燜20分。\nIndonesia: Tumis jahe, goreng ayam hingga keemasan, tambah arak beras 2 sdm, minyak wijen 1 sdm, ungkep 20 menit."],
+["咖喱雞","Kari Ayam","中文：咖喱粉洋蔥爆香，雞炒勻加椰奶薯仔炆30分。\nIndonesia: Tumis bubuk kari dan bawang bombay, masukkan ayam, tambah santan dan kentang, masak 30 menit."],
+["蒸雞","Ayam Kukus","中文：雞醃鹽薑汁蒸15分，淋熟油豉油。\nIndonesia: Marinasi ayam garam jahe, kukus 15 menit, siram minyak panas dan kecap asin."],
+["咕嚕雞","Ayam Asam Manis","中文：雞炸金黃，番茄醬糖醋汁炒勻。\nIndonesia: Goreng ayam hingga keemasan, tumis saus tomat asam manis."],
+["豉椒雞","Ayam Tauco Cabe","中文：豆豉辣椒蒜爆香，雞炒熟。\nIndonesia: Tumis tauco, cabai, bawang putih, masukkan ayam hingga matang."],
+["檸檬雞","Ayam Lemon","中文：雞扒煎香，檸檬汁糖水埋芡。\nIndonesia: Goreng chicken chop, buat saus lemon gula."],
+["鹽焗雞","Ayam Garam Panggang","中文：鹽焗雞粉醃1小時，焗爐200度焗40分。\nIndonesia: Marinasi bubuk ayam garam 1 jam, panggang 200C 40 menit."],
+["雞翼薯仔炆","Sayap Ayam Kentang","中文：雞翼煎香加薯仔豉油炆25分。\nIndonesia: Goreng sayap ayam, tambah kentang dan kecap, ungkep 25 menit."]
+ ]],
+["牛 Sapi",[
+["柱侯牛腩","Semur Sapi Chu Hou","中文：牛腩汆水，柱侯醬炆1.5小時加蘿蔔。\nIndonesia: Rebus daging sebentar, masak dengan saus chu hou 1,5 jam tambah lobak."],
+["黑椒牛柳","Daging Sapi Lada Hitam","中文：牛柳粒煎香，黑椒汁洋蔥炒。\nIndonesia: Tumis daging sapi dadu, saus lada hitam dan bawang bombay."],
+["蕃茄牛","Sapi Tomat","中文：牛肉片炒蕃茄洋蔥。\nIndonesia: Tumis irisan sapi dengan tomat dan bawang bombay."],
+["牛扒","Steak Sapi","中文：牛扒煎兩面，黑椒汁。\nIndonesia: Goreng steak dua sisi, saus lada hitam."],
+["咖喱牛","Kari Sapi","中文：咖喱薯仔牛腩炆1小時。\nIndonesia: Kari kentang daging sapi 1 jam."],
+["涼瓜牛","Pare Sapi","中文：涼瓜牛肉豉汁炒。\nIndonesia: Tumis pare dan sapi saus tauco."],
+["芥蘭牛","Kailan Sapi","中文：芥蘭炒牛肉。\nIndonesia: Tumis kailan dan sapi."],
+["紅燒牛尾","Buntut Sapi Semur","中文：牛尾炆2小時。\nIndonesia: Buntut direbus 2 jam."],
+["沙爹牛","Sate Sapi","中文：沙爹醬炒牛肉。\nIndonesia: Tumis sapi saus sate."],
+["牛腩粉","Sop Sapi","中文：清湯牛腩蘿蔔。\nIndonesia: Sop bening daging sapi lobak."]
+ ]],
+["豬 Babi",[
+["叉燒","Babi Panggang Manis","中文：叉燒醬醃過夜，焗200度20分。\nIndonesia: Marinasi saus char siu semalam, panggang 200C 20 menit."],
+["蒸肉餅","Kukus Daging Cincang","中文：豬肉碎醃鹹魚蒸15分。\nIndonesia: Daging cincang marinasi ikan asin kukus 15 menit."],
+["咕嚕肉","Babi Asam Manis","中文：豬肉炸香，糖醋汁菠蘿炒。\nIndonesia: Goreng daging babi, saus asam manis nanas."],
+["梅菜扣肉","Babi Mei Cai","中文：五花肉梅菜炆1小時。\nIndonesia: Perut babi dan sayur mei cai ungkep 1 jam."],
+["椒鹽豬扒","Pork Chop Lada Garam","中文：豬扒炸香椒鹽。\nIndonesia: Goreng pork chop dengan lada garam."],
+["粟米肉粒","Daging Jagung","中文：豬肉粒粟米炒。\nIndonesia: Tumis daging dadu dengan jagung."],
+["回鍋肉","Babi Tumis Balik Wajan","中文：蒜苗豆瓣醬炒五花肉。\nIndonesia: Tumis daun bawang dan saus doubanjiang dengan perut babi."],
+["糖醋排骨","Iga Asam Manis","中文：排骨炸香糖醋汁。\nIndonesia: Iga goreng saus asam manis."],
+["蓮藕炆豬肉","Akar Teratai Babi","中文：蓮藕豬肉炆1小時。\nIndonesia: Akar teratai dan babi ungkep 1 jam."],
+["豬手","Kaki Babi","中文：豬手炆花生1.5小時。\nIndonesia: Kaki babi ungkep kacang 1,5 jam."]
+ ]],
+["魚 Ikan",[
+["蒸鯇魚","Ikan Rumput Kukus","中文：薑蔥蒸8分淋豉油滾油。\nIndonesia: Kukus ikan 8 menit jahe daun bawang, siram kecap asin minyak panas."],
+["豉汁蒸魚","Ikan Kukus Tauco","中文：豆豉蒜蓉蒸魚。\nIndonesia: Ikan kukus tauco bawang putih."],
+["煎魚","Ikan Goreng","中文：魚煎金黃。\nIndonesia: Goreng ikan hingga keemasan."],
+["糖醋魚","Ikan Asam Manis","中文：魚炸香糖醋汁。\nIndonesia: Goreng ikan saus asam manis."],
+["魚香茄子","Terong Ikan","中文：茄子魚鬆炒。\nIndonesia: Tumis terong dengan ikan cincang."],
+["魚湯","Sup Ikan","中文：魚煎香加薑滾湯。\nIndonesia: Goreng ikan tambah jahe jadi sup."],
+["椒鹽九肚魚","Ikan Bombay Lada Garam","中文：九肚魚炸椒鹽。\nIndonesia: Goreng ikan bombay lada garam."],
+["檸檬魚","Ikan Lemon","中文：檸檬汁蒸魚。\nIndonesia: Ikan kukus saus lemon."],
+["咖喱魚","Kari Ikan","中文：咖喱魚腩。\nIndonesia: Kari perut ikan."],
+["魚餅","Kue Ikan","中文：魚肉煎餅。\nIndonesia: Goreng kue ikan."]
+ ]],
+["蔬菜 Sayur",[
+["番茄蛋","Tomat Telur","中文：蛋先炒，番茄炒軟回鍋。\nIndonesia: Goreng telur dulu, tumis tomat lalu campur."],
+["菜心","Choy Sum","中文：蒜蓉炒菜心。\nIndonesia: Tumis choy sum bawang putih."],
+["芥蘭","Kailan","中文：蠔油芥蘭。\nIndonesia: Kailan saus tiram."],
+["通菜","Kangkung","中文：腐乳通菜。\nIndonesia: Kangkung tauco fermentasi."],
+["白菜","Sawi Putih","中文：上湯白菜。\nIndonesia: Sawi putih sup atas."],
+["椰菜花","Brokoli Putih","中文：蒜蓉椰菜花。\nIndonesia: Tumis kembang kol bawang putih."],
+["勝瓜","Oyong","中文：勝瓜炒蛋。\nIndonesia: Oyong tumis telur."],
+["豆角","Kacang Panjang","中文：乾煸四季豆。\nIndonesia: Tumis kering kacang panjang."],
+["蓮藕炒","Tumis Akar Teratai","中文：蓮藕炒木耳。\nIndonesia: Tumis akar teratai jamur kuping."],
+["雜菜","Capcay","中文：雜菜炒。\nIndonesia: Capcay goreng."]
+ ]],
+["湯水 Sup",[
+["老火湯","Sup Tua","中文：豬骨紅蘿蔔粟米煲2小時。\nIndonesia: Tulang babi wortel jagung rebus 2 jam."],
+["冬瓜湯","Sup Labu Putih","中文：冬瓜薏米煲1.5小時。\nIndonesia: Labu putih barley rebus 1,5 jam."],
+[" ABC湯","Sup ABC","中文：番茄薯仔紅蘿蔔煲。\nIndonesia: Tomat kentang wortel."],
+["紫菜蛋花湯","Sup Rumput Laut Telur","中文：紫菜蛋花。\nIndonesia: Rumput laut telur."],
+["豆腐湯","Sup Tahu","中文：豆腐魚湯。\nIndonesia: Sup tahu ikan."],
+["蘿蔔排骨湯","Sup Lobak Iga","中文：白蘿蔔排骨。\nIndonesia: Lobak putih iga."],
+["菜乾湯","Sup Sayur Kering","中文：菜乾豬骨。\nIndonesia: Sayur kering tulang babi."],
+["青紅蘿蔔湯","Sup Wortel Hijau Merah","中文：青紅蘿蔔豬骨。\nIndonesia: Wortel hijau merah tulang babi."],
+["節瓜湯","Sup Labu Kecil","中文：節瓜鹹蛋。\nIndonesia: Labu kecil telur asin."],
+["西洋菜湯","Sup Selada Air","中文：西洋菜陳腎。\nIndonesia: Selada air ginjal kering."]
+ ]],
+["西式 Barat",[
+["意粉","Spaghetti","中文：番茄肉醬意粉。\nIndonesia: Spaghetti saus bolognese."],
+["焗薯","Kentang Panggang","中文：芝士焗薯。\nIndonesia: Kentang panggang keju."],
+["沙律","Salad","中文：雜菜沙律。\nIndonesia: Salad sayur."],
+["漢堡","Burger","中文：牛肉漢堡。\nIndonesia: Burger sapi."],
+["薯條","Kentang Goreng","中文：炸薯條。\nIndonesia: Kentang goreng."],
+["牛扒薯條","Steak Kentang","中文：西冷薯條。\nIndonesia: Sirloin dan kentang."],
+["蘑菇湯","Sup Jamur Barat","中文：忌廉蘑菇湯。\nIndonesia: Sup krim jamur."],
+["焗雞翼","Sayap Panggang Barat","中文：蜜糖焗雞翼。\nIndonesia: Sayap panggang madu."],
+["三文治","Sandwich","中文：火腿芝士三文治。\nIndonesia: Sandwich ham keju."],
+["薄餅","Pizza","中文：芝士薄餅。\nIndonesia: Pizza keju."]
+ ]],
+["罐頭 Kaleng",[
+["茄汁豆","Kacang Tomat Kaleng","中文：茄汁豆炒蛋。\nIndonesia: Kacang tomat kaleng tumis telur."],
+["午餐肉","Daging Kaleng Lunch","中文：煎午餐肉。\nIndonesia: Goreng daging kaleng."],
+["沙甸魚","Sarden Kaleng","中文：沙甸魚炒洋蔥。\nIndonesia: Sarden tumis bawang bombay."],
+["粟米湯","Sup Jagung Kaleng","中文：粟米忌廉湯。\nIndonesia: Sup krim jagung kaleng."],
+["吞拿魚","Tuna Kaleng","中文：吞拿魚沙律。\nIndonesia: Salad tuna."],
+["蘑菇罐","Jamur Kaleng","中文：蘑菇炒雞。\nIndonesia: Jamur kaleng tumis ayam."],
+["豆豉鯪魚","Ikan Dencis Tauco Kaleng","中文：豆豉鯪魚炒油麥菜。\nIndonesia: Ikan dencis tauco tumis selada."],
+["火腿湯","Sup Ham Kaleng","中文：火腿通粉。\nIndonesia: Sup ham makaroni."],
+["罐頭粟米肉粒","Jagung Daging Kaleng","中文：粟米午餐肉炒。\nIndonesia: Jagung daging kaleng goreng."],
+["椰奶","Santan Kaleng","中文：椰奶咖喱。\nIndonesia: Kari santan kaleng."]
+ ]],
+["其他 Lainnya",[
+["蒸水蛋","Telur Kukus","中文：水蛋蒸8分。\nIndonesia: Telur kukus 8 menit."],
+["炒飯","Nasi Goreng","中文：揚州炒飯。\nIndonesia: Nasi goreng Yangzhou."],
+["炒麵","Mie Goreng","中文：豉油王炒麵。\nIndonesia: Mie goreng kecap raja."],
+["粥","Bubur","中文：白粥皮蛋。\nIndonesia: Bubur telur pitan."],
+["餃子","Pangsit","中文：煎餃。\nIndonesia: Pangsit goreng."],
+["雲吞","Wonton","中文：雲吞湯。\nIndonesia: Sup wonton."],
+["腸粉","Cheung Fun","中文：蒸腸粉。\nIndonesia: Kukus cheung fun."],
+["白飯","Nasi Putih","中文：白飯。\nIndonesia: Nasi putih."],
+["糖水","Sup Manis","中文：紅豆沙。\nIndonesia: Bubur kacang merah."],
+["涼拌","Acar","中文：涼拌青瓜。\nIndonesia: Acar mentimun."]
+ ]]
+ ];
+ data.forEach(([cat,list])=>{ list.forEach(([name,indo,note])=>{ dishes.push({id:Date.now()+Math.random(),name,indo,note,cat}); }); });
+ return dishes;
+}
+dishes=defaultDishes();
 
-      <!-- 分類管理 -->
-      <div class="bg-white dark:bg-gray-800 p-4 rounded-2xl shadow space-y-4">
-        <div class="flex justify-between items-center">
-          <span class="text-dynamic-lg font-bold">分類管理</span>
-          <button @click="addNewCategoryPrompt()" class="px-3 py-1 bg-emerald-600 text-white rounded-xl text-dynamic-base">+ 新增分類</button>
-        </div>
-        <div class="space-y-2">
-          <template x-for="(cat, idx) in categories" :key="cat.id">
-            <div class="flex items-center justify-between p-3 bg-slate-100 dark:bg-gray-700 rounded-xl">
-              <div class="flex items-center space-x-2">
-                <span class="text-2xl" x-text="cat.icon"></span>
-                <span class="text-dynamic-base font-bold" x-text="cat.name"></span>
-              </div>
-              <div class="flex items-center space-x-2">
-                <button @click="moveCategory(idx, -1)" class="p-2 bg-gray-300 dark:bg-gray-600 rounded-lg"><i class="fa-solid fa-arrow-up"></i></button>
-                <button @click="moveCategory(idx, 1)" class="p-2 bg-gray-300 dark:bg-gray-600 rounded-lg"><i class="fa-solid fa-arrow-down"></i></button>
-                <button @click="deleteCategory(cat, idx)" class="p-2 bg-red-500 text-white rounded-lg"><i class="fa-solid fa-trash"></i></button>
-              </div>
-            </div>
-          </template>
-        </div>
-      </div>
-    </div>
+const cn=["一","二","三","四","五","六","日"], idn=["Senin","Selasa","Rabu","Kamis","Jumat","Sabtu","Minggu"];
+const dayEmoji=["🌅","🌤️","🌞","🌇","🌙","⭐","🎉"];
 
-  </main>
+function go(p){ document.querySelectorAll('.page').forEach(e=>e.classList.remove('active')); document.getElementById('p-'+p).classList.add('active'); document.querySelectorAll('.nav').forEach((e,i)=>{ e.classList.remove('active'); if(['weekly','library','mymenus','settings'][i]==p) e.classList.add('active'); }); }
+function getMon(d){ let dt=new Date(d); let day=dt.getDay(); let diff=dt.getDate()-day+(day==0?-6:1); return new Date(dt.setDate(diff)); }
+function fmt(d){ if(typeof d==='string') return d; return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; }
 
-  <!-- 彈出視窗 1：單日菜單編輯 modal -->
-  <div x-show="showDayModal" x-cloak class="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
-    <div class="bg-white dark:bg-gray-800 w-full max-w-lg rounded-3xl p-5 space-y-4 max-h-[90vh] overflow-y-auto relative shadow-2xl">
-      <button @click="showDayModal = false" class="absolute top-4 right-4 text-3xl font-bold text-gray-500">✕</button>
-      <h3 class="text-dynamic-xl font-bold text-emerald-600 dark:text-emerald-400" x-text="daysHeader[activeDayIndex]?.name + ' 菜單安排'"></h3>
-      
-      <!-- 人數選擇 -->
-      <div class="grid grid-cols-2 gap-4 bg-slate-100 dark:bg-gray-700 p-3 rounded-2xl">
-        <div>
-          <label class="block text-dynamic-base font-bold">用餐人數</label>
-          <select x-model="weeklyMenu[activeDayIndex].diners" class="w-full mt-1 p-2 rounded-xl text-dynamic-base border dark:bg-gray-800">
-            <template x-for="i in 10"><option :value="i-1" x-text="i-1"></option></template>
-          </select>
-        </div>
-        <div>
-          <label class="block text-dynamic-base font-bold">外帶人數</label>
-          <select x-model="weeklyMenu[activeDayIndex].takeout" class="w-full mt-1 p-2 rounded-xl text-dynamic-base border dark:bg-gray-800">
-            <template x-for="i in 10"><option :value="i-1" x-text="i-1"></option></template>
-          </select>
-        </div>
-      </div>
+function init(){
+ lastCook=JSON.parse(localStorage.getItem('lastCook')||'{}');
+ loadAvatar(); loadFS();
+ let mon=getMon(new Date()); document.getElementById('mondayPicker').valueAsDate=mon; onMonChange({target:{valueAsDate:mon}});
+ renderCats(); renderWeekly(); renderMy(); renderCatOrder(); setupPick();
+ let sel=document.getElementById('diners'); sel.innerHTML=[...Array(10).keys()].map(n=>`<option>${n}</option>`).join('');
+ document.getElementById('takeaway').innerHTML=sel.innerHTML;
+}
+function onMonChange(e){
+ let d=e.target.valueAsDate; if(!d) return;
+ if(d.getDay()!==1){ alert('只可以選擇星期一作起始日\nHanya boleh pilih Senin sebagai awal minggu'); let m=getMon(d); document.getElementById('mondayPicker').valueAsDate=m; d=m; }
+ currentWeek.monday=d; currentWeek.days=[];
+ for(let i=0;i<7;i++){ let day=new Date(d); day.setDate(d.getDate()+i); currentWeek.days.push({date:day,dishes:[],diners:0,takeaway:0}); }
+ renderWeekly();
+}
+function renderCats(){
+ let grid=document.getElementById('catGrid'); grid.innerHTML='';
+ let fcat=document.getElementById('f_cat'); fcat.innerHTML=cats.map(c=>`<option>${c}</option>`).join('');
+ cats.forEach(cat=>{
+  let meta=CAT_META[cat]||{bg:'#eee',emoji:'🍱'};
+  let count=dishes.filter(d=>d.cat===cat).length;
+  grid.innerHTML+=`<div class="catBox" style="background:${meta.bg}" onclick="openCat('${cat}')"><div class="emoji">${meta.emoji}</div><div class="label">${cat} (${count})</div></div>`;
+ });
+}
+function openCat(cat){
+ document.getElementById('catTitle').innerText=cat;
+ let list=dishes.filter(d=>d.cat===cat);
+ let box=document.getElementById('catDishes');
+ box.innerHTML=list.map(d=>`<div class="dishRow"><div style="flex:1;cursor:pointer" onclick="showNote(${d.id})"><b>${d.name}</b> <span style="color:var(--muted)">${d.indo||''}</span><div style="font-size:.85rem;color:var(--muted)">${lastCook[d.id]?'上次 Terakhir: '+lastCook[d.id]:''}</div></div><div class="act"><button onclick="openAddToDay(${d.id})">📅</button><button onclick="editDish(${d.id})">✏️</button><button onclick="delDish(${d.id})">🗑️</button></div></div>`).join('')||'<div style="padding:20px;color:var(--muted)">暫無菜式</div>';
+ openM('catModal');
+}
+function showNote(id){
+ let d=dishes.find(x=>x.id==id); if(!d) return;
+ document.getElementById('noteContent').innerText=`${d.name} / ${d.indo||''}\n\n${d.note||''}`;
+ openM('dishNoteModal');
+}
+function openM(id){ document.getElementById(id).classList.add('open'); }
+function closeM(id){ document.getElementById(id).classList.remove('open'); }
 
-      <!-- 已選菜式列表 -->
-      <div class="space-y-2">
-        <div class="flex justify-between items-center">
-          <span class="text-dynamic-lg font-bold">已選菜式：</span>
-          <button @click="showSelectCatModal = true" class="px-4 py-2 bg-emerald-600 text-white rounded-2xl text-dynamic-base font-bold">+ 選擇菜式</button>
-        </div>
-        <template x-for="(dish, dIdx) in weeklyMenu[activeDayIndex]?.dishes" :key="dIdx">
-          <div class="flex justify-between items-center bg-emerald-50 dark:bg-gray-700 p-3 rounded-xl border border-emerald-200">
-            <div>
-              <p class="text-dynamic-base font-bold" x-text="dish.name"></p>
-              <p class="text-sm text-emerald-600 dark:text-emerald-400" x-text="dish.indoName"></p>
-            </div>
-            <button @click="weeklyMenu[activeDayIndex].dishes.splice(dIdx, 1)" class="p-2 text-red-500 text-dynamic-lg"><i class="fa-solid fa-trash"></i></button>
-          </div>
-        </template>
-      </div>
-    </div>
-  </div>
+function openAdd(){ document.getElementById('f_id').value=''; document.getElementById('f_name').value=''; document.getElementById('f_indo').value=''; document.getElementById('f_note').value=''; openM('addModal'); }
+function editDish(id){ let d=dishes.find(x=>x.id==id); openAdd(); document.getElementById('f_id').value=d.id; document.getElementById('f_name').value=d.name; document.getElementById('f_indo').value=d.indo||''; document.getElementById('f_note').value=d.note||''; document.getElementById('f_cat').value=d.cat; }
+function saveDish(){
+ let id=document.getElementById('f_id').value, name=document.getElementById('f_name').value.trim(), indo=document.getElementById('f_indo').value.trim(), note=document.getElementById('f_note').value.trim(), cat=document.getElementById('f_cat').value;
+ if(!name) return alert('請輸入中文名稱');
+ if(id){ let d=dishes.find(x=>x.id==id); d.name=name; d.indo=indo; d.note=note; d.cat=cat; } else dishes.push({id:Date.now()+Math.random(),name,indo,note,cat});
+ localStorage.setItem('dishes',JSON.stringify(dishes)); renderCats(); closeM('addModal');
+}
+function delDish(id){ if(!confirm('確定刪除？ Hapus?')) return; dishes=dishes.filter(x=>x.id!=id); localStorage.setItem('dishes',JSON.stringify(dishes)); renderCats(); document.getElementById('catDishes').innerHTML=dishes.filter(d=>true).length; openCat(document.getElementById('catTitle').innerText); }
 
-  <!-- 彈出視窗 2：選擇菜式分類 modal -->
-  <div x-show="showSelectCatModal" x-cloak class="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
-    <div class="bg-white dark:bg-gray-800 w-full max-w-lg rounded-3xl p-5 space-y-4 relative shadow-2xl">
-      <button @click="showSelectCatModal = false" class="absolute top-4 right-4 text-3xl font-bold text-gray-500">✕</button>
-      <h3 class="text-dynamic-xl font-bold">請選擇菜式分類</h3>
-      <div class="grid grid-cols-3 gap-3">
-        <template x-for="cat in categories" :key="cat.id">
-          <div @click="activeSelectCat = cat.name; showSelectDishListModal = true" class="aspect-square bg-orange-100 dark:bg-orange-900/40 border-2 border-orange-400 rounded-3xl p-2 flex flex-col justify-center items-center cursor-pointer active:scale-95">
-            <span class="text-3xl" x-text="cat.icon"></span>
-            <span class="text-dynamic-base font-bold mt-1" x-text="cat.name"></span>
-          </div>
-        </template>
-      </div>
-    </div>
-  </div>
+function openAddToDay(id){ pendingDishId=id; document.getElementById('anyDate').valueAsDate=new Date(); openM('dateForDishModal'); }
+function confirmAddToDay(){
+ let dateVal=document.getElementById('anyDate').value; if(!dateVal) return;
+ let date=new Date(dateVal);
+ let monday=getMon(date);
+ if(fmt(currentWeek.monday)!=fmt(monday)){ alert('請先在每週頁選擇包含此日期的星期一\nPilih Senin yang mengandung tanggal ini dulu'); return; }
+ let idx=Math.floor((date - currentWeek.monday)/86400000);
+ if(idx<0||idx>=7) return alert('日期超出本週');
+ let d=dishes.find(x=>x.id==pendingDishId);
+ currentWeek.days[idx].dishes.push({...d});
+ lastCook[d.id]=fmt(date); localStorage.setItem('lastCook',JSON.stringify(lastCook));
+ renderWeekly(); closeM('dateForDishModal'); closeM('catModal');
+}
 
-  <!-- 彈出視窗 3：從分類中挑選菜式 modal -->
-  <div x-show="showSelectDishListModal" x-cloak class="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
-    <div class="bg-white dark:bg-gray-800 w-full max-w-lg rounded-3xl p-5 space-y-4 max-h-[80vh] overflow-y-auto relative shadow-2xl">
-      <button @click="showSelectDishListModal = false" class="absolute top-4 right-4 text-3xl font-bold text-gray-500">✕</button>
-      <h3 class="text-dynamic-xl font-bold" x-text="activeSelectCat + ' - 選擇菜式'"></h3>
-      <div class="space-y-2">
-        <template x-for="dish in getDishesByCategory(activeSelectCat)" :key="dish.id">
-          <div class="p-3 bg-slate-100 dark:bg-gray-700 rounded-2xl flex justify-between items-center">
-            <div @click="openNoteDetail(dish)" class="cursor-pointer flex-1">
-              <p class="text-dynamic-base font-bold" x-text="dish.name"></p>
-              <p class="text-sm text-emerald-600 dark:text-emerald-400" x-text="dish.indoName"></p>
-              <p class="text-xs text-gray-400" x-text="'上次烹飪：' + (dish.lastCooked || '無')"></p>
-            </div>
-            <button @click="addDishToDay(dish)" class="px-4 py-2 bg-emerald-600 text-white rounded-xl text-dynamic-base font-bold">加入</button>
-          </div>
-        </template>
-      </div>
-    </div>
-  </div>
+function renderWeekly(){
+ let grid=document.getElementById('weeklyGrid'); grid.innerHTML='';
+ let rows=[[0,1],[2,3],[4,5,6]];
+ rows.forEach((r,ri)=>{
+  let wrap=document.createElement('div'); wrap.className= ri==2? 'full' : '';
+  if(ri<2) wrap.style.display='contents';
+  r.forEach(idx=>{
+   let day=currentWeek.days[idx]; if(!day) return;
+   let div=document.createElement('div'); div.className='dayBox';
+   div.innerHTML=`<div class="d1">${dayEmoji[idx]}</div><div class="d2">星期${cn[idx]}<br>${fmt(day.date).slice(5)}<br><span style="font-size:.8rem">${idn[idx]}</span><br><span style="font-size:.75rem;color:var(--primary)">${day.dishes.length}道</span></div>`;
+   div.onclick=()=>openWeek(idx);
+   if(ri==2) wrap.appendChild(div); else grid.appendChild(div);
+  });
+  if(ri==2) grid.appendChild(wrap);
+ });
+}
+function openWeek(idx){
+ editingDayIndex=idx;
+ let day=currentWeek.days[idx];
+ document.getElementById('weekTitle').innerText=`${fmt(day.date)} 星期${cn[idx]} / ${idn[idx]}`;
+ document.getElementById('diners').value=day.diners;
+ document.getElementById('takeaway').value=day.takeaway;
+ document.getElementById('diners').onchange=e=>{ day.diners=+e.target.value; };
+ document.getElementById('takeaway').onchange=e=>{ day.takeaway=+e.target.value; };
+ let sel=document.getElementById('selectedDishes');
+ sel.innerHTML=day.dishes.map((d,i)=>`<div class="dishRow"><span style="flex:1;cursor:pointer" onclick="showNote(${d.id})"><b>${d.name}</b> ${d.indo||''}</span><button class="ghost" style="width:auto;padding:6px 12px" onclick="removeFromDay(${idx},${i})">✕</button></div>`).join('')||'<div style="color:var(--muted)">尚未選擇 Belum pilih</div>';
+ openM('weekModal');
+}
+function removeFromDay(dayIdx,dishIdx){ currentWeek.days[dayIdx].dishes.splice(dishIdx,1); openWeek(dayIdx); renderWeekly(); }
+function openDishPicker(){
+ let box=document.getElementById('pickCats'); box.innerHTML='';
+ cats.forEach(cat=>{
+  let meta=CAT_META[cat]||{bg:'#eee',emoji:'🍱'};
+  box.innerHTML+=`<div class="catBox" style="background:${meta.bg}" onclick="openPickDishes('${cat}')"><div class="emoji">${meta.emoji}</div><div class="label">${cat}</div></div>`;
+ });
+ openM('pickModal');
+}
+function openPickDishes(cat){
+ let list=dishes.filter(d=>d.cat===cat);
+ let box=document.getElementById('pickDishes');
+ box.innerHTML=list.map(d=>`<div class="dishRow"><span style="flex:1;cursor:pointer" onclick="showNote(${d.id})"><b>${d.name}</b> ${d.indo||''}</span><button class="bigBtn" style="width:auto;padding:8px 14px" onclick="pickToWeek(${d.id})">加入</button></div>`).join('');
+ openM('pickDishModal');
+}
+function pickToWeek(id){
+ let d=dishes.find(x=>x.id==id);
+ currentWeek.days[editingDayIndex].dishes.push({...d});
+ lastCook[id]=fmt(currentWeek.days[editingDayIndex].date); localStorage.setItem('lastCook',JSON.stringify(lastCook));
+ openWeek(editingDayIndex); renderWeekly();
+}
+function setupPick(){}
+function saveWeekly(){
+ if(!currentWeek.monday) return;
+ let fname=fmt(currentWeek.monday);
+ let ex=weeklyMenus.findIndex(m=>m.monday===fname);
+ if(ex>=0){
+  let c=confirm(`菜單 ${fname} 已存在，取代？\nMenu ${fname} sudah ada, ganti?`);
+  if(!c){
+   let nd=prompt('輸入新星期一日期 YYYY-MM-DD\nMasukkan Senin baru');
+   if(!nd) return;
+   let d=new Date(nd);
+   if(d.getDay()!==1) return alert('只可以選擇星期一\nHanya Senin');
+   fname=fmt(d);
+   currentWeek.monday=d;
+  } else weeklyMenus.splice(ex,1);
+ }
+ let toSave={monday:fname,days:currentWeek.days.map(d=>({date:fmt(d.date),dishes:d.dishes,diners:d.diners,takeaway:d.takeaway}))};
+ let idx=weeklyMenus.findIndex(m=>m.monday===fname);
+ if(idx>=0) weeklyMenus[idx]=toSave; else weeklyMenus.push(toSave);
+ if(weeklyMenus.length>10) weeklyMenus.shift();
+ localStorage.setItem('weeklyMenus',JSON.stringify(weeklyMenus));
+ renderMy(); alert('已儲存 '+fname);
+}
+function renderMy(){
+ let box=document.getElementById('myList');
+ box.innerHTML=weeklyMenus.map((m,i)=>`<div class="card"><div style="display:flex;justify-content:space-between"><b>${m.monday} 星期一 Senin</b><div class="row"><button class="ghost" style="width:auto" onclick="loadMenu(${i})">修改</button><button class="ghost" style="width:auto" onclick="delMenu(${i})">刪除</button><button class="iconBtn" onclick="exportPDFSingle(${i})">📄</button></div></div>${m.days.map((d,di)=>`<div style="border-top:1px dashed var(--border);padding:8px 0"><b>星期${cn[di]} ${idn[di]} ${d.date} 用餐 Makan:${d.diners} 外帶 Bungkus:${d.takeaway}</b>${d.dishes.map(dd=>`<div class="dishRow" style="padding:6px 0"><span style="flex:1;cursor:pointer" onclick="showNote(${dd.id})">${dd.name} / ${dd.indo||''}</span></div>`).join('')}</div>`).join('')}</div>`).join('')||'<div class="card">暫無菜單</div>';
+}
+function loadMenu(i){ let m=weeklyMenus[i]; document.getElementById('mondayPicker').value=m.monday; let mon=new Date(m.monday); currentWeek.monday=mon; currentWeek.days=m.days.map(d=>({date:new Date(d.date),dishes:d.dishes,diners:d.diners,takeaway:d.takeaway})); go('weekly'); renderWeekly(); }
+function delMenu(i){ if(!confirm('刪除？')) return; weeklyMenus.splice(i,1); localStorage.setItem('weeklyMenus',JSON.stringify(weeklyMenus)); renderMy(); }
 
-  <!-- 彈出視窗 4：菜式庫分類彈出菜式 modal -->
-  <div x-show="showCatDishesModal" x-cloak class="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
-    <div class="bg-white dark:bg-gray-800 w-full max-w-lg rounded-3xl p-5 space-y-4 max-h-[85vh] overflow-y-auto relative shadow-2xl">
-      <button @click="showCatDishesModal = false" class="absolute top-4 right-4 text-3xl font-bold text-gray-500">✕</button>
-      <h3 class="text-dynamic-xl font-bold text-orange-600 dark:text-orange-400" x-text="activeCategory?.name + ' 菜式清單'"></h3>
-      
-      <div class="space-y-3">
-        <template x-for="dish in getDishesByCategory(activeCategory?.name)" :key="dish.id">
-          <div class="p-3 bg-slate-100 dark:bg-gray-700 rounded-2xl space-y-2">
-            <div @click="openNoteDetail(dish)" class="cursor-pointer">
-              <span class="text-dynamic-lg font-bold" x-text="dish.name"></span>
-              <span class="text-dynamic-base text-emerald-600 dark:text-emerald-400 block" x-text="dish.indoName"></span>
-            </div>
-            <!-- 三個按鍵：加入日曆、修改、刪除 -->
-            <div class="flex justify-end space-x-2 pt-2 border-t">
-              <button @click="openAddToDateModal(dish)" class="px-3 py-1 bg-emerald-600 text-white rounded-xl text-sm font-bold"><i class="fa-solid fa-calendar-plus"></i> 加入菜單</button>
-              <button @click="openEditDishModal(dish)" class="px-3 py-1 bg-blue-600 text-white rounded-xl text-sm font-bold"><i class="fa-solid fa-pen"></i> 修改</button>
-              <button @click="deleteDish(dish.id)" class="px-3 py-1 bg-red-600 text-white rounded-xl text-sm font-bold"><i class="fa-solid fa-trash"></i> 刪除</button>
-            </div>
-          </div>
-        </template>
-      </div>
-    </div>
-  </div>
+// PDF
+function makePDFContent(days, mondayStr){
+ let title=`<div class="pdfTitle">每週菜單<br><span style="font-size:14pt">Daftar Menu Mingguan</span></div><div class="pdfSub">${mondayStr} 星期一 / Senin</div>`;
+ let body=days.map((d,i)=>`<div class="pdfDay"><div class="pdfDayH"><span>星期${cn[i]} ${idn[i]} ${d.date}</span><span>用餐 Makan:${d.diners} 外帶 Bungkus:${d.takeaway}</span></div>${d.dishes.map(dd=>`<div class="pdfDish"><b>${dd.name} / ${dd.indo||''}</b><div style="margin-top:4px;white-space:pre-wrap">備註 Catatan: ${dd.note||''}</div></div>`).join('')||'<div class="pdfDish">無 Belum ada</div>'}</div>`).join('');
+ return title+body;
+}
+function exportWeeklyPDF(){ let content=makePDFContent(currentWeek.days.map(d=>({date:fmt(d.date),dishes:d.dishes,diners:d.diners,takeaway:d.takeaway})), fmt(currentWeek.monday)); showPDF(content); }
+function exportPDFSingle(i){ let m=weeklyMenus[i]; showPDF(makePDFContent(m.days, m.monday)); }
+function showPDF(inner){ document.getElementById('pdfContent').innerHTML=inner; document.getElementById('pdfWrap').classList.add('open'); }
+function closePDF(){ document.getElementById('pdfWrap').classList.remove('open'); }
+function downloadPDF(){
+ let el=document.getElementById('pdfContent'); let full=`<!DOCTYPE html><html><head><meta charset="utf-8"><style>@page{size:A4;margin:12mm}body{font-family:sans-serif;font-size:14pt}.pdfDay{border:1.5px solid #000;border-radius:10px;margin-bottom:12px}.pdfDayH{background:#000;color:#fff;padding:6px 10px;display:flex;justify-content:space-between}</style></head><body>${el.innerHTML}</body></html>`;
+ let blob=new Blob([full],{type:'text/html'}); let url=URL.createObjectURL(blob); let a=document.createElement('a'); a.href=url; a.download=`每週菜單_${fmt(new Date())}.html`; a.click(); setTimeout(()=>URL.revokeObjectURL(url),1000);
+}
+async function sharePDF(){
+ let el=document.getElementById('pdfContent'); let html=`<!DOCTYPE html><html><head><meta charset="utf-8"></head><body>${el.innerHTML}</body></html>`; let blob=new Blob([html],{type:'text/html'}); let file=new File([blob],`每週菜單.html`,{type:'text/html'});
+ try{ if(navigator.canShare && navigator.canShare({files:[file]})){ await navigator.share({files:[file], title:'每週菜單'}); return; } }catch(e){}
+ try{ if(navigator.share){ await navigator.share({title:'每週菜單 Daftar Menu', text:el.innerText.slice(0,800)}); return; } }catch(e){}
+ downloadPDF();
+}
 
-  <!-- 彈出視窗 5：菜式備註 modal -->
-  <div x-show="showNoteModal" x-cloak class="fixed inset-0 bg-black/60 z-[60] flex items-center justify-center p-4">
-    <div class="bg-white dark:bg-gray-800 w-full max-w-md rounded-3xl p-5 space-y-3 relative shadow-2xl">
-      <button @click="showNoteModal = false" class="absolute top-4 right-4 text-3xl font-bold text-gray-500">✕</button>
-      <h3 class="text-dynamic-xl font-bold" x-text="activeDishNote?.name"></h3>
-      <p class="text-dynamic-base text-emerald-600 font-bold" x-text="activeDishNote?.indoName"></p>
-      <div class="bg-slate-100 dark:bg-gray-700 p-3 rounded-2xl space-y-2 text-dynamic-base">
-        <p x-text="'中文烹調備註：' + (activeDishNote?.note || '無')"></p>
-        <p x-text="'印尼文：' + (activeDishNote?.indoNote || '無')"></p>
-      </div>
-    </div>
-  </div>
+// Export/Import JSON - 必須功能
+function exportLib(){
+ let data={cats,dishes};
+ let blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+ let url=URL.createObjectURL(blob); let a=document.createElement('a'); a.href=url; a.download=`菜式庫_${fmt(new Date())}.json`; a.click(); setTimeout(()=>URL.revokeObjectURL(url),1000);
+ alert('已匯出 JSON');
+}
+document.getElementById('importFile').addEventListener('change',e=>{
+ let f=e.target.files[0]; if(!f) return;
+ let r=new FileReader(); r.onload=ev=>{
+  try{
+   let j=JSON.parse(ev.target.result);
+   if(j.cats && j.dishes){ cats=j.cats; dishes=j.dishes; localStorage.setItem('cats',JSON.stringify(cats)); localStorage.setItem('dishes',JSON.stringify(dishes)); renderCats(); renderCatOrder(); alert('匯入成功 Berjaya import'); }
+   else alert('JSON格式錯誤 Format salah');
+  }catch{ alert('JSON解析失敗 Gagal parse'); }
+ }; r.readAsText(f); e.target.value='';
+});
 
-  <!-- 彈出視窗 6：新增/修改菜式 modal -->
-  <div x-show="showAddDishModal" x-cloak class="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
-    <div class="bg-white dark:bg-gray-800 w-full max-w-lg rounded-3xl p-5 space-y-4 max-h-[90vh] overflow-y-auto relative shadow-2xl">
-      <button @click="showAddDishModal = false" class="absolute top-4 right-4 text-3xl font-bold text-gray-500">✕</button>
-      <h3 class="text-dynamic-xl font-bold" x-text="editingDish ? '修改菜式' : '新增菜式'"></h3>
-      <div class="space-y-3">
-        <div>
-          <label class="block text-dynamic-base font-bold">中文菜名</label>
-          <input type="text" x-model="dishForm.name" class="w-full p-2 border rounded-xl dark:bg-gray-700 text-dynamic-base">
-        </div>
-        <div>
-          <label class="block text-dynamic-base font-bold">印尼文菜名</label>
-          <input type="text" x-model="dishForm.indoName" class="w-full p-2 border rounded-xl dark:bg-gray-700 text-dynamic-base">
-        </div>
-        <div>
-          <label class="block text-dynamic-base font-bold">分類</label>
-          <select x-model="dishForm.category" class="w-full p-2 border rounded-xl dark:bg-gray-700 text-dynamic-base">
-            <template x-for="cat in categories" :key="cat.id">
-              <option :value="cat.name" x-text="cat.name"></option>
-            </template>
-          </select>
-        </div>
-        <div>
-          <label class="block text-dynamic-base font-bold">中文烹調方法/備註</label>
-          <textarea x-model="dishForm.note" class="w-full p-2 border rounded-xl dark:bg-gray-700 text-dynamic-base h-20"></textarea>
-        </div>
-        <div>
-          <label class="block text-dynamic-base font-bold">印尼文烹調方法/備註</label>
-          <textarea x-model="dishForm.indoNote" class="w-full p-2 border rounded-xl dark:bg-gray-700 text-dynamic-base h-20"></textarea>
-        </div>
-        <button @click="saveDishForm()" class="w-full py-3 bg-emerald-600 text-white rounded-2xl text-dynamic-lg font-bold shadow">儲存菜式</button>
-      </div>
-    </div>
-  </div>
+// Settings
+function renderCatOrder(){ let box=document.getElementById('catOrder'); box.innerHTML=cats.map((c,i)=>`<div class="card row" style="justify-content:space-between"><span>${i+1}. ${c}</span><span class="row"><button class="iconBtn" onclick="moveCat(${i},-1)">↑</button><button class="iconBtn" onclick="moveCat(${i},1)">↓</button><button class="ghost" style="width:auto" onclick="deleteCat(${i})">刪除</button></span></div>`).join(''); }
+function moveCat(i,dir){ let ni=i+dir; if(ni<0||ni>=cats.length) return; let t=cats[i]; cats[i]=cats[ni]; cats[ni]=t; localStorage.setItem('cats',JSON.stringify(cats)); renderCatOrder(); renderCats(); }
+function addCat(){ let v=document.getElementById('newCat').value.trim(); if(!v) return; cats.push(v); localStorage.setItem('cats',JSON.stringify(cats)); document.getElementById('newCat').value=''; renderCatOrder(); renderCats(); }
+function deleteCat(i){
+ let cat=cats[i]; if(!confirm(`刪除「${cat}」分類？內所有菜式會移到「其他」\nHapus kategori "${cat}"? Semua menu pindah ke "其他"`)) return;
+ dishes.forEach(d=>{ if(d.cat===cat) d.cat='其他 Lainnya'; });
+ if(!cats.includes('其他 Lainnya')) cats.push('其他 Lainnya');
+ cats.splice(i,1);
+ localStorage.setItem('cats',JSON.stringify(cats)); localStorage.setItem('dishes',JSON.stringify(dishes));
+ renderCatOrder(); renderCats();
+}
+function toggleTheme(){ document.body.classList.toggle('dark'); localStorage.setItem('theme',document.body.classList.contains('dark')?'dark':'light'); }
+function setFS(v){ document.documentElement.style.setProperty('--fs',v+'px'); document.getElementById('fsVal').innerText=v; localStorage.setItem('fs',v); }
+function loadFS(){ let fs=localStorage.getItem('fs'); if(fs){ setFS(fs); document.getElementById('fsRange').value=fs; } let th=localStorage.getItem('theme'); if(th==='dark') document.body.classList.add('dark'); }
+function loadAvatar(){ let av=localStorage.getItem('avatar'); if(av){ document.getElementById('avatarTop').src=av; } }
+let img=new Image(), scale=1, px=0, py=0, dragging=false, lx=0, ly=0, initS=1;
+let canvas=document.getElementById('avCanvas');
+function drawAv(){ let ctx=canvas.getContext('2d'); ctx.clearRect(0,0,600,600); if(!img.src) return; let w=img.width*scale, h=img.height*scale; ctx.drawImage(img,300-w/2+px,300-h/2+py,w,h); }
+document.getElementById('avatarFile').addEventListener('change',e=>{ let f=e.target.files[0]; if(!f) return; let r=new FileReader(); r.onload=ev=>{ img.src=ev.target.result; img.onload=()=>{ let m=Math.min(img.width,img.height); initS=500/m; scale=initS; px=0; py=0; document.getElementById('avZoom').value=scale; drawAv(); }; }; r.readAsDataURL(f); });
+document.getElementById('avZoom').addEventListener('input',e=>{ scale=parseFloat(e.target.value); drawAv(); });
+canvas.addEventListener('mousedown',e=>{ dragging=true; lx=e.clientX; ly=e.clientY; });
+canvas.addEventListener('touchstart',e=>{ dragging=true; lx=e.touches[0].clientX; ly=e.touches[0].clientY; },{passive:false});
+window.addEventListener('mousemove',e=>{ if(!dragging) return; px+=e.clientX-lx; py+=e.clientY-ly; lx=e.clientX; ly=e.clientY; drawAv(); });
+window.addEventListener('touchmove',e=>{ if(!dragging) return; e.preventDefault(); px+=e.touches[0].clientX-lx; py+=e.touches[0].clientY-ly; lx=e.touches[0].clientX; ly=e.touches[0].clientY; drawAv(); },{passive:false});
+window.addEventListener('mouseup',()=>dragging=false); window.addEventListener('touchend',()=>dragging=false);
+canvas.addEventListener('wheel',e=>{ e.preventDefault(); scale+=e.deltaY*-0.001; scale=Math.min(Math.max(0.2,scale),4); document.getElementById('avZoom').value=scale; drawAv(); },{passive:false});
+function resetAv(){ px=0; py=0; scale=initS; document.getElementById('avZoom').value=scale; drawAv(); }
+function saveAv(){ let d=canvas.toDataURL('image/png'); localStorage.setItem('avatar',d); document.getElementById('avatarTop').src=d; alert('頭像已儲存'); }
 
-  <!-- 底部導航欄 (行高較高，便於年長人士點擊) -->
-  <nav class="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 flex justify-around items-center h-24 z-40 px-2">
-    <button @click="currentTab = 'home'" :class="currentTab === 'home' ? 'text-emerald-600 dark:text-emerald-400' : 'text-gray-400'" class="flex flex-col items-center justify-center w-full h-full active:scale-95">
-      <i class="fa-solid fa-calendar-week text-3xl mb-1"></i>
-      <span class="text-dynamic-base font-bold">每週菜單</span>
-    </button>
-    <button @click="currentTab = 'recipes'" :class="currentTab === 'recipes' ? 'text-emerald-600 dark:text-emerald-400' : 'text-gray-400'" class="flex flex-col items-center justify-center w-full h-full active:scale-95">
-      <i class="fa-solid fa-utensils text-3xl mb-1"></i>
-      <span class="text-dynamic-base font-bold">菜式庫</span>
-    </button>
-    <button @click="currentTab = 'myMenus'" :class="currentTab === 'myMenus' ? 'text-emerald-600 dark:text-emerald-400' : 'text-gray-400'" class="flex flex-col items-center justify-center w-full h-full active:scale-95">
-      <i class="fa-solid fa-book-open text-3xl mb-1"></i>
-      <span class="text-dynamic-base font-bold">我的菜單</span>
-    </button>
-    <button @click="currentTab = 'settings'" :class="currentTab === 'settings' ? 'text-emerald-600 dark:text-emerald-400' : 'text-gray-400'" class="flex flex-col items-center justify-center w-full h-full active:scale-95">
-      <i class="fa-solid fa-gear text-3xl mb-1"></i>
-      <span class="text-dynamic-base font-bold">設定</span>
-    </button>
-  </nav>
-
-  <!-- JavaScript 邏輯 -->
-  <script>
-    function app() {
-      return {
-        currentTab: 'home',
-        darkMode: false,
-        fontScale: 1.0,
-        avatar: '',
-        selectedMonday: '',
-        activeDayIndex: 0,
-        showDayModal: false,
-        showSelectCatModal: false,
-        showSelectDishListModal: false,
-        activeSelectCat: '',
-        showCatDishesModal: false,
-        activeCategory: null,
-        showNoteModal: false,
-        activeDishNote: null,
-        showAddDishModal: false,
-        editingDish: null,
-        dishForm: { name: '', indoName: '', category: '雞', note: '', indoNote: '' },
-
-        daysHeader: [
-          { name: '星期一 / Senin', icon: '🍳' },
-          { name: '星期二 / Selasa', icon: '🍲' },
-          { name: '星期三 / Rabu', icon: '🥗' },
-          { name: '星期四 / Kamis', icon: '蒸' },
-          { name: '星期五 / Jumat', icon: '🍗' },
-          { name: '星期六 / Sabtu', icon: '魚' },
-          { name: '星期日 / Minggu', icon: '🍲' }
-        ],
-
-        categories: [
-          { id: 1, name: '雞', icon: '🐔' },
-          { id: 2, name: '牛', icon: '🐮' },
-          { id: 3, name: '豬', icon: '🐷' },
-          { id: 4, name: '魚', icon: '🐟' },
-          { id: 5, name: '蔬菜', icon: '🥬' },
-          { id: 6, name: '湯水', icon: '🥣' },
-          { id: 7, name: '西式', icon: '🍝' },
-          { id: 8, name: '罐頭', icon: '🥫' },
-          { id: 9, name: '其他', icon: '🍱' }
-        ],
-
-        dishes: [],
-        weeklyMenu: Array.from({ length: 7 }, () => ({ diners: 0, takeout: 0, dishes: [] })),
-        savedMenus: [],
-
-        initApp() {
-          this.initDefaultMonday();
-          this.loadLocalData();
-          if (this.dishes.length === 0) {
-            this.seedDefaultDishes();
-          }
-        },
-
-        initDefaultMonday() {
-          const d = new Date();
-          const day = d.getDay();
-          const diff = d.getDate() - day + (day === 0 ? -6 : 1);
-          const monday = new Date(d.setDate(diff));
-          this.selectedMonday = monday.toISOString().split('T')[0];
-        },
-
-        validateMonday(e) {
-          const val = e.target.value;
-          if (!val) return;
-          const d = new Date(val);
-          if (d.getDay() !== 1) {
-            alert('只可以選擇星期一作起始日！');
-            this.initDefaultMonday();
-          }
-        },
-
-        getCategoryDishCount(catName) {
-          return this.dishes.filter(d => d.category === catName).length;
-        },
-
-        getDishesByCategory(catName) {
-          return this.dishes.filter(d => d.category === catName);
-        },
-
-        openDayModal(idx) {
-          this.activeDayIndex = idx;
-          this.showDayModal = true;
-        },
-
-        addDishToDay(dish) {
-          this.weeklyMenu[this.activeDayIndex].dishes.push({ ...dish });
-          this.showSelectDishListModal = false;
-          this.showSelectCatModal = false;
-        },
-
-        openNoteDetail(dish) {
-          this.activeDishNote = dish;
-          this.showNoteModal = true;
-        },
-
-        openEditDishModal(dish) {
-          this.editingDish = dish;
-          this.dishForm = { ...dish };
-          this.showAddDishModal = true;
-        },
-
-        saveDishForm() {
-          if (!this.dishForm.name) return alert('請輸入菜名');
-          if (this.editingDish) {
-            Object.assign(this.editingDish, this.dishForm);
-          } else {
-            this.dishes.push({
-              id: Date.now(),
-              ...this.dishForm,
-              lastCooked: ''
-            });
-          }
-          this.saveLocalData();
-          this.showAddDishModal = false;
-          this.editingDish = null;
-          this.dishForm = { name: '', indoName: '', category: '雞', note: '', indoNote: '' };
-        },
-
-        deleteDish(id) {
-          if (confirm('確定刪除此菜式？')) {
-            this.dishes = this.dishes.filter(d => d.id !== id);
-            this.saveLocalData();
-          }
-        },
-
-        openAddToDateModal(dish) {
-          const inputDate = prompt('請輸入要加入的日期 (YYYY-MM-DD)：', this.selectedMonday);
-          if (!inputDate) return;
-          const d = new Date(inputDate);
-          const day = d.getDay();
-          const targetIndex = day === 0 ? 6 : day - 1;
-          this.weeklyMenu[targetIndex].dishes.push({ ...dish });
-          alert(`已加入到 ${this.daysHeader[targetIndex].name}`);
-        },
-
-        saveCurrentMenu() {
-          if (this.savedMenus.length >= 10) {
-            alert('最多只能儲存10張每週菜單，請先刪除舊菜單。');
-            return;
-          }
-          const existingIdx = this.savedMenus.findIndex(m => m.date === this.selectedMonday);
-          if (existingIdx !== -1) {
-            if (!confirm('該週菜單已存在，是否取代？')) return;
-            this.savedMenus[existingIdx] = { date: this.selectedMonday, days: JSON.parse(JSON.stringify(this.weeklyMenu)) };
-          } else {
-            this.savedMenus.push({ date: this.selectedMonday, days: JSON.parse(JSON.stringify(this.weeklyMenu)) });
-          }
-          
-          // 更新菜式的最後烹飪日期
-          this.weeklyMenu.forEach(day => {
-            day.dishes.forEach(d => {
-              const target = this.dishes.find(x => x.id === d.id);
-              if (target) target.lastCooked = this.selectedMonday;
-            });
-          });
-
-          this.saveLocalData();
-          alert('菜單已儲存！');
-        },
-
-        loadSavedMenuToCurrent(menu) {
-          this.selectedMonday = menu.date;
-          this.weeklyMenu = JSON.parse(JSON.stringify(menu.days));
-          this.currentTab = 'home';
-        },
-
-        deleteSavedMenu(idx) {
-          if (confirm('確定刪除此每週菜單？')) {
-            this.savedMenus.splice(idx, 1);
-            this.saveLocalData();
-          }
-        },
-
-        // JSON 匯出與匯入 (菜式庫)
-        exportRecipesJSON() {
-          const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(this.dishes, null, 2));
-          const dlAnchorElem = document.createElement('a');
-          dlAnchorElem.setAttribute("href", dataStr);
-          dlAnchorElem.setAttribute("download", "recipes_backup.json");
-          dlAnchorElem.click();
-        },
-
-        importRecipesJSON(event) {
-          const file = event.target.files[0];
-          if (!file) return;
-          const reader = new FileReader();
-          reader.onload = (e) => {
-            try {
-              const imported = JSON.parse(e.target.result);
-              if (Array.isArray(imported)) {
-                this.dishes = imported;
-                this.saveLocalData();
-                alert('菜式庫匯入成功！');
-              }
-            } catch (err) {
-              alert('JSON 格式錯誤，無法匯入');
-            }
-          };
-          reader.readAsText(file);
-        },
-
-        // PDF 匯出功能
-        exportPDF() {
-          const docDefinition = {
-            pageSize: 'A4',
-            pageMargins: [20, 20, 20, 20],
-            content: [
-              { text: `每週菜單 Menu Mingguan (${this.selectedMonday})`, style: 'header', alignment: 'center' },
-              { text: '\n' }
-            ],
-            styles: {
-              header: { fontSize: 22, bold: true },
-              dayTitle: { fontSize: 16, bold: true, margin: [0, 5, 0, 5] },
-              dishName: { fontSize: 14, bold: true },
-              noteText: { fontSize: 12, italics: true, color: '#555555' }
-            }
-          };
-
-          this.weeklyMenu.forEach((day, idx) => {
-            docDefinition.content.push({
-              text: `${this.daysHeader[idx].name} (Diners: ${day.diners}, Takeout: ${day.takeout})`,
-              style: 'dayTitle'
-            });
-
-            if (day.dishes.length === 0) {
-              docDefinition.content.push({ text: '無安排 / Tidak ada', margin: [10, 0, 0, 5] });
-            } else {
-              day.dishes.forEach(dish => {
-                docDefinition.content.push({ text: `• ${dish.name} / ${dish.indoName}`, style: 'dishName', margin: [10, 2, 0, 0] });
-                docDefinition.content.push({ text: `  備註：${dish.note || '-'} | Indo: ${dish.indoNote || '-'}`, style: 'noteText', margin: [15, 0, 0, 4] });
-              });
-            }
-          });
-
-          pdfMake.createPdf(docDefinition).download(`Menu_${this.selectedMonday}.pdf`);
-        },
-
-        moveCategory(idx, dir) {
-          const target = idx + dir;
-          if (target < 0 || target >= this.categories.length) return;
-          const temp = this.categories[idx];
-          this.categories[idx] = this.categories[target];
-          this.categories[target] = temp;
-          this.saveLocalData();
-        },
-
-        deleteCategory(cat, idx) {
-          if (confirm(`刪除「${cat.name}」分類後，該分類所有菜式將自動移至「其他」分類，確定刪除？`)) {
-            this.dishes.forEach(d => {
-              if (d.category === cat.name) d.category = '其他';
-            });
-            this.categories.splice(idx, 1);
-            this.saveLocalData();
-          }
-        },
-
-        addNewCategoryPrompt() {
-          const name = prompt('請輸入新分類名稱：');
-          if (name) {
-            this.categories.push({ id: Date.now(), name, icon: '🍲' });
-            this.saveLocalData();
-          }
-        },
-
-        uploadAvatar(e) {
-          const file = e.target.files[0];
-          if (!file) return;
-          const reader = new FileReader();
-          reader.onload = (evt) => {
-            this.avatar = evt.target.result;
-            this.saveLocalData();
-          };
-          reader.readAsDataURL(file);
-        },
-
-        saveLocalData() {
-          localStorage.setItem('menu_app_dishes', JSON.stringify(this.dishes));
-          localStorage.setItem('menu_app_saved_menus', JSON.stringify(this.savedMenus));
-          localStorage.setItem('menu_app_categories', JSON.stringify(this.categories));
-          localStorage.setItem('menu_app_avatar', this.avatar);
-        },
-
-        loadLocalData() {
-          const d = localStorage.getItem('menu_app_dishes');
-          if (d) this.dishes = JSON.parse(d);
-          const m = localStorage.getItem('menu_app_saved_menus');
-          if (m) this.savedMenus = JSON.parse(m);
-          const c = localStorage.getItem('menu_app_categories');
-          if (c) this.categories = JSON.parse(c);
-          const a = localStorage.getItem('menu_app_avatar');
-          if (a) this.avatar = a;
-        },
-
-        // 預設預載各分類 10 款菜式 (含中英印烹飪備註)
-        seedDefaultDishes() {
-          const defs = [
-            // 雞
-            { name: '白切雞', indoName: 'Ayam Rebus', category: '雞', note: '水滾後浸熟20分鐘', indoNote: 'Rebus ayam dalam air mendidih selama 20 menit' },
-            { name: '宮保雞丁', indoName: 'Ayam Kung Pao', category: '雞', note: '雞肉切粒炒香加花生', indoNote: 'Tumis dadu ayam dengan kacang tanah' },
-            { name: '咖喱雞', indoName: 'Kari Ayam', category: '雞', note: '加椰漿薯仔慢火燉煮', indoNote: 'Masak ayam dengan santan dan kentang' },
-            { name: '手撕雞', indoName: 'Ayam Suwir', category: '雞', note: '蒸熟後撕絲拌麻油', indoNote: 'Kukus ayam lalu suwir dan campur minyak wijen' },
-            { name: '滷水雞翼', indoName: 'Kepak Ayam Kecap', category: '雞', note: '滷汁浸泡煮30分鐘', indoNote: 'Rebus kepak ayam dalam kuah kecap 30 menit' },
-            { name: '炸雞排', indoName: 'Ayam Goreng Tepung', category: '雞', note: '沾粉大火炸至金黃', indoNote: 'Goreng ayam bertepung hingga keemasan' },
-            { name: '香菇蒸雞', indoName: 'Ayam Kukus Jamur', category: '雞', note: '冬菇浸軟蒸15分鐘', indoNote: 'Kukus ayam dengan jamur selama 15 menit' },
-            { name: '三杯雞', indoName: 'Ayam Tiga Cangkir', category: '雞', note: '麻油米酒醬油同煮', indoNote: 'Masak ayam dengan minyak wijen dan kecap' },
-            { name: '雞扒炒麵', indoName: 'Mie Goreng Ayam', category: '雞', note: '雞扒煎香切條炒面', indoNote: 'Goreng ayam lalu tumis dengan mie' },
-            { name: '醉雞', indoName: 'Ayam Daging Mabuk', category: '雞', note: '花雕酒浸泡過夜', indoNote: 'Rendam ayam dalam arak memasak semalaman' },
-            
-            // 牛
-            { name: '乾炒牛河', indoName: 'Kwetiau Goreng Sapi', category: '牛', note: '大火快炒避免河粉黏連', indoNote: 'Tumis kwetiau dengan daging sapi api besar' },
-            { name: '水煮牛肉', indoName: 'Daging Sapi Pedas', category: '牛', note: '加花椒辣椒滾油澆淋', indoNote: 'Masak sapi dengan cabai dan minyak panas' },
-            { name: '蔥爆牛肉', indoName: 'Tumis Sapi Daun Bawang', category: '牛', note: '大蔥切段與牛肉大火爆炒', indoNote: 'Tumis daging sapi dengan daun bawang' },
-            { name: '番茄燉牛肉', indoName: 'Sup Sapi Tomat', category: '牛', note: '燉煮2小時至牛肉軟爛', indoNote: 'Rebus sapi dan tomat selama 2 jam' },
-            { name: '黑椒牛柳', indoName: 'Sapi Lada Hitam', category: '牛', note: '加大量黑椒粒炒香', indoNote: 'Tumis sapi dengan saus lada hitam' },
-            { name: '紅燒牛腩', indoName: 'Semur Daging Sapi', category: '牛', note: '柱侯醬燉煮', indoNote: 'Rebus sapi dengan saus Chu Hou' },
-            { name: '牛尾湯', indoName: 'Sup Buntut', category: '牛', note: '牛尾慢火熬煮3小時', indoNote: 'Rebus buntut sapi selama 3 jam' },
-            { name: '咖喱牛肉飯', indoName: 'Nasi Kari Sapi', category: '牛', note: '咖喱塊煮濃淋飯', indoNote: 'Masak kari sapi dan sajikan dengan nasi' },
-            { name: '牛肉丸湯', indoName: 'Bakso Sapi', category: '牛', note: '清湯煮熟加芹菜粒', indoNote: 'Rebus bakso sapi dalam kuah bening' },
-            { name: '沙爹牛肉', indoName: 'Sate Daging Sapi', category: '牛', note: '沙爹醬醃製後煎香', indoNote: 'Bumbui sapi dengan saus sate lalu goreng' },
-
-            // 豬
-            { name: '咕嚕肉', indoName: 'Babi Asam Manis', category: '豬', note: '炸酥後裹甜酸汁', indoNote: 'Goreng babi lalu lumuri saus asam manis' },
-            { name: '梅菜扣肉', indoName: 'Babi Kecap Meicai', category: '豬', note: '五花肉蒸熟切片蒸梅菜', indoNote: 'Kukus samcan dengan sayur meicai' },
-            { name: '麻婆豆腐', indoName: 'Tahu Mapo Daging Babi', category: '豬', note: '豬肉碎炒香加辣豆板醬', indoNote: 'Tumis tahu dengan daging babi cincang pedas' },
-            { name: '蒜泥白肉', indoName: 'Babi Bumbu Bawang Putih', category: '豬', note: '白灼肉片淋蒜泥醬油', indoNote: 'Iris babi rebus dan siram saus bawang putih' },
-            { name: '蒸肉餅', indoName: 'Daging Cincang Kukus', category: '豬', note: '豬肉碎剁爛蒸12分鐘', indoNote: 'Kukus daging babi cincang selama 12 menit' },
-            { name: '回鍋肉', indoName: 'Babi Tumis Pedas', category: '豬', note: '煮熟切片再下鍋爆炒', indoNote: 'Rebus babi, iris, lalu tumis pedas' },
-            { name: '豬扒包', indoName: 'Roti Daging Babi', category: '豬', note: '煎香豬扒夾麵包', indoNote: 'Goreng pork chop dan jepit dalam roti' },
-            { name: '排骨湯', indoName: 'Sup Iga Babi', category: '豬', note: '紅蘿蔔玉米燉排骨', indoNote: 'Rebus iga babi dengan wortel dan jagung' },
-            { name: '椒鹽排骨', indoName: 'Iga Babi Garam Lada', category: '豬', note: '油炸後撒椒鹽粉', indoNote: 'Goreng iga babi lalu taburi garam dan lada' },
-            { name: '豬腳薑', indoName: 'Cuka Kaki Babi', category: '豬', note: '甜醋慢火燉豬腳', indoNote: 'Rebus kaki babi dengan cuka manis' },
-
-            // 魚
-            { name: '清蒸海上鮮', indoName: 'Ikan Kukus HK', category: '魚', note: '水滾蒸8分鐘淋熟油醬油', indoNote: 'Kukus ikan 8 menit, siram minyak panas & kecap' },
-            { name: '紅燒魚', indoName: 'Ikan Masak Kecap', category: '魚', note: '兩面煎香加醬油燜燒', indoNote: 'Goreng ikan lalu masak dengan kecap' },
-            { name: '酸菜魚', indoName: 'Ikan Sayur Asin Pedas', category: '魚', note: '魚片滑熟放入酸菜湯', indoNote: 'Rebus filat ikan dalam kuah sayur asin' },
-            { name: '松子黃魚', indoName: 'Ikan Asam Manis', category: '魚', note: '魚身劃刀炸酥淋酸甜汁', indoNote: 'Goreng ikan sampai renyah, siram saus asam manis' },
-            { name: '三文魚刺身', indoName: 'Sashimi Salmon', category: '魚', note: '切片即食', indoNote: 'Iris segar dan sajikan' },
-            { name: '泰式香茅魚', indoName: 'Ikan Steam Sereh Thailand', category: '魚', note: '加檸檬汁香茅蒸熟', indoNote: 'Kukus ikan dengan sereh dan air jeruk nipis' },
-            { name: '煎三文魚扒', indoName: 'Steak Salmon Goreng', category: '魚', note: '少油煎至兩面金黃', indoNote: 'Goreng steak salmon dengan sedikit minyak' },
-            { name: '魚頭豆腐湯', indoName: 'Sup Kepala Ikan Tahu', category: '魚', note: '魚頭煎香加水煮至奶白色', indoNote: 'Goreng kepala ikan lalu rebus dengan tahu' },
-            { name: '銀魚炒蛋', indoName: 'Telur Tumis Ikan Teri', category: '魚', note: '銀魚仔洗淨拌蛋液炒熟', indoNote: 'Tumis ikan teri dengan kocokan telur' },
-            { name: '香煎黃花魚', indoName: 'Ikan Yellow Croaker Goreng', category: '魚', note: '鹽醃後慢火煎香', indoNote: 'Garam ikan lalu goreng dengan api kecil' },
-
-            // 蔬菜
-            { name: '蒜蓉炒炒心', indoName: 'Tumis Choy Sum Bawang Putih', category: '蔬菜', note: '大火蒜蓉爆炒', indoNote: 'Tumis choy sum dengan bawang putih api besar' },
-            { name: '地三鮮', indoName: 'Tumis Terong Kentang Paprika', category: '蔬菜', note: '茄子薯仔過油後炒', indoNote: 'Goreng terong dan kentang lalu tumis' },
-            { name: '乾煸四季豆', indoName: 'Tumis Buncis Pedas', category: '蔬菜', note: '四季豆炸至皺皮加肉碎炒', indoNote: 'Goreng buncis lalu tumis dengan daging cincang' },
-            { name: '炒通菜', indoName: 'Tumis Kangkung Belacan', category: '蔬菜', note: '加蝦醬大火快炒', indoNote: 'Tumis kangkung dengan terasi/belacan' },
-            { name: '蠔油芥蘭', indoName: 'Gai Lan Saus Tiram', category: '蔬菜', note: '白灼芥蘭淋蠔油', indoNote: 'Rebus gai lan dan siram saus tiram' },
-            { name: '清炒西兰花', indoName: 'Tumis Brokoli', category: '蔬菜', note: '焯水後蒜蓉炒', indoNote: 'Rebus brokoli sebentar lalu tumis' },
-            { name: '手撕包菜', indoName: 'Tumis Kubis Pedas', category: '蔬菜', note: '乾辣椒爆香炒包菜', indoNote: 'Tumis kubis dengan cabai kering' },
-            { name: '番茄炒蛋', indoName: 'Tumis Telur Tomat', category: '蔬菜', note: '酸甜開胃家庭菜', indoNote: 'Tumis telur dengan tomat segar' },
-            { name: '上湯娃娃菜', indoName: 'Sup Sawi Putih', category: '蔬菜', note: '皮蛋皮肉碎煮上湯', indoNote: 'Rebus sawi putih dalam kuah kaldu' },
-            { name: '炒絲瓜', indoName: 'Tumis Gambas/Oyong', category: '蔬菜', note: '絲瓜去皮切塊炒蒜蓉', indoNote: 'Kupas gambas lalu tumis dengan bawang putih' },
-
-            // 湯水
-            { name: '老火靚湯', indoName: 'Sup Kaldu HK', category: '湯水', note: '豬骨煲3小時', indoNote: 'Rebus tulang babi selama 3 jam' },
-            { name: '蕃茄豆腐蛋花湯', indoName: 'Sup Tomat Tahu Telur', category: '湯水', note: '滾水下材料煮15分鐘', indoNote: 'Rebus tomat, tahu, dan telur 15 menit' },
-            { name: '西洋菜豬骨湯', indoName: 'Sup Watercress Iga Babi', category: '湯水', note: '西洋菜滾水後下鍋', indoNote: 'Masukan watercress saat air mendidih' },
-            { name: '雞湯', indoName: 'Sup Ayam Khas', category: '湯水', note: '整雞加枸杞燉煮', indoNote: 'Rebus ayam utuh dengan goji berry' },
-            { name: '冬瓜排骨湯', indoName: 'Sup Labu Kundur Iga Babi', category: '湯水', note: '冬瓜切塊清熱解暑', indoNote: 'Rebus labu kundur dengan iga babi' },
-            { name: '青檸冬蔭功湯', indoName: 'Sup Tom Yum', category: '湯水', note: '泰式酸辣蝦湯', indoNote: 'Sup udang pedas asam khas Thailand' },
-            { name: '羅宋湯', indoName: 'Sup Borscht', category: '湯水', note: '牛肉牛榜牛西芹牛肉湯', indoNote: 'Sup sayur daging sapi gaya Rusia' },
-            { name: '花旗蔘雞湯', indoName: 'Sup Ayam Ginseng', category: '湯水', note: '滋陰補氣燉湯', indoNote: 'Rebus ayam dengan ginseng' },
-            { name: '海帶豆腐湯', indoName: 'Sup Rumput Laut Tahu', category: '湯水', note: '日式味噌風味', indoNote: 'Sup rumput laut dengan tahu' },
-            { name: '玉米鬚豬胰湯', indoName: 'Sup Jagung Babi', category: '湯水', note: '清甜煲湯', indoNote: 'Sup manis jagung dan daging babi' },
-
-            // 西式
-            { name: '肉醬意粉', indoName: 'Spaghetti Bolognese', category: '西式', note: '牛肉醬煮意粉', indoNote: 'Rebus spaghetti dengan saus daging' },
-            { name: '煎牛扒', indoName: 'Steak Daging Sapi', category: '西式', note: '牛油蒜頭煎5分鐘', indoNote: 'Goreng steak dengan mentega dan bawang putih' },
-            { name: '奶油蘑菇湯', indoName: 'Sup Jamur Krim', category: '西式', note: '鮮奶油炒蘑菇', indoNote: 'Tumis jamur dengan krim segar' },
-            { name: '千層餅/披薩', indoName: 'Pizza', category: '西式', note: '焗爐200度烤15分鐘', indoNote: 'Panggang oven 200 derajat 15 menit' },
-            { name: '凱撒沙律', indoName: 'Caesar Salad', category: '西式', note: '沙律菜拌凱撒醬', indoNote: 'Campur sayuran dengan saus Caesar' },
-            { name: '焗豬扒飯', indoName: 'Nasi Panggang Pork Chop', category: '西式', note: '鋪芝士焗至金黃', indoNote: 'Panggang nasi pork chop dengan keju' },
-            { name: '美式炸雞', indoName: 'Ayam Goreng America', category: '西式', note: '香辣麵粉炸雞', indoNote: 'Goreng ayam dengan tepung bumbu pedas' },
-            { name: '芝士漢堡', indoName: 'Cheeseburger', category: '西式', note: '牛肉餅夾芝士', indoNote: 'Burger daging sapi dengan keju' },
-            { name: '羅宋意粉', indoName: 'Pasta Macaroni', category: '西式', note: '茄汁炒通心粉', indoNote: 'Tumis makaroni dengan saus tomat' },
-            { name: '海鮮西班牙飯', indoName: 'Paella Seafood', category: '西式', note: '黃薑飯燉海鮮', indoNote: 'Nasi kunyit dimasak dengan seafood' },
-
-            // 罐頭
-            { name: '午餐肉炒蛋', indoName: 'Luncheon Meat Telur', category: '罐頭', note: '午餐肉切粒煎香', indoNote: 'Goreng potongan luncheon meat dan telur' },
-            { name: '豆豉鯪魚炒油麥菜', indoName: 'Ikan Kaleng Tumis Sayur', category: '罐頭', note: '整罐豆豉鯪魚連油下鍋', indoNote: 'Tumis sayur dengan ikan dace kalengan' },
-            { name: '回鍋肉罐頭炒麵', indoName: 'Mie Tumis Babi Kaleng', category: '罐頭', note: '罐頭肉快炒意粉', indoNote: 'Tumis mie dengan babi kalengan' },
-            { name: '茄汁 sardines 魚蛋', indoName: 'Ikan Sarden Saus Tomat', category: '罐頭', note: '加熱即食', indoNote: 'Panaskan sarden saus tomat kaleng' },
-            { name: '紅燒扣肉罐頭燉白菜', indoName: 'Babi Kaleng Sawi Putih', category: '罐頭', note: '燉煮白菜吸汁', indoNote: 'Rebus sawi putih dengan babi kaleng' },
-            { name: '罐頭金槍魚沙律', indoName: 'Salad Tuna Kaleng', category: '罐頭', note: '鮪魚拌沙律醬', indoNote: 'Campur tuna kaleng dengan mayones' },
-            { name: '罐頭鮑魚燜雞', indoName: 'Ayam Abalone Kaleng', category: '罐頭', note: '鮑魚汁燜雞肉', indoNote: 'Masak ayam dengan kuah abalone kaleng' },
-            { name: '罐頭玉米濃湯', indoName: 'Sup Jagung Kaleng', category: '罐頭', note: '加蛋花煮滾', indoNote: 'Panaskan sup jagung kaleng dan telur' },
-            { name: '茄汁豆多士', indoName: 'Kacang Merah Kaleng Roti', category: '罐頭', note: '茄汁豆烘熱鋪多士', indoNote: 'Panaskan kacang kaleng dan sajikan di atas roti' },
-            { name: '罐頭咖喱牛肉麵', indoName: 'Mie Kari Sapi Kaleng', category: '罐頭', note: '煮麵後加入罐頭汁', indoNote: 'Rebus mie dan campur kari sapi kaleng' },
-
-            // 其他
-            { name: '日式章魚燒', indoName: 'Takoyaki', category: '其他', note: '章魚小丸子', indoNote: 'Bola-bola gurita khas Jepang' },
-            { name: '韓式石鍋拌飯', indoName: 'Bibimbap', category: '其他', note: '各式野菜拌飯', indoNote: 'Nasi campur sayuran khas Korea' },
-            { name: '越南牛肉河', indoName: 'Pho Sapi', category: '其他', note: '生牛肉淋滾湯', indoNote: 'Mie kuah sapi khas Vietnam' },
-            { name: '印尼炒飯', indoName: 'Nasi Goreng Indo', category: '其他', note: '甜醬油辣醬炒飯加煎蛋', indoNote: 'Nasi goreng dengan kecap manis dan telur' },
-            { name: '海南雞飯', indoName: 'Nasi Ayam Hainan', category: '其他', note: '雞油煮飯跟油雞', indoNote: 'Nasi gurih dengan ayam rebus' },
-            { name: '壽司拼盤', indoName: 'Sushi Assorted', category: '其他', note: '醋飯配各式生魚片', indoNote: 'Nasi sushi dengan aneka topping' },
-            { name: '天婦羅蝦', indoName: 'Tempura Udang', category: '其他', note: '炸漿油炸大蝦', indoNote: 'Udang goreng tepung khas Jepang' },
-            { name: '新加坡喇沙', indoName: 'Laksa Singapore', category: '其他', note: '椰奶咖喱湯麵', indoNote: 'Mie kuah laksa santan gurih' },
-            { name: '印度薄餅', indoName: 'Roti Canai', category: '其他', note: '煎餅沾咖喱汁', indoNote: 'Roti pipih disajikan dengan kuah kari' },
-            { name: '廣東點心拼盤', indoName: 'Dimsum Set', category: '其他', note: '蝦餃燒賣蒸10分鐘', indoNote: 'Kukus dimsum selama 10 menit' }
-          ];
-
-          this.dishes = defs.map((d, i) => ({ id: i + 1, ...d, lastCooked: '' }));
-          this.saveLocalData();
-        }
-      }
-    }
-  </script>
+init();
+</script>
 </body>
 </html>
