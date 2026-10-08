@@ -20,7 +20,7 @@ body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,P
 .page{display:none}.page.active{display:block}
 .card{background:var(--card);border:2px solid var(--border);border-radius:20px;padding:14px;margin-bottom:14px}
 .row{display:flex;gap:8px;align-items:center}
-.btn{flex:1;padding:16px;border-radius:16px;border:none;background:var(--primary);color:#fff;font-weight:900;font-size:1.1rem}
+.btn{flex:1;padding:18px;border-radius:16px;border:none;background:var(--primary);color:#fff;font-weight:900;font-size:1.3rem}
 .ghost{flex:1;padding:14px;border-radius:16px;border:2px solid var(--border);background:var(--bg);font-weight:800;font-size:1rem}
 .iconBtn{width:60px;height:60px;border-radius:18px;border:2px solid var(--border);background:var(--card);font-size:30px;display:grid;place-items:center;flex-shrink:0}
 .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
@@ -43,21 +43,22 @@ body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,P
 select,input,textarea{width:100%;padding:14px;border-radius:14px;border:2px solid var(--border);background:var(--bg);color:var(--text);font-size:1.05rem}
 .topRowFixed{display:flex;gap:8px;align-items:center;width:100%}
 .topRowFixed input{flex:1;min-width:0}
-
-/* PDF 真A4 */
 #pdfWrap{position:fixed;inset:0;background:#222;z-index:10000;display:none;flex-direction:column}
 #pdfWrap.open{display:flex}
 .pdfTool{position:sticky;top:0;background:#fff;padding:12px;display:flex;gap:12px;border-bottom:2px solid #ccc;z-index:2}
 .pdfView{flex:1;overflow:auto;background:#333;padding:16px;display:flex;justify-content:center}
 .pdfPage{width:100%;max-width:800px;background:#fff;margin:0 auto}
 .pdfInner{padding:20mm;background:#fff;color:#000;box-sizing:border-box;font-size:18pt;line-height:1.6}
-.pdfInner h1{text-align:center;margin:0 0 6px 0;font-size:26pt;line-height:1.2}
-.pdfInner.sub{text-align:center;color:#555;font-size:13pt;margin-bottom:16px}
-.pdfInner.day{border:2.5px solid #000;border-radius:12px;margin-top:18px;overflow:hidden;page-break-inside:avoid}
-.pdfInner.dayHead{background:#000;color:#fff;padding:12px 16px}
-.pdfInner.dayHead b{display:block;font-size:14pt}
-.pdfInner.dayHead span{display:block;font-size:12pt;margin-top:4px}
-.pdfInner.dish{padding:12px 16px;border-top:1.5px dashed #999}
+.pdfInner h1{border:4px solid #000;border-radius:16px;padding:18px;text-align:center;margin:0 0 16px 0;font-size:26pt;line-height:1.2}
+.pdfInner.sub{font-size:12pt;font-weight:400;margin-top:8px}
+.pdfInner.day{border:3.5px solid #000;border-radius:16px;margin-top:22px;overflow:hidden;page-break-inside:avoid;background:#fff}
+.pdfInner.dayHead{background:#000;color:#fff;padding:14px 18px}
+.pdfInner.dayHead b{display:block;font-size:15pt;font-weight:900}
+.pdfInner.dayHead span{display:block;font-size:11pt;margin-top:6px;opacity:.9}
+.pdfInner.dish{padding:14px 18px;border-top:2.5px solid #000}
+.pdfInner.dish:first-of-type{border-top:none}
+.pdfInner.dish b{font-size:13pt}
+.pdfInner.noteBox{margin-top:8px;white-space:pre-wrap;font-size:10.5pt;line-height:1.5;border:1.8px dashed #999;border-radius:10px;padding:10px;background:#fffef5}
 @media screen and (max-width:600px){.pdfView{padding:8px}.pdfInner{padding:16px;font-size:14pt}}
 </style>
 </head>
@@ -77,7 +78,8 @@ select,input,textarea{width:100%;padding:14px;border-radius:14px;border:2px soli
 <div class="modal" id="mPickCat" style="z-index:10003"><div class="sheet"><div class="head"><b>分類</b><div class="x" onclick="closeM('mPickCat')">✕</div></div><div id="mPickCatBody" class="grid3" style="padding:12px"></div></div></div>
 <div class="modal" id="mPickDish" style="z-index:10004"><div class="sheet"><div class="head"><b>菜式</b><div class="x" onclick="closeM('mPickDish')">✕</div></div><div id="mPickDishBody"></div></div></div>
 <div class="modal" id="mAdd" style="z-index:10005"><div class="sheet"><div class="head"><b>新增/修改菜式</b><div class="x" onclick="closeM('mAdd')">✕</div></div><div style="padding:14px"><input id="fName" placeholder="中文菜名"><input id="fIndo" placeholder="印尼文" style="margin-top:10px"><textarea id="fNote" placeholder="備註 + 烹調方法" style="margin-top:10px;height:120px"></textarea><select id="fCat" style="margin-top:10px"></select><input type="hidden" id="fId"><button class="btn" style="width:100%;margin-top:12px" onclick="saveDish()">儲存</button></div></div></div>
-<div class="modal" id="mAnyDate" style="z-index:10006"><div class="sheet"><div class="head"><b>加入到哪一天？</b><div class="x" onclick="closeM('mAnyDate')">✕</div></div><div style="padding:14px"><input type="date" id="anyDate"><button class="btn" style="width:100%;margin-top:12px" onclick="confirmAddToWeek()">確認加入</button></div></div></div>
+
+<div class="modal" id="mAnyDate" style="z-index:10006"><div class="sheet"><div class="head"><b>加入到哪一天？</b><div class="x" onclick="closeM('mAnyDate')">✕</div></div><div style="padding:14px;display:flex;flex-direction:column;gap:12px"><input type="date" id="anyDate" style="width:100%;padding:18px;border-radius:16px;border:3px solid #111;background:#fffaf0;color:#111;font-weight:900;font-size:1.3rem;text-align:center"><button class="btn" style="width:100%;padding:18px;border-radius:16px;font-size:1.3rem" onclick="confirmAddToWeek()">確認加入</button></div></div></div>
 
 <div id="pdfWrap"><div class="pdfTool"><button class="btn" id="btnClosePdf" type="button">✕ 關閉</button><button class="ghost" id="btnSharePdf" type="button">📤 傳送真PDF</button></div><div class="pdfView"><div class="pdfPage"><div class="pdfInner" id="pdfContent"></div></div></div></div>
 
@@ -185,14 +187,12 @@ function toggleMy(open){document.querySelectorAll('.myBody').forEach(b=>b.style.
 function loadMenu(i){ let m=weeklyMenus[i]; document.getElementById('monPicker').value=m.monday; let mon=new Date(m.monday); current.mon=mon; current.days=m.days.map(d=>({date:new Date(d.date),dishes:d.dishes,diners:d.diners,takeaway:d.takeaway})); go('weekly'); renderWeek(); }
 function delMenu(i){ if(!confirm('刪除?')) return; weeklyMenus.splice(i,1); localStorage.setItem('weeklyMenus',JSON.stringify(weeklyMenus)); renderMy(); }
 
-/* 真PDF - 不用flex，唔會疊字 */
 function makePDF(days, monStr){
-  let html = `<h1>每週菜單<br><span style="font-size:16pt">Daftar Menu Mingguan</span></h1>
-  <div class="sub">${monStr} 星期一 / Senin</div>`;
+  let html = `<h1>每週菜單<br><span style="font-size:16pt">Daftar Menu Mingguan</span><div class="sub">${monStr} 星期一 / Senin</div></h1>`;
   days.forEach((d,i)=>{
-    html += `<div class="day"><div class="dayHead"><b>星期${cn[i]} / ${idn[i]} ${d.date}</b><span>用餐 Makan ${d.diners} 外帶 Bungkus ${d.takeaway}</span></div>`;
-    if(d.dishes.length===0){ html+=`<div class="dish">無 / Belum ada</div>`; }
-    else{ d.dishes.forEach(dd=>{ html+=`<div class="dish"><b>${dd.name} / ${dd.indo||''}</b><div style="margin-top:6px;white-space:pre-wrap;font-size:11pt">備註 Catatan: ${dd.note||''}</div></div>`; }); }
+    html += `<div class="day"><div class="dayHead"><b>星期${cn[i]} / ${idn[i]} ${d.date}</b><span>用餐 Makan ${d.diners} &nbsp; 外帶 Bungkus ${d.takeaway}</span></div>`;
+    if(d.dishes.length===0){ html+=`<div class="dish" style="text-align:center;color:#888">無 / Belum ada</div>`; }
+    else{ d.dishes.forEach(dd=>{ html+=`<div class="dish"><b>${dd.name} / ${dd.indo||''}</b><div class="noteBox">備註 Catatan: ${dd.note||''}</div></div>`; }); }
     html+=`</div>`;
   });
   return html;
@@ -201,55 +201,32 @@ function exportWeeklyPDF(){ showPDF(makePDF(current.days.map(d=>({date:fmt(d.dat
 function pdfSingle(i){ let m=weeklyMenus[i]; showPDF(makePDF(m.days,m.monday)); }
 function showPDF(inner){ document.getElementById('pdfContent').innerHTML=inner; document.getElementById('pdfWrap').classList.add('open'); }
 function closePDF(){ document.getElementById('pdfWrap').classList.remove('open'); }
-
 async function sharePDF(){
   let content=document.getElementById('pdfContent');
   let btn=document.getElementById('btnSharePdf');
   if(btn.dataset.busy==="1") return;
   let old=btn.textContent; btn.textContent='⏳ 產生中...'; btn.disabled=true; btn.dataset.busy="1";
   try{
-    // 離屏A4 794px寬度，確保20mm邊界
     let wrapper=document.createElement('div');
-    wrapper.style.width='794px'; wrapper.style.padding='0'; wrapper.style.background='#fff';
-    wrapper.style.position='fixed'; wrapper.style.left='-9999px'; wrapper.style.top='0';
-    let clone=content.cloneNode(true);
-    clone.style.width='794px'; clone.style.boxSizing='border-box'; clone.style.padding='76px'; // 20mm = 76px
-    wrapper.appendChild(clone);
-    document.body.appendChild(wrapper);
+    wrapper.style.width='794px'; wrapper.style.position='fixed'; wrapper.style.left='-9999px'; wrapper.style.top='0';
+    let clone=content.cloneNode(true); clone.style.width='794px'; clone.style.boxSizing='border-box'; clone.style.padding='76px';
+    wrapper.appendChild(clone); document.body.appendChild(wrapper);
     const canvas = await html2canvas(clone,{scale:2,useCORS:true,backgroundColor:'#ffffff',width:794});
     document.body.removeChild(wrapper);
-
     const { jsPDF } = window.jspdf;
     const pdf = new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
     const imgData = canvas.toDataURL('image/png');
-    const pageW=210, pageH=297, margin=0;
-    const imgW=pageW, imgH=canvas.height * imgW / canvas.width;
+    const pageW=210, pageH=297, imgW=pageW, imgH=canvas.height * imgW / canvas.width;
     pdf.addImage(imgData,'PNG',0,0,imgW,imgH);
-    let remain=imgH - pageH;
-    let y = -pageH;
-    while(remain>0){
-      pdf.addPage();
-      pdf.addImage(imgData,'PNG',0,y,imgW,imgH);
-      y -= pageH;
-      remain -= pageH;
-    }
+    let remain=imgH - pageH; let y = -pageH;
+    while(remain>0){ pdf.addPage(); pdf.addImage(imgData,'PNG',0,y,imgW,imgH); y -= pageH; remain -= pageH; }
     const blob = pdf.output('blob');
     const file = new File([blob], `每週菜單_${fmt(new Date())}.pdf`, {type:'application/pdf'});
-    try{
-      if(navigator.canShare && navigator.canShare({files:[file]})){
-        await navigator.share({files:[file],title:'每週菜單'});
-        return;
-      }
-    }catch(e){
-      if(e.name==='AbortError' || String(e.message).includes('cancellation')){ return; }
-    }
-    const url=URL.createObjectURL(blob);
-    const a=document.createElement('a'); a.href=url; a.download=file.name; a.click();
-    setTimeout(()=>URL.revokeObjectURL(url),2000);
+    try{ if(navigator.canShare && navigator.canShare({files:[file]})){ await navigator.share({files:[file],title:'每週菜單'}); return; } }catch(e){ if(e.name==='AbortError' || String(e.message).includes('cancellation')) return; }
+    const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download=file.name; a.click(); setTimeout(()=>URL.revokeObjectURL(url),2000);
   }catch(e){ if(e.name!=='AbortError') alert('PDF失敗: '+e.message); }
   finally{ btn.textContent=old; btn.disabled=false; btn.dataset.busy="0"; }
 }
-
 function exportLib(){ let blob=new Blob([JSON.stringify({cats,dishes},null,2)],{type:'application/json;charset=utf-8'}); let url=URL.createObjectURL(blob); let a=document.createElement('a'); a.href=url; a.download=`菜式庫_${fmt(new Date())}.json`; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(url),1000); }
 function importLib(e){ let f=e.target.files[0]; if(!f) return; let r=new FileReader(); r.onload=ev=>{ try{ let j=JSON.parse(ev.target.result); if(j.cats&&j.dishes){ cats=j.cats; dishes=j.dishes; localStorage.setItem('cats',JSON.stringify(cats)); localStorage.setItem('dishes',JSON.stringify(dishes)); renderCats(); renderCatOrder(); alert('匯入成功'); } }catch{ alert('失敗'); } }; r.readAsText(f); e.target.value=''; }
 function renderCatOrder(){ let b=document.getElementById('catOrder'); b.innerHTML=cats.map((c,i)=>`<div class="card row" style="justify-content:space-between"><span>${i+1}. ${c}</span><span class="row"><button class="iconBtn" onclick="moveCat(${i},-1)">↑</button><button class="iconBtn" onclick="moveCat(${i},1)">↓</button><button class="ghost" style="width:auto" onclick="delCat(${i})">刪除</button></span></div>`).join(''); }
