@@ -29,7 +29,10 @@ body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,P
 .dayBox{width:32%;aspect-ratio:1;border-radius:18px;border:3px solid #111;background:var(--card);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;cursor:pointer;padding:6px}
 .dayBox.d1{font-size:30px}.dayBox.d2{font-weight:900;margin-top:4px;font-size:.85rem;line-height:1.1}
 .bottom{position:fixed;bottom:0;left:0;right:0;background:var(--card);border-top:2px solid var(--border);display:flex;justify-content:space-around;padding:16px 0 38px;z-index:20}
-.nav{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;color:var(--muted);font-size:13px;cursor:pointer}.nav.ic{font-size:46px;line-height:1}.nav.active{color:var(--primary)}
+.nav{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;color:var(--muted);font-size:13px;cursor:pointer;-webkit-tap-highlight-color:transparent;user-select:none}
+.nav.ic{font-size:46px;line-height:1;pointer-events:none}
+.nav.active{color:var(--primary)!important}
+.nav.active.ic{color:var(--primary)!important}
 .modal{position:fixed;inset:0;background:rgba(0,0,0,.55);display:none;z-index:9999;align-items:center;justify-content:center;padding:12px}.modal.open{display:flex}
 .sheet{width:100%;max-width:500px;max-height:88vh;overflow:auto;background:var(--card);border-radius:24px;border:3px solid #111}
 .head{position:sticky;top:0;background:var(--card);padding:14px;border-bottom:2px solid var(--border);display:flex;justify-content:space-between;align-items:center}
@@ -54,6 +57,7 @@ select,input,textarea{width:100%;padding:14px;border-radius:14px;border:2px soli
 </style>
 </head>
 <body>
+<!-- LOCKED v1.1 - 修復底部變紅 + v1.0完美彈窗 -->
 <div class="top"><img id="avatarTop" class="avatar" src="icon.png"><div><div style="font-weight:900;font-size:1.25rem">每週菜單</div><div style="font-size:.9rem;color:var(--muted)">每週計劃</div></div></div>
 <div class="pages">
 <div id="p-weekly" class="page active"><div class="card"><div class="topRowFixed"><input type="date" id="monPicker"><button class="iconBtn" onclick="saveWeekly()">💾</button><button class="iconBtn" onclick="exportWeeklyPDF()">📄</button></div></div><div id="weeklyGrid" class="weekWrap"></div></div>
@@ -61,14 +65,18 @@ select,input,textarea{width:100%;padding:14px;border-radius:14px;border:2px soli
 <div id="p-mymenus" class="page"><div class="card row"><button class="ghost" onclick="toggleMy(true)">一鍵打開全部</button><button class="ghost" onclick="toggleMy(false)">一鍵關閉全部</button></div><div id="myList"></div></div>
 <div id="p-settings" class="page"><div class="card"><h3>分類排序</h3><div id="catOrder"></div><div class="row" style="margin-top:12px"><input id="newCat" placeholder="新分類名稱"><button class="btn" onclick="addCat()">新增</button></div></div><div class="card"><h3>外觀</h3><div class="row"><span>深淺色</span><button class="ghost" onclick="toggleTheme()">切換</button></div><div style="margin-top:12px"><label>字體大小 <span id="fsVal">20</span>px</label><input type="range" id="fsRange" min="14" max="28" value="20" oninput="setFS(this.value)" style="width:100%"></div></div><div class="card"><h3>頭像</h3><input type="file" id="avFile" accept="image/*"><div style="width:260px;height:260px;margin:12px auto;border-radius:50%;overflow:hidden;border:3px solid var(--primary);background:#000;touch-action:none"><canvas id="avCanvas" width="600" height="600" style="width:100%;height:100%"></canvas></div><div class="row"><span>縮放</span><input type="range" id="avZoom" min="0.2" max="4" step="0.05" value="1" style="flex:1"><button class="ghost" onclick="resetAv()">重置</button></div><button class="btn" style="width:100%;margin-top:10px" onclick="saveAv()">儲存頭像</button></div></div>
 </div>
-<div class="bottom"><div class="nav active" onclick="go('weekly')"><span class="nav ic">📅</span>每週</div><div class="nav" onclick="go('library')"><span class="nav ic">📚</span>菜式庫</div><div class="nav" onclick="go('mymenus')"><span class="nav ic">🗂️</span>我的菜單</div><div class="nav" onclick="go('settings')"><span class="nav ic">⚙️</span>設定</div></div>
+<div class="bottom">
+<div class="nav active" onclick="go('weekly',this)"><span class="ic">📅</span>每週</div>
+<div class="nav" onclick="go('library',this)"><span class="ic">📚</span>菜式庫</div>
+<div class="nav" onclick="go('mymenus',this)"><span class="ic">🗂️</span>我的菜單</div>
+<div class="nav" onclick="go('settings',this)"><span class="ic">⚙️</span>設定</div>
+</div>
 <div class="modal" id="mCat" style="z-index:10001"><div class="sheet"><div class="head"><b id="mCatTitle">分類</b><div class="x" onclick="closeM('mCat')">✕</div></div><div id="mCatBody"></div></div></div>
 <div class="modal" id="mNote" style="z-index:10010"><div class="sheet"><div class="head"><b>備註</b><div class="x" onclick="closeM('mNote')">✕</div></div><div id="mNoteBody" style="padding:16px;white-space:pre-wrap;font-size:1.1rem"></div></div></div>
 <div class="modal" id="mWeek" style="z-index:10002"><div class="sheet"><div class="head"><b id="mWeekTitle">日期</b><div class="x" onclick="closeM('mWeek')">✕</div></div><div style="padding:14px"><div class="row"><label>用餐</label><select id="diners"></select><label>外帶</label><select id="takeaway"></select></div><div id="selDishes" style="margin-top:12px"></div><button class="btn" style="width:100%;margin-top:12px" onclick="openPickCat()">選擇菜式</button></div></div></div>
 <div class="modal" id="mPickCat" style="z-index:10003"><div class="sheet"><div class="head"><b>分類</b><div class="x" onclick="closeM('mPickCat')">✕</div></div><div id="mPickCatBody" class="grid3" style="padding:12px"></div></div></div>
 <div class="modal" id="mPickDish" style="z-index:10004"><div class="sheet"><div class="head"><b>菜式</b><div class="x" onclick="closeM('mPickDish')">✕</div></div><div id="mPickDishBody"></div></div></div>
 <div class="modal" id="mAdd" style="z-index:10005"><div class="sheet"><div class="head"><b>新增/修改菜式</b><div class="x" onclick="closeM('mAdd')">✕</div></div><div style="padding:14px"><input id="fName" placeholder="中文菜名"><input id="fIndo" placeholder="印尼文" style="margin-top:10px"><textarea id="fNote" placeholder="備註 + 烹調方法" style="margin-top:10px;height:120px"></textarea><select id="fCat" style="margin-top:10px"></select><input type="hidden" id="fId"><button class="btn" style="width:100%;margin-top:12px" onclick="saveDish()">儲存</button></div></div></div>
-<!-- 修改：日期置中 -->
 <div class="modal" id="mAnyDate" style="z-index:10006"><div class="sheet" style="border-radius:28px;border:3px solid #111"><div class="head"><b>加入到哪一天？</b><div class="x" onclick="closeM('mAnyDate')">✕</div></div><div style="padding:20px;display:flex;flex-direction:column;gap:14px;align-items:center"><input type="date" id="anyDate" style="width:92%!important;height:68px!important;min-height:68px!important;line-height:68px!important;padding:0 12px!important;border-radius:20px!important;border:3px solid #111!important;background:#fffaf5!important;color:#111!important;font-weight:900!important;font-size:1.3rem!important;text-align:center!important;text-align-last:center!important;box-sizing:border-box!important;display:block!important"><button onclick="confirmAddToWeek()" style="width:92%!important;height:68px!important;min-height:68px!important;line-height:68px!important;padding:0!important;border-radius:20px!important;border:3px solid #111!important;background:#ff6b35!important;color:#fff!important;font-weight:900!important;font-size:1.35rem!important;box-sizing:border-box!important;display:grid!important;place-items:center!important;text-align:center!important">確認加入</button></div></div></div>
 <div id="pdfWrap"><div class="pdfTool"><button class="btn" id="btnClosePdf" type="button">✕ 關閉</button><button class="ghost" id="btnSharePdf" type="button">📤 傳送真PDF</button></div><div class="pdfView"><div class="pdfPage"><div class="pdfInner" id="pdfContent"></div></div></div></div>
 <script>
@@ -78,7 +86,17 @@ let dishes=JSON.parse(localStorage.getItem('dishes')||'null')||[];
 let weeklyMenus=JSON.parse(localStorage.getItem('weeklyMenus')||'[]');
 let current={mon:null,days:[]}, lastCook=JSON.parse(localStorage.getItem('lastCook')||'{}'), editDay=null, pendDish=null;
 const cn=["一","二","三","四","五","六","日"], idn=["Senin","Selasa","Rabu","Kamis","Jumat","Sabtu","Minggu"], dayEmo=["🌅","🌤️","🌞","🌇","🌙","⭐","🎉"];
-function go(p){document.querySelectorAll('.page').forEach(e=>e.classList.remove('active'));document.getElementById('p-'+p).classList.add('active');document.querySelectorAll('.nav').forEach((el,i)=>{el.classList.remove('active');if(['weekly','library','mymenus','settings'][i]===p)el.classList.add('active');});}
+function go(p,el){
+  document.querySelectorAll('.page').forEach(e=>e.classList.remove('active'));
+  document.getElementById('p-'+p).classList.add('active');
+  document.querySelectorAll('.nav').forEach(e=>e.classList.remove('active'));
+  if(el) el.classList.add('active');
+  else {
+    let idx=['weekly','library','mymenus','settings'].indexOf(p);
+    let navs=document.querySelectorAll('.nav');
+    if(navs[idx]) navs[idx].classList.add('active');
+  }
+}
 function getMon(d){let dt=new Date(d);let day=dt.getDay();let diff=dt.getDate()-day+(day==0?-6:1);return new Date(dt.setDate(diff));}
 function fmt(d){if(typeof d==='string')return d;return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;}
 function openM(id){document.getElementById(id).classList.add('open');}function closeM(id){document.getElementById(id).classList.remove('open');}
