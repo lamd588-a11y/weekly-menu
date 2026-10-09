@@ -42,32 +42,37 @@ body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,P
 select,input,textarea{width:100%;padding:14px;border-radius:14px;border:2px solid var(--border);background:var(--bg);color:var(--text);font-size:1.05rem}
 .topRowFixed{display:flex;gap:8px;align-items:center;width:100%}.topRowFixed input{flex:1;min-width:0}
 #pdfWrap{position:fixed;inset:0;background:#222;z-index:10000;display:none;flex-direction:column}#pdfWrap.open{display:flex}
-/* v1.8 - 跟你截圖：左右各一半長方形藥丸大掣 */
-.pdfTool{
-  position:sticky;top:0;
-  background:#fff;
-  padding:12px;
-  display:flex;
-  gap:12px;
-  border-bottom:2px solid #111;
-  z-index:2;
+/* v1.9 修正版 - 跟你截圖左右各一半藥丸大掣，用ID鎖死一定生效 */
+#pdfWrap.pdfTool{
+  position:sticky!important;top:0!important;
+  background:#fff!important;
+  padding:12px!important;
+  display:flex!important;
+  gap:12px!important;
+  border-bottom:2px solid #111!important;
+  z-index:2!important;
 }
-.pdfTool.btn{
+#btnClosePdf{
   flex:1!important;
+  width:auto!important;
   height:68px!important;
-  border-radius:22px!important;
+  min-height:68px!important;
+  border-radius:28px!important;
   border:3px solid #111!important;
   background:#ff6b35!important;
   color:#fff!important;
-  font-size:32px!important;
+  font-size:34px!important;
   font-weight:900!important;
   display:grid!important;
   place-items:center!important;
+  padding:0!important;
 }
-.pdfTool.ghost{
+#btnSharePdf{
   flex:1!important;
+  width:auto!important;
   height:68px!important;
-  border-radius:22px!important;
+  min-height:68px!important;
+  border-radius:28px!important;
   border:2px solid #e8d5c0!important;
   background:#fffaf5!important;
   color:#111!important;
@@ -75,6 +80,7 @@ select,input,textarea{width:100%;padding:14px;border-radius:14px;border:2px soli
   font-weight:900!important;
   display:grid!important;
   place-items:center!important;
+  padding:0!important;
 }
 .pdfView{flex:1;overflow:auto;background:#333;padding:16px;display:flex;justify-content:center}
 .pdfPage{width:100%;max-width:800px;background:#fff;margin:0 auto}
@@ -82,7 +88,7 @@ select,input,textarea{width:100%;padding:14px;border-radius:14px;border:2px soli
 </style>
 </head>
 <body>
-<!-- LOCKED v1.8 FINAL - 跟截圖：左右一半藥丸大掣 + 68px卡通+刪副標題+90道菜分行 -->
+<!-- LOCKED v1.9 FINAL - 跟截圖修正版，ID鎖死生效 -->
 <div class="top">
   <img id="avatarTop" class="avatar" src="icon.png">
   <div style="display:flex;align-items:center;height:62px">
@@ -156,8 +162,6 @@ select,input,textarea{width:100%;padding:14px;border-radius:14px;border:2px soli
 <div class="modal" id="mPickDish" style="z-index:10004"><div class="sheet"><div class="head"><b>菜式</b><div class="x" onclick="closeM('mPickDish')">✕</div></div><div id="mPickDishBody"></div></div></div>
 <div class="modal" id="mAdd" style="z-index:10005"><div class="sheet"><div class="head"><b>新增/修改菜式</b><div class="x" onclick="closeM('mAdd')">✕</div></div><div style="padding:14px"><input id="fName" placeholder="中文菜名"><input id="fIndo" placeholder="印尼文" style="margin-top:10px"><textarea id="fNote" placeholder="備註 + 烹調方法" style="margin-top:10px;height:120px"></textarea><select id="fCat" style="margin-top:10px"></select><input type="hidden" id="fId"><button class="btn" style="width:100%;margin-top:12px" onclick="saveDish()">儲存</button></div></div></div>
 <div class="modal" id="mAnyDate" style="z-index:10006"><div class="sheet" style="border-radius:28px;border:3px solid #111"><div class="head"><b>加入到哪一天？</b><div class="x" onclick="closeM('mAnyDate')">✕</div></div><div style="padding:20px;display:flex;flex-direction:column;gap:14px;align-items:center"><input type="date" id="anyDate" style="width:92%!important;height:68px!important;min-height:68px!important;line-height:68px!important;padding:0 12px!important;border-radius:20px!important;border:3px solid #111!important;background:#fffaf5!important;color:#111!important;font-weight:900!important;font-size:1.3rem!important;text-align:center!important;box-sizing:border-box!important;display:block!important"><button onclick="confirmAddToWeek()" style="width:92%!important;height:68px!important;min-height:68px!important;line-height:68px!important;padding:0!important;border-radius:20px!important;border:3px solid #111!important;background:#ff6b35!important;color:#fff!important;font-weight:900!important;font-size:1.35rem!important;box-sizing:border-box!important;display:grid!important;place-items:center!important;text-align:center!important">確認加入</button></div></div></div>
-
-<!-- PDF v1.8 跟圖：左右一半藥丸大掣 -->
 <div id="pdfWrap">
   <div class="pdfTool">
     <button class="btn" id="btnClosePdf" type="button">✕</button>
@@ -165,7 +169,6 @@ select,input,textarea{width:100%;padding:14px;border-radius:14px;border:2px soli
   </div>
   <div class="pdfView"><div class="pdfPage"><div class="pdfInner" id="pdfContent"></div></div></div>
 </div>
-
 <script>
 const CAT_META={"雞":{bg:"#ffeb8a",e:"🐔"},"牛":{bg:"#d7b899",e:"🐮"},"豬":{bg:"#ffb3c1",e:"🐷"},"魚":{bg:"#8ecfff",e:"🐟"},"蔬菜":{bg:"#a8e6a3",e:"🥬"},"湯水":{bg:"#ffcc7a",e:"🍲"},"西式":{bg:"#e2c499",e:"🍔"},"罐頭":{bg:"#9ec6ff",e:"🥫"},"其他":{bg:"#d8b4fe",e:"🍱"}};
 let cats=JSON.parse(localStorage.getItem('cats')||'null')||Object.keys(CAT_META);
