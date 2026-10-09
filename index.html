@@ -1,35 +1,20 @@
 <!DOCTYPE html>
-<html lang="zh-HK">
+<html>
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<title>每週菜單 v1.3</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <style>
-:root{--bg:#fffaf0;--card:#fff;--text:#111;--muted:#888;--primary:#ff6b35;--border:#f0dcc8;--fs:20px}
-html{font-size:var(--fs)}*{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,sans-serif;padding-bottom:140px}
-.top{position:sticky;top:0;z-index:10;background:var(--card);border-bottom:2px solid var(--border);padding:12px 16px;display:flex;align-items:center;gap:12px}
-.avatar{width:62px;height:62px;border-radius:50%;border:3px solid var(--primary);object-fit:cover}
-.pages{max-width:520px;margin:0 auto;padding:12px}.page{display:none}.page.active{display:block}
-.card{background:var(--card);border:2px solid var(--border);border-radius:20px;padding:14px;margin-bottom:14px}
-.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
-.catBox{aspect-ratio:1;border-radius:20px;border:3px solid #111;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;padding:8px;background:#fff}
-.catBox.em{font-size:68px!important;line-height:1!important}
-.catBox.lb{margin-top:8px;background:#fff;color:#111;border:2px solid #111;border-radius:10px;padding:5px 10px;font-weight:900;font-size:16px!important}
-.bottom{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:2px solid var(--border);display:flex;justify-content:space-around;padding:16px 0 38px}
-.nav{flex:1;display:flex;flex-direction:column;align-items:center;color:#888;font-size:13px}.ic{font-size:46px!important}.nav.active{color:#ff6b35!important}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;max-width:400px;margin:20px auto}
+.catBox{aspect-ratio:1;border-radius:20px;border:3px solid #111;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:8px}
+.catBox .em{font-size:70px!important;line-height:1!important}
+.catBox .lb{margin-top:8px;border:2px solid #111;border-radius:10px;padding:4px 10px;font-weight:900;font-size:16px;background:#fff}
 </style>
 </head>
 <body>
-<div class="top"><img class="avatar" src="icon.png"><b style="font-size:1.3rem">每週菜單</b></div>
-<div class="pages"><div class="page active"><div class="grid3" id="catGrid"></div></div></div>
-<div class="bottom"><div class="nav active"><span class="ic">📅</span>每週</div><div class="nav"><span class="ic">📚</span>菜式庫</div><div class="nav"><span class="ic">🗂️</span>我的菜單</div><div class="nav"><span class="ic">⚙️</span>設定</div></div>
-<script>
-const CAT_META={"雞":{bg:"#ffeb8a",e:"🐔"},"牛":{bg:"#d7b899",e:"🐮"},"豬":{bg:"#ffb3c1",e:"🐷"},"魚":{bg:"#8ecfff",e:"🐟"},"蔬菜":{bg:"#a8e6a3",e:"🥬"},"湯水":{bg:"#ffcc7a",e:"🍲"},"西式":{bg:"#e2c499",e:"🍔"},"罐頭":{bg:"#9ec6ff",e:"🥫"},"其他":{bg:"#d8b4fe",e:"🍱"}};
-let cats=Object.keys(CAT_META);
-function renderCats(){let g=document.getElementById('catGrid');g.innerHTML='';cats.forEach(cat=>{let m=CAT_META[cat];g.innerHTML+=`<div class="catBox" style="background:${m.bg}"><div class="em">${m.e}</div><div class="lb">${cat} (10)</div></div>`;});}
-renderCats();
-</script>
+<div class="grid3">
+<div class="catBox" style="background:#ffeb8a"><div class="em">🐔</div><div class="lb">雞 (10)</div></div>
+<div class="catBox" style="background:#d7b899"><div class="em">🐮</div><div class="lb">牛 (10)</div></div>
+<div class="catBox" style="background:#ffb3c1"><div class="em">🐷</div><div class="lb">豬 (10)</div></div>
+</div>
 </body>
 </html>
