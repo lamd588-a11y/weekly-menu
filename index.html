@@ -48,8 +48,8 @@ select,input,textarea{width:100%;padding:14px;border-radius:14px;border:2px soli
 </style>
 </head>
 <body>
-<!-- LOCKED v1.1 - 46px原size + 底部變紅修復 + v1.0完美彈窗置中 -->
-<div class="top"><img id="avatarTop" class="avatar" src="icon.png"><div><div style="font-weight:900;font-size:1.25rem">每週菜單</div><div style="font-size:.9rem;color:var(--muted)">每週計劃</div></div></div>
+<!-- LOCKED v1.2 - 刪每週計劃副標題 + v1.1底部46px變橙 + v1.0完美彈窗 -->
+<div class="top"><img id="avatarTop" class="avatar" src="icon.png"><div style="display:flex;align-items:center;height:62px"><div style="font-weight:900;font-size:1.35rem;line-height:62px">每週菜單</div></div></div>
 <div class="pages">
 <div id="p-weekly" class="page active"><div class="card"><div class="topRowFixed"><input type="date" id="monPicker"><button class="iconBtn" onclick="saveWeekly()">💾</button><button class="iconBtn" onclick="exportWeeklyPDF()">📄</button></div></div><div id="weeklyGrid" class="weekWrap"></div></div>
 <div id="p-library" class="page"><div class="card row"><button class="ghost" onclick="exportLib()">匯出</button><button class="ghost" onclick="document.getElementById('impFile').click()">匯入</button><button class="btn" onclick="openAdd()">新增菜式</button><input type="file" id="impFile" accept=".json" style="display:none"></div><div id="catGrid" class="grid3"></div></div>
