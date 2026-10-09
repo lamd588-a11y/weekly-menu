@@ -42,26 +42,30 @@ body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,P
 select,input,textarea{width:100%;padding:14px;border-radius:14px;border:2px solid var(--border);background:var(--bg);color:var(--text);font-size:1.05rem}
 .topRowFixed{display:flex;gap:8px;align-items:center;width:100%}.topRowFixed input{flex:1;min-width:0}
 #pdfWrap{position:fixed;inset:0;background:#222;z-index:10000;display:none;flex-direction:column}#pdfWrap.open{display:flex}
-/* v1.9 修正版 - 跟你截圖左右各一半藥丸大掣，用ID鎖死一定生效 */
+/* v1.9.1 終極修正 - 跟你第一張截圖，左右一半橫排藥丸大掣 - 有空格+強制row */
 #pdfWrap.pdfTool{
-  position:sticky!important;top:0!important;
+  position:sticky!important;
+  top:0!important;
   background:#fff!important;
   padding:12px!important;
   display:flex!important;
+  flex-direction:row!important;
   gap:12px!important;
   border-bottom:2px solid #111!important;
-  z-index:2!important;
+  z-index:999!important;
+  width:100%!important;
+  box-sizing:border-box!important;
 }
 #btnClosePdf{
   flex:1!important;
-  width:auto!important;
-  height:68px!important;
-  min-height:68px!important;
-  border-radius:28px!important;
+  width:100%!important;
+  height:62px!important;
+  min-height:62px!important;
+  border-radius:20px!important;
   border:3px solid #111!important;
   background:#ff6b35!important;
   color:#fff!important;
-  font-size:34px!important;
+  font-size:32px!important;
   font-weight:900!important;
   display:grid!important;
   place-items:center!important;
@@ -69,14 +73,14 @@ select,input,textarea{width:100%;padding:14px;border-radius:14px;border:2px soli
 }
 #btnSharePdf{
   flex:1!important;
-  width:auto!important;
-  height:68px!important;
-  min-height:68px!important;
-  border-radius:28px!important;
+  width:100%!important;
+  height:62px!important;
+  min-height:62px!important;
+  border-radius:20px!important;
   border:2px solid #e8d5c0!important;
   background:#fffaf5!important;
   color:#111!important;
-  font-size:32px!important;
+  font-size:30px!important;
   font-weight:900!important;
   display:grid!important;
   place-items:center!important;
@@ -88,7 +92,7 @@ select,input,textarea{width:100%;padding:14px;border-radius:14px;border:2px soli
 </style>
 </head>
 <body>
-<!-- LOCKED v1.9 FINAL - 跟截圖修正版，ID鎖死生效 -->
+<!-- LOCKED v1.9.1 FINAL - 修正直立bug，橫排左右一半藥丸大掣 -->
 <div class="top">
   <img id="avatarTop" class="avatar" src="icon.png">
   <div style="display:flex;align-items:center;height:62px">
