@@ -30,9 +30,8 @@ body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,P
 .dayBox.d1{font-size:30px}.dayBox.d2{font-weight:900;margin-top:4px;font-size:.85rem;line-height:1.1}
 .bottom{position:fixed;bottom:0;left:0;right:0;background:var(--card);border-top:2px solid var(--border);display:flex;justify-content:space-around;padding:16px 0 38px;z-index:20}
 .nav{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;color:var(--muted);font-size:13px;cursor:pointer;-webkit-tap-highlight-color:transparent;user-select:none}
-.nav.ic{font-size:46px;line-height:1;pointer-events:none}
+.ic{font-size:46px!important;line-height:1!important;display:block;pointer-events:none}
 .nav.active{color:var(--primary)!important}
-.nav.active.ic{color:var(--primary)!important}
 .modal{position:fixed;inset:0;background:rgba(0,0,0,.55);display:none;z-index:9999;align-items:center;justify-content:center;padding:12px}.modal.open{display:flex}
 .sheet{width:100%;max-width:500px;max-height:88vh;overflow:auto;background:var(--card);border-radius:24px;border:3px solid #111}
 .head{position:sticky;top:0;background:var(--card);padding:14px;border-bottom:2px solid var(--border);display:flex;justify-content:space-between;align-items:center}
@@ -46,18 +45,10 @@ select,input,textarea{width:100%;padding:14px;border-radius:14px;border:2px soli
 .pdfView{flex:1;overflow:auto;background:#333;padding:16px;display:flex;justify-content:center}
 .pdfPage{width:100%;max-width:800px;background:#fff;margin:0 auto}
 .pdfInner{padding:20mm;background:#fff;color:#000;box-sizing:border-box;font-size:18pt;line-height:1.6}
-.pdfInner h1{text-align:center;margin:0 0 6px 0;font-size:26pt;line-height:1.2}
-.pdfInner.sub{text-align:center;color:#555;font-size:13pt;margin-bottom:16px}
-.pdfInner.day{border:2.5px solid #000;border-radius:12px;margin-top:18px;overflow:hidden;page-break-inside:avoid}
-.pdfInner.dayHead{background:#000;color:#fff;padding:12px 16px}
-.pdfInner.dayHead b{display:block;font-size:14pt}
-.pdfInner.dayHead span{display:block;font-size:12pt;margin-top:4px}
-.pdfInner.dish{padding:12px 16px;border-top:1.5px dashed #999}
-@media screen and (max-width:600px){.pdfView{padding:8px}.pdfInner{padding:16px;font-size:14pt}}
 </style>
 </head>
 <body>
-<!-- LOCKED v1.1 - 修復底部變紅 + v1.0完美彈窗 -->
+<!-- LOCKED v1.1 - 46px原size + 底部變紅修復 + v1.0完美彈窗置中 -->
 <div class="top"><img id="avatarTop" class="avatar" src="icon.png"><div><div style="font-weight:900;font-size:1.25rem">每週菜單</div><div style="font-size:.9rem;color:var(--muted)">每週計劃</div></div></div>
 <div class="pages">
 <div id="p-weekly" class="page active"><div class="card"><div class="topRowFixed"><input type="date" id="monPicker"><button class="iconBtn" onclick="saveWeekly()">💾</button><button class="iconBtn" onclick="exportWeeklyPDF()">📄</button></div></div><div id="weeklyGrid" class="weekWrap"></div></div>
@@ -77,7 +68,7 @@ select,input,textarea{width:100%;padding:14px;border-radius:14px;border:2px soli
 <div class="modal" id="mPickCat" style="z-index:10003"><div class="sheet"><div class="head"><b>分類</b><div class="x" onclick="closeM('mPickCat')">✕</div></div><div id="mPickCatBody" class="grid3" style="padding:12px"></div></div></div>
 <div class="modal" id="mPickDish" style="z-index:10004"><div class="sheet"><div class="head"><b>菜式</b><div class="x" onclick="closeM('mPickDish')">✕</div></div><div id="mPickDishBody"></div></div></div>
 <div class="modal" id="mAdd" style="z-index:10005"><div class="sheet"><div class="head"><b>新增/修改菜式</b><div class="x" onclick="closeM('mAdd')">✕</div></div><div style="padding:14px"><input id="fName" placeholder="中文菜名"><input id="fIndo" placeholder="印尼文" style="margin-top:10px"><textarea id="fNote" placeholder="備註 + 烹調方法" style="margin-top:10px;height:120px"></textarea><select id="fCat" style="margin-top:10px"></select><input type="hidden" id="fId"><button class="btn" style="width:100%;margin-top:12px" onclick="saveDish()">儲存</button></div></div></div>
-<div class="modal" id="mAnyDate" style="z-index:10006"><div class="sheet" style="border-radius:28px;border:3px solid #111"><div class="head"><b>加入到哪一天？</b><div class="x" onclick="closeM('mAnyDate')">✕</div></div><div style="padding:20px;display:flex;flex-direction:column;gap:14px;align-items:center"><input type="date" id="anyDate" style="width:92%!important;height:68px!important;min-height:68px!important;line-height:68px!important;padding:0 12px!important;border-radius:20px!important;border:3px solid #111!important;background:#fffaf5!important;color:#111!important;font-weight:900!important;font-size:1.3rem!important;text-align:center!important;text-align-last:center!important;box-sizing:border-box!important;display:block!important"><button onclick="confirmAddToWeek()" style="width:92%!important;height:68px!important;min-height:68px!important;line-height:68px!important;padding:0!important;border-radius:20px!important;border:3px solid #111!important;background:#ff6b35!important;color:#fff!important;font-weight:900!important;font-size:1.35rem!important;box-sizing:border-box!important;display:grid!important;place-items:center!important;text-align:center!important">確認加入</button></div></div></div>
+<div class="modal" id="mAnyDate" style="z-index:10006"><div class="sheet" style="border-radius:28px;border:3px solid #111"><div class="head"><b>加入到哪一天？</b><div class="x" onclick="closeM('mAnyDate')">✕</div></div><div style="padding:20px;display:flex;flex-direction:column;gap:14px;align-items:center"><input type="date" id="anyDate" style="width:92%!important;height:68px!important;min-height:68px!important;line-height:68px!important;padding:0 12px!important;border-radius:20px!important;border:3px solid #111!important;background:#fffaf5!important;color:#111!important;font-weight:900!important;font-size:1.3rem!important;text-align:center!important;box-sizing:border-box!important;display:block!important"><button onclick="confirmAddToWeek()" style="width:92%!important;height:68px!important;min-height:68px!important;line-height:68px!important;padding:0!important;border-radius:20px!important;border:3px solid #111!important;background:#ff6b35!important;color:#fff!important;font-weight:900!important;font-size:1.35rem!important;box-sizing:border-box!important;display:grid!important;place-items:center!important;text-align:center!important">確認加入</button></div></div></div>
 <div id="pdfWrap"><div class="pdfTool"><button class="btn" id="btnClosePdf" type="button">✕ 關閉</button><button class="ghost" id="btnSharePdf" type="button">📤 傳送真PDF</button></div><div class="pdfView"><div class="pdfPage"><div class="pdfInner" id="pdfContent"></div></div></div></div>
 <script>
 const CAT_META={"雞":{bg:"#ffeb8a",e:"🐔"},"牛":{bg:"#d7b899",e:"🐮"},"豬":{bg:"#ffb3c1",e:"🐷"},"魚":{bg:"#8ecfff",e:"🐟"},"蔬菜":{bg:"#a8e6a3",e:"🥬"},"湯水":{bg:"#ffcc7a",e:"🍲"},"西式":{bg:"#e2c499",e:"🍔"},"罐頭":{bg:"#9ec6ff",e:"🥫"},"其他":{bg:"#d8b4fe",e:"🍱"}};
@@ -90,12 +81,7 @@ function go(p,el){
   document.querySelectorAll('.page').forEach(e=>e.classList.remove('active'));
   document.getElementById('p-'+p).classList.add('active');
   document.querySelectorAll('.nav').forEach(e=>e.classList.remove('active'));
-  if(el) el.classList.add('active');
-  else {
-    let idx=['weekly','library','mymenus','settings'].indexOf(p);
-    let navs=document.querySelectorAll('.nav');
-    if(navs[idx]) navs[idx].classList.add('active');
-  }
+  if(el) el.classList.add('active'); else document.querySelectorAll('.nav')[['weekly','library','mymenus','settings'].indexOf(p)].classList.add('active');
 }
 function getMon(d){let dt=new Date(d);let day=dt.getDay();let diff=dt.getDate()-day+(day==0?-6:1);return new Date(dt.setDate(diff));}
 function fmt(d){if(typeof d==='string')return d;return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;}
@@ -180,7 +166,7 @@ function renderMy(){
  box.querySelectorAll('.head').forEach(h=>{h.onclick=()=>{let b=h.nextElementSibling; b.style.display=b.style.display==='none'?'block':'none';};});
 }
 function toggleMy(open){document.querySelectorAll('.myBody').forEach(b=>b.style.display=open?'block':'none');}
-function loadMenu(i){ let m=weeklyMenus[i]; document.getElementById('monPicker').value=m.monday; let mon=new Date(m.monday); current.mon=mon; current.days=m.days.map(d=>({date:new Date(d.date),dishes:d.dishes,diners:d.diners,takeaway:d.takeaway})); go('weekly'); renderWeek(); }
+function loadMenu(i){ let m=weeklyMenus[i]; document.getElementById('monPicker').value=m.monday; let mon=new Date(m.monday); current.mon=mon; current.days=m.days.map(d=>({date:new Date(d.date),dishes:d.dishes,diners:d.diners,takeaway:d.takeaway})); go('weekly',document.querySelectorAll('.nav')[0]); renderWeek(); }
 function delMenu(i){ if(!confirm('刪除?')) return; weeklyMenus.splice(i,1); localStorage.setItem('weeklyMenus',JSON.stringify(weeklyMenus)); renderMy(); }
 function makePDF(days, monStr){
   let html = `<h1>每週菜單<br><span style="font-size:16pt">Daftar Menu Mingguan</span></h1><div class="sub">${monStr} 星期一 / Senin</div>`;
