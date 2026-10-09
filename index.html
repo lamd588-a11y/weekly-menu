@@ -39,8 +39,6 @@ body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,P
 .act{display:flex;gap:6px}.act button{width:46px;height:46px;border-radius:12px;border:2px solid var(--border);background:var(--bg);font-size:20px}
 select,input,textarea{width:100%;padding:14px;border-radius:14px;border:2px solid var(--border);background:var(--bg);color:var(--text);font-size:1.05rem}
 .topRowFixed{display:flex;gap:8px;align-items:center;width:100%}.topRowFixed input{flex:1;min-width:0}
-
-/* PDF FIX */
 #pdfWrap{position:fixed;inset:0;background:#222;z-index:10000;display:none;flex-direction:column}#pdfWrap.open{display:flex}
 .pdfTool{position:sticky;top:0;background:#fff;padding:12px;display:flex;gap:12px;border-bottom:2px solid #ccc;z-index:2}
 .pdfView{flex:1;overflow:auto;background:#333;padding:16px;display:flex;justify-content:center}
@@ -64,21 +62,14 @@ select,input,textarea{width:100%;padding:14px;border-radius:14px;border:2px soli
 <div id="p-settings" class="page"><div class="card"><h3>分類排序</h3><div id="catOrder"></div><div class="row" style="margin-top:12px"><input id="newCat" placeholder="新分類名稱"><button class="btn" onclick="addCat()">新增</button></div></div><div class="card"><h3>外觀</h3><div class="row"><span>深淺色</span><button class="ghost" onclick="toggleTheme()">切換</button></div><div style="margin-top:12px"><label>字體大小 <span id="fsVal">20</span>px</label><input type="range" id="fsRange" min="14" max="28" value="20" oninput="setFS(this.value)" style="width:100%"></div></div><div class="card"><h3>頭像</h3><input type="file" id="avFile" accept="image/*"><div style="width:260px;height:260px;margin:12px auto;border-radius:50%;overflow:hidden;border:3px solid var(--primary);background:#000;touch-action:none"><canvas id="avCanvas" width="600" height="600" style="width:100%;height:100%"></canvas></div><div class="row"><span>縮放</span><input type="range" id="avZoom" min="0.2" max="4" step="0.05" value="1" style="flex:1"><button class="ghost" onclick="resetAv()">重置</button></div><button class="btn" style="width:100%;margin-top:10px" onclick="saveAv()">儲存頭像</button></div></div>
 </div>
 <div class="bottom"><div class="nav active" onclick="go('weekly')"><span class="nav ic">📅</span>每週</div><div class="nav" onclick="go('library')"><span class="nav ic">📚</span>菜式庫</div><div class="nav" onclick="go('mymenus')"><span class="nav ic">🗂️</span>我的菜單</div><div class="nav" onclick="go('settings')"><span class="nav ic">⚙️</span>設定</div></div>
-
 <div class="modal" id="mCat" style="z-index:10001"><div class="sheet"><div class="head"><b id="mCatTitle">分類</b><div class="x" onclick="closeM('mCat')">✕</div></div><div id="mCatBody"></div></div></div>
 <div class="modal" id="mNote" style="z-index:10010"><div class="sheet"><div class="head"><b>備註</b><div class="x" onclick="closeM('mNote')">✕</div></div><div id="mNoteBody" style="padding:16px;white-space:pre-wrap;font-size:1.1rem"></div></div></div>
 <div class="modal" id="mWeek" style="z-index:10002"><div class="sheet"><div class="head"><b id="mWeekTitle">日期</b><div class="x" onclick="closeM('mWeek')">✕</div></div><div style="padding:14px"><div class="row"><label>用餐</label><select id="diners"></select><label>外帶</label><select id="takeaway"></select></div><div id="selDishes" style="margin-top:12px"></div><button class="btn" style="width:100%;margin-top:12px" onclick="openPickCat()">選擇菜式</button></div></div></div>
 <div class="modal" id="mPickCat" style="z-index:10003"><div class="sheet"><div class="head"><b>分類</b><div class="x" onclick="closeM('mPickCat')">✕</div></div><div id="mPickCatBody" class="grid3" style="padding:12px"></div></div></div>
 <div class="modal" id="mPickDish" style="z-index:10004"><div class="sheet"><div class="head"><b>菜式</b><div class="x" onclick="closeM('mPickDish')">✕</div></div><div id="mPickDishBody"></div></div></div>
 <div class="modal" id="mAdd" style="z-index:10005"><div class="sheet"><div class="head"><b>新增/修改菜式</b><div class="x" onclick="closeM('mAdd')">✕</div></div><div style="padding:14px"><input id="fName" placeholder="中文菜名"><input id="fIndo" placeholder="印尼文" style="margin-top:10px"><textarea id="fNote" placeholder="備註 + 烹調方法" style="margin-top:10px;height:120px"></textarea><select id="fCat" style="margin-top:10px"></select><input type="hidden" id="fId"><button class="btn" style="width:100%;margin-top:12px" onclick="saveDish()">儲存</button></div></div></div>
-<div class="modal" id="mAnyDate" style="z-index:10006"><div class="sheet"><div class="head"><b>加入到哪一天？</b><div class="x" onclick="closeM('mAnyDate')">✕</div></div>
-<div style="padding:14px;display:flex;flex-direction:column;gap:12px">
-<input type="date" id="anyDate" style="width:100%!important;height:64px!important;padding:18px!important;border-radius:16px!important;border:3px solid #111!important;background:#fffaf0!important;color:#111!important;font-weight:900!important;font-size:1.35rem!important;text-align:center!important;box-sizing:border-box!important">
-<button class="btn" style="width:100%!important;height:64px!important;padding:18px!important;border-radius:16px!important;font-size:1.35rem!important;border:3px solid #111!important;box-sizing:border-box!important" onclick="confirmAddToWeek()">確認加入</button>
-</div></div></div>
-
+<div class="modal" id="mAnyDate" style="z-index:10006"><div class="sheet"><div class="head"><b>加入到哪一天？</b><div class="x" onclick="closeM('mAnyDate')">✕</div></div><div style="padding:14px;display:flex;flex-direction:column;gap:12px"><input type="date" id="anyDate" style="width:100%!important;height:64px!important;padding:18px!important;border-radius:16px!important;border:3px solid #111!important;background:#fffaf0!important;color:#111!important;font-weight:900!important;font-size:1.35rem!important;text-align:center!important;box-sizing:border-box!important"><button class="btn" style="width:100%!important;height:64px!important;padding:18px!important;border-radius:16px!important;font-size:1.35rem!important;border:3px solid #111!important;box-sizing:border-box!important" onclick="confirmAddToWeek()">確認加入</button></div></div></div>
 <div id="pdfWrap"><div class="pdfTool"><button class="btn" id="btnClosePdf" type="button">✕ 關閉</button><button class="ghost" id="btnSharePdf" type="button">📤 傳送真PDF</button></div><div class="pdfView"><div class="pdfPage"><div class="pdfInner" id="pdfContent"></div></div></div></div>
-
 <script>
 const CAT_META={"雞":{bg:"#ffeb8a",e:"🐔"},"牛":{bg:"#d7b899",e:"🐮"},"豬":{bg:"#ffb3c1",e:"🐷"},"魚":{bg:"#8ecfff",e:"🐟"},"蔬菜":{bg:"#a8e6a3",e:"🥬"},"湯水":{bg:"#ffcc7a",e:"🍲"},"西式":{bg:"#e2c499",e:"🍔"},"罐頭":{bg:"#9ec6ff",e:"🥫"},"其他":{bg:"#d8b4fe",e:"🍱"}};
 let cats=JSON.parse(localStorage.getItem('cats')||'null')||Object.keys(CAT_META);
@@ -89,8 +80,7 @@ const cn=["一","二","三","四","五","六","日"], idn=["Senin","Selasa","Rab
 function go(p){document.querySelectorAll('.page').forEach(e=>e.classList.remove('active'));document.getElementById('p-'+p).classList.add('active');document.querySelectorAll('.nav').forEach((el,i)=>{el.classList.remove('active');if(['weekly','library','mymenus','settings'][i]===p)el.classList.add('active');});}
 function getMon(d){let dt=new Date(d);let day=dt.getDay();let diff=dt.getDate()-day+(day==0?-6:1);return new Date(dt.setDate(diff));}
 function fmt(d){if(typeof d==='string')return d;return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;}
-function openM(id){document.getElementById(id).classList.add('open');}
-function closeM(id){document.getElementById(id).classList.remove('open');}
+function openM(id){document.getElementById(id).classList.add('open');}function closeM(id){document.getElementById(id).classList.remove('open');}
 function makeDefaults(){
  if(dishes.length) return;
  const D={
