@@ -16,22 +16,20 @@ html{font-size:var(--fs)}*{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,PingFang HK,sans-serif;padding-bottom:140px;line-height:1.5}
 .top{position:sticky;top:0;z-index:10;background:var(--card);border-bottom:2px solid var(--border);padding:12px 16px;padding-top:calc(10px + env(safe-area-inset-top));display:flex;align-items:center;gap:12px}
 .avatar{width:62px;height:62px;border-radius:50%;border:3px solid var(--primary);object-fit:cover}
-.pages{max-width:520px;margin:0 auto;padding:16px;box-sizing:border-box}.page{display:none}.page.active{display:block}
+.pages{max-width:520px;margin:0 auto;padding:0 16px 16px 16px;box-sizing:border-box}
+.page{display:none}.page.active{display:block}
 .card{background:var(--card);border:2px solid var(--border);border-radius:20px;padding:12px;margin:0 0 16px 0;width:100%;box-sizing:border-box;overflow:hidden}
 .row{display:flex;gap:8px;align-items:center}
 .btn{flex:1;padding:16px;border-radius:16px;border:none;background:var(--primary);color:#fff;font-weight:900;font-size:1.1rem}
 .ghost{flex:1;padding:14px;border-radius:16px;border:2px solid var(--border);background:var(--bg);font-weight:800;font-size:1rem}
-.iconBtn{width:52px;height:52px;min-width:52px;border-radius:16px;border:2px solid var(--border);background:var(--card);font-size:26px;display:grid;place-items:center;margin:0;box-sizing:border-box;flex-shrink:0}
+.iconBtn{width:48px;height:48px;min-width:48px;border-radius:14px;border:2px solid var(--border);background:var(--card);font-size:22px;display:grid;place-items:center;margin:0;box-sizing:border-box;flex-shrink:0}
 .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
 .catBox{aspect-ratio:1;border-radius:18px;border:3px solid #111;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;padding:6px}
-.catBox.em{font-size:68px!important;line-height:1!important;display:block!important}
-.catBox.lb{margin-top:6px;background:#fff;color:#111;border:2px solid #111;border-radius:10px;padding:6px 10px;font-weight:900;font-size:16px!important;text-align:center}
 .weekWrap{display:flex;flex-direction:column;gap:8px}.weekRow{display:flex;gap:8px;justify-content:center}
 .dayBox{width:32%;aspect-ratio:1;border-radius:18px;border:3px solid #111;background:var(--card);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;cursor:pointer;padding:6px}
-.dayBox.d1{font-size:30px}.dayBox.d2{font-weight:900;margin-top:4px;font-size:.85rem;line-height:1.1}
 .bottom{position:fixed;bottom:0;left:0;right:0;background:var(--card);border-top:2px solid var(--border);display:flex;justify-content:space-around;padding:16px 0 38px;z-index:20}
-.nav{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;color:var(--muted);font-size:13px;cursor:pointer;-webkit-tap-highlight-color:transparent;user-select:none}
-.ic{font-size:46px!important;line-height:1!important;display:block;pointer-events:none}
+.nav{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;color:var(--muted);font-size:13px;cursor:pointer}
+.ic{font-size:46px!important;line-height:1!important;display:block}
 .nav.active{color:var(--primary)!important}
 .modal{position:fixed;inset:0;background:rgba(0,0,0,.55);display:none;z-index:9999;align-items:center;justify-content:center;padding:12px}.modal.open{display:flex}
 .sheet{width:100%;max-width:500px;max-height:88vh;overflow:auto;background:var(--card);border-radius:24px;border:3px solid #111}
@@ -39,22 +37,20 @@ body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,P
 .x{width:48px;height:48px;border-radius:50%;border:2px solid var(--border);background:var(--bg);display:grid;place-items:center;font-size:24px;cursor:pointer}
 .dishRow{display:flex;justify-content:space-between;align-items:center;padding:14px;border-bottom:1.5px dashed var(--border);gap:8px}
 .act{display:flex;gap:6px}.act button{width:46px;height:46px;border-radius:12px;border:2px solid var(--border);background:var(--bg);font-size:20px}
-select,input,textarea{padding:14px;border-radius:14px;border:2px solid var(--border);background:var(--bg);color:var(--text);font-size:1.05rem;box-sizing:border-box}
-.topRowFixed input{width:100%;min-width:0;text-align:center;font-weight:900;background:#fff7e6;border-radius:16px}
-.topRowFixed{display:grid;grid-template-columns:1fr 52px 52px;gap:10px;align-items:center;width:100%;box-sizing:border-box}.topRowFixed input{flex:1;min-width:0}
+select,textarea{width:100%;padding:14px;border-radius:14px;border:2px solid var(--border);background:var(--bg);color:var(--text);font-size:1.05rem;box-sizing:border-box}
+.topRowFixed{display:flex;gap:8px;align-items:center;width:100%;box-sizing:border-box}
+.topRowFixed input{flex:1 1 0;min-width:0;width:0;text-align:center;font-weight:900;background:#fff7e6;border-radius:16px;padding:12px 6px;border:2px solid var(--border);box-sizing:border-box;font-size:1rem}
 #pdfWrap{position:fixed;inset:0;background:#222;z-index:10000;display:none;flex-direction:column}#pdfWrap.open{display:flex}
 .pdfTool{position:sticky;top:0;background:#fff;padding:12px;display:flex;gap:12px;border-bottom:2px solid #ccc;z-index:2}
 .pdfView{flex:1;overflow:auto;background:#333;padding:16px;display:flex;justify-content:center}
 .pdfPage{width:100%;max-width:800px;background:#fff;margin:0 auto}
 .pdfInner{padding:15mm 15mm 25mm 15mm!important;background:#fff;color:#000;box-sizing:border-box;font-size:16pt;line-height:1.5}
-.pdfInner h1{text-align:center;border-bottom:3px solid #111;padding-bottom:12px;margin:0 0 12px 0;font-size:20pt}
-@page{margin-bottom:2cm}
 </style>
 </head>
 <body>
 <div class="top"><img id="avatarTop" class="avatar" src="icon.png"><div style="display:flex;align-items:center;height:62px"><div style="font-weight:900;font-size:1.35rem;line-height:62px">每週菜單</div></div></div>
 <div class="pages">
-<div id="p-weekly" class="page active"><div class="card"><div class="topRowFixed"><input type="date" id="monPicker" style="flex:1;min-width:0;text-align:center;font-weight:900;background:#fff7e6;border-radius:16px"><button class="iconBtn" onclick="saveWeekly()">💾</button><button class="iconBtn" onclick="exportWeeklyPDF()">📄</button></div></div><div id="weeklyGrid" class="weekWrap"></div></div>
+<div id="p-weekly" class="page active"><div class="card"><div class="topRowFixed"><input type="date" id="monPicker"><button class="iconBtn" onclick="saveWeekly()">💾</button><button class="iconBtn" onclick="exportWeeklyPDF()">📄</button></div></div><div id="weeklyGrid" class="weekWrap"></div></div>
 <div id="p-library" class="page"><div class="card row"><button class="ghost" onclick="exportLib()">匯出</button><button class="ghost" onclick="document.getElementById('impFile').click()">匯入</button><button class="btn" onclick="openAdd()">新增菜式</button><input type="file" id="impFile" accept=".json" style="display:none"></div><div id="catGrid" class="grid3"></div></div>
 <div id="p-mymenus" class="page"><div class="card row"><button class="ghost" onclick="toggleMy(true)">一鍵打開全部</button><button class="ghost" onclick="toggleMy(false)">一鍵關閉全部</button></div><div id="myList"></div></div>
 <div id="p-settings" class="page"><div class="card"><h3>分類排序</h3><div id="catOrder"></div><div class="row" style="margin-top:12px"><input id="newCat" placeholder="新分類名稱"><button class="btn" onclick="addCat()">新增</button></div></div><div class="card"><h3>外觀</h3><div class="row"><span>深淺色</span><button class="ghost" onclick="toggleTheme()">切換</button></div><div style="margin-top:12px"><label>字體大小 <span id="fsVal">20</span>px</label><input type="range" id="fsRange" min="14" max="28" value="20" oninput="setFS(this.value)" style="width:100%"></div></div><div class="card"><h3>頭像</h3><input type="file" id="avFile" accept="image/*"><div style="width:260px;height:260px;margin:12px auto;border-radius:50%;overflow:hidden;border:3px solid var(--primary);background:#000;touch-action:none"><canvas id="avCanvas" width="600" height="600" style="width:100%;height:100%"></canvas></div><div class="row"><span>縮放</span><input type="range" id="avZoom" min="0.2" max="4" step="0.05" value="1" style="flex:1"><button class="ghost" onclick="resetAv()">重置</button></div><button class="btn" style="width:100%;margin-top:10px" onclick="saveAv()">儲存頭像</button></div></div>
