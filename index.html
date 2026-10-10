@@ -277,7 +277,7 @@ function delMenu(i){ if(!confirm('刪除?')) return; weeklyMenus.splice(i,1); lo
 function makePDF(days, monStr){
   let html = `<h1 style="text-align:center;border-bottom:3px solid #111;padding-bottom:12px;margin:0 0 12px 0;font-size:20pt">每週菜單<br><span style="font-size:16pt">Daftar Menu Mingguan</span></h1><div style="text-align:center;margin:10px 0;font-weight:900;font-size:13pt">${monStr} 星期一 / Senin</div>`;
   days.forEach((d,i)=>{
-    html += `<div style="border:2.5px solid #111;border-radius:14px;overflow:hidden;margin-bottom:16px;background:#fff;break-inside:avoid;page-break-inside:avoid"><div style="display:flex;justify-content:space-between;background:#fff3d6;padding:10px 14px;font-weight:900;border-bottom:2.5px solid #111;flex-wrap:wrap;gap:6px;font-size:12pt"><b>星期${cn[i]} / ${idn[i]} ${d.date}</b><span>用餐人數 人數 / No. of People / Jumlah Orang: ${d.diners} &nbsp; 外帶 Bungkus: ${d.takeaway}</span></div>`;
+    html += `<div style="border:2.5px solid #111;border-radius:14px;overflow:hidden;margin-bottom:16px;background:#fff;break-inside:avoid;page-break-inside:avoid"><div style="display:flex;justify-content:space-between;background:#fff3d6;padding:10px 14px;font-weight:900;border-bottom:2.5px solid #111;flex-wrap:wrap;gap:6px;font-size:12pt"><b>星期${cn[i]} / ${idn[i]} ${d.date}</b><span>用餐/ Makan: ${d.diners} &nbsp; 外帶 Bungkus: ${d.takeaway}</span></div>`;
     if(d.dishes.length===0){ html+=`<div style="padding:10px 14px;font-size:11pt">無 / Belum ada</div>`; }
     else{ d.dishes.forEach(dd=>{ html+=`<div style="padding:10px 14px;border-bottom:1px dashed #999;font-size:11pt"><b>${dd.name} / ${dd.indo||''}</b><div style="margin-top:6px;white-space:pre-wrap">備註 Catatan: ${dd.note||''}</div></div>`; }); }
     html+=`</div>`;
