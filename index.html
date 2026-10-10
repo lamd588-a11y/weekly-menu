@@ -46,6 +46,10 @@ select,input,textarea{width:100%;padding:14px;border-radius:14px;border:2px soli
 .pdfView{flex:1;overflow:auto;background:#333;padding:16px;display:flex;justify-content:center}
 .pdfPage{width:100%;max-width:800px;background:#fff;margin:0 auto}
 .pdfInner{padding:15mm 15mm 25mm 15mm!important;background:#fff;color:#000;box-sizing:border-box;font-size:18pt;line-height:1.6}
+.pdfInner .day{border:2.5px solid #111!important;border-radius:14px!important;overflow:hidden!important;margin-bottom:16px!important;background:#fff!important;break-inside:avoid!important;page-break-inside:avoid!important}
+.pdfInner .dayHead{display:flex!important;justify-content:space-between!important;align-items:center!important;background:#fff3d6!important;padding:10px 14px!important;font-weight:900!important;border-bottom:2.5px solid #111!important;flex-wrap:wrap!important;gap:6px!important}
+.pdfInner .dish{padding:10px 14px!important;border-bottom:1px dashed #999!important;font-size:12pt!important}
+.pdfInner .dish:last-child{border-bottom:none!important}
 .day{break-inside:avoid!important;page-break-inside:avoid!important;-webkit-column-break-inside:avoid!important}
 @page{margin-bottom:2cm}
 </style>
