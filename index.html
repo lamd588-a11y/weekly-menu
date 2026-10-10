@@ -45,7 +45,9 @@ select,input,textarea{width:100%;padding:14px;border-radius:14px;border:2px soli
 .pdfTool{position:sticky;top:0;background:#fff;padding:12px;display:flex;gap:12px;border-bottom:2px solid #ccc;z-index:2}
 .pdfView{flex:1;overflow:auto;background:#333;padding:16px;display:flex;justify-content:center}
 .pdfPage{width:100%;max-width:800px;background:#fff;margin:0 auto}
-.pdfInner{padding:20mm;background:#fff;color:#000;box-sizing:border-box;font-size:18pt;line-height:1.6}
+.pdfInner{padding:15mm 15mm 25mm 15mm!important;background:#fff;color:#000;box-sizing:border-box;font-size:18pt;line-height:1.6}
+.day{break-inside:avoid!important;page-break-inside:avoid!important;-webkit-column-break-inside:avoid!important}
+@page{margin-bottom:2cm}
 </style>
 </head>
 <body>
@@ -64,7 +66,7 @@ select,input,textarea{width:100%;padding:14px;border-radius:14px;border:2px soli
 </div>
 <div class="modal" id="mCat" style="z-index:10001"><div class="sheet"><div class="head"><b id="mCatTitle">分類</b><div class="x" onclick="closeM('mCat')">✕</div></div><div id="mCatBody"></div></div></div>
 <div class="modal" id="mNote" style="z-index:10010"><div class="sheet"><div class="head"><b>備註</b><div class="x" onclick="closeM('mNote')">✕</div></div><div id="mNoteBody" style="padding:16px;white-space:pre-wrap;font-size:1.1rem"></div></div></div>
-<div class="modal" id="mWeek" style="z-index:10002"><div class="sheet"><div class="head"><b id="mWeekTitle">日期</b><div class="x" onclick="closeM('mWeek')">✕</div></div><div style="padding:14px"><div class="row"><label>用餐</label><select id="diners"></select><label>外帶</label><select id="takeaway"></select></div><div id="selDishes" style="margin-top:12px"></div><button class="btn" style="width:100%;margin-top:12px" onclick="openPickCat()">選擇菜式</button></div></div></div>
+<div class="modal" id="mWeek" style="z-index:10002"><div class="sheet"><div class="head"><b id="mWeekTitle">日期</b><div class="x" onclick="closeM('mWeek')">✕</div></div><div style="padding:14px"><div class="row"><label>用餐<br>Jumlah</label><select id="diners"></select><label>外帶<br>Bungkus</label><select id="takeaway"></select></div><div id="selDishes" style="margin-top:12px"></div><button class="btn" style="width:100%;margin-top:12px" onclick="openPickCat()">選擇菜式</button></div></div></div>
 <div class="modal" id="mPickCat" style="z-index:10003"><div class="sheet"><div class="head"><b>分類</b><div class="x" onclick="closeM('mPickCat')">✕</div></div><div id="mPickCatBody" class="grid3" style="padding:12px"></div></div></div>
 <div class="modal" id="mPickDish" style="z-index:10004"><div class="sheet"><div class="head"><b>菜式</b><div class="x" onclick="closeM('mPickDish')">✕</div></div><div id="mPickDishBody"></div></div></div>
 <div class="modal" id="mAdd" style="z-index:10005"><div class="sheet"><div class="head"><b>新增/修改菜式</b><div class="x" onclick="closeM('mAdd')">✕</div></div><div style="padding:14px"><input id="fName" placeholder="中文菜名"><input id="fIndo" placeholder="印尼文" style="margin-top:10px"><textarea id="fNote" placeholder="備註 + 烹調方法" style="margin-top:10px;height:120px"></textarea><select id="fCat" style="margin-top:10px"></select><input type="hidden" id="fId"><button class="btn" style="width:100%;margin-top:12px" onclick="saveDish()">儲存</button></div></div></div>
@@ -274,7 +276,7 @@ function loadMenu(i){ let m=weeklyMenus[i]; document.getElementById('monPicker')
 function delMenu(i){ if(!confirm('刪除?')) return; weeklyMenus.splice(i,1); localStorage.setItem('weeklyMenus',JSON.stringify(weeklyMenus)); renderMy(); }
 function makePDF(days, monStr){
   let html = `<h1>每週菜單<br><span style="font-size:16pt">Daftar Menu Mingguan</span></h1><div class="sub">${monStr} 星期一 / Senin</div>`;
-  days.forEach((d,i)=>{ html += `<div class="day"><div class="dayHead"><b>星期${cn[i]} / ${idn[i]} ${d.date}</b><span>用餐 Makan ${d.diners} 外帶 Bungkus ${d.takeaway}</span></div>`; if(d.dishes.length===0){ html+=`<div class="dish">無 / Belum ada</div>`; } else{ d.dishes.forEach(dd=>{ html+=`<div class="dish"><b>${dd.name} / ${dd.indo||''}</b><div style="margin-top:6px;white-space:pre-wrap;font-size:11pt">備註 Catatan: ${dd.note||''}</div></div>`; }); } html+=`</div>`; }); return html;
+  days.forEach((d,i)=>{ html += `<div class="day"><div class="dayHead"><b>星期${cn[i]} / ${idn[i]} ${d.date}</b><span>用餐人數 人數 / No. of People / Jumlah Orang: ${d.diners} &nbsp; 外帶 Bungkus: ${d.takeaway}</span></div>`; if(d.dishes.length===0){ html+=`<div class="dish">無 / Belum ada</div>`; } else{ d.dishes.forEach(dd=>{ html+=`<div class="dish"><b>${dd.name} / ${dd.indo||''}</b><div style="margin-top:6px;white-space:pre-wrap;font-size:11pt">備註 Catatan: ${dd.note||''}</div></div>`; }); } html+=`</div>`; }); return html;
 }
 function exportWeeklyPDF(){ showPDF(makePDF(current.days.map(d=>({date:fmt(d.date),dishes:d.dishes,diners:d.diners,takeaway:d.takeaway})), fmt(current.mon))); }
 function pdfSingle(i){ let m=weeklyMenus[i]; showPDF(makePDF(m.days,m.monday)); }
@@ -286,14 +288,32 @@ async function sharePDF(){
   if(btn.dataset.busy==="1") return;
   let old=btn.textContent; btn.textContent='⏳ 產生中...'; btn.disabled=true; btn.dataset.busy="1";
   try{
-    let wrapper=document.createElement('div'); wrapper.style.width='794px'; wrapper.style.padding='0'; wrapper.style.background='#fff'; wrapper.style.position='fixed'; wrapper.style.left='-9999px'; wrapper.style.top='0';
-    let clone=content.cloneNode(true); clone.style.width='794px'; clone.style.boxSizing='border-box'; clone.style.padding='76px'; wrapper.appendChild(clone); document.body.appendChild(wrapper);
-    const canvas = await html2canvas(clone,{scale:2,useCORS:true,backgroundColor:'#ffffff',width:794});
-    document.body.removeChild(wrapper);
-    const { jsPDF } = window.jspdf; const pdf = new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
-    const imgData = canvas.toDataURL('image/png'); const pageW=210, pageH=297; const imgW=pageW, imgH=canvas.height * imgW / canvas.width;
-    pdf.addImage(imgData,'PNG',0,0,imgW,imgH); let remain=imgH - pageH; let y = -pageH;
-    while(remain>0){ pdf.addPage(); pdf.addImage(imgData,'PNG',0,y,imgW,imgH); y -= pageH; remain -= pageH; }
+    const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF({orientation:'portrait',unit:'mm',format:'a4',compress:true});
+    const pageW=210, pageH=297, marginTop=15, marginBottom=20, marginX=15;
+    const usableW = pageW - marginX*2;
+    let curY = marginTop;
+    let headerWrap=document.createElement('div'); headerWrap.style.width='794px'; headerWrap.style.background='#fff'; headerWrap.style.position='fixed'; headerWrap.style.left='-9999px'; headerWrap.style.top='0';
+    let hClone=document.createElement('div'); hClone.innerHTML = content.querySelector('h1').outerHTML + content.querySelector('.sub').outerHTML;
+    hClone.style.width='794px'; headerWrap.appendChild(hClone); document.body.appendChild(headerWrap);
+    let hCanvas = await html2canvas(hClone,{scale:1.2,useCORS:true,backgroundColor:'#ffffff'});
+    document.body.removeChild(headerWrap);
+    let hImg = hCanvas.toDataURL('image/jpeg',0.75);
+    let hH = hCanvas.height * usableW / hCanvas.width;
+    pdf.addImage(hImg,'JPEG',marginX,curY,usableW,hH,undefined,'FAST');
+    curY += hH + 6;
+    let days = content.querySelectorAll('.day');
+    for(let dayEl of days){
+      let wrap=document.createElement('div'); wrap.style.width='794px'; wrap.style.background='#fff'; wrap.style.position='fixed'; wrap.style.left='-9999px'; wrap.style.top='0';
+      let clone=dayEl.cloneNode(true); clone.style.width='794px'; wrap.appendChild(clone); document.body.appendChild(wrap);
+      let c = await html2canvas(clone,{scale:1.2,useCORS:true,backgroundColor:'#ffffff'});
+      document.body.removeChild(wrap);
+      let imgData = c.toDataURL('image/jpeg',0.75);
+      let imgH = c.height * usableW / c.width;
+      if(curY + imgH > pageH - marginBottom){ pdf.addPage(); curY = marginTop; }
+      pdf.addImage(imgData,'JPEG',marginX,curY,usableW,imgH,undefined,'FAST');
+      curY += imgH + 4;
+    }
     const blob = pdf.output('blob'); const file = new File([blob], `每週菜單_${fmt(new Date())}.pdf`, {type:'application/pdf'});
     try{ if(navigator.canShare && navigator.canShare({files:[file]})){ await navigator.share({files:[file],title:'每週菜單'}); return; } }catch(e){ if(e.name==='AbortError' || String(e.message).includes('cancellation')){ return; } }
     const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download=file.name; a.click(); setTimeout(()=>URL.revokeObjectURL(url),2000);
