@@ -6,7 +6,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <link rel="apple-touch-icon" href="icon.png">
 <link rel="manifest" href="manifest.json">
-<title>每週菜單 v2.0 最終</title>
+<title>每週菜單 v2.0 最終純圖示</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
@@ -41,18 +41,17 @@ body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,P
 .act{display:flex;gap:6px}.act button{width:46px;height:46px;border-radius:12px;border:2px solid var(--border);background:var(--bg);font-size:20px}
 select,input,textarea{width:100%;padding:14px;border-radius:14px;border:2px solid var(--border);background:var(--bg);color:var(--text);font-size:1.05rem}
 .topRowFixed{display:flex;gap:8px;align-items:center;width:100%}.topRowFixed input{flex:1;min-width:0}
-/* v2.0 最終 PDF白膠囊頭 - 按你張圖 */
+/* v2.0 純圖示版 PDF頭 - 淨圖示唔要字 72px方掣 */
 #pdfWrap{position:fixed;inset:0;background:#222;z-index:10000;display:none;flex-direction:column}#pdfWrap.open{display:flex}
-.pdfTool{position:sticky;top:0;background:#ffffff;padding:14px 12px;display:flex;gap:14px;border-bottom:2px solid #eee;z-index:2}
-#btnClosePdf{flex:1;height:64px;border-radius:22px;border:none;background:#ff6b35;color:#fff;font-weight:900;font-size:1.35rem;display:flex;align-items:center;justify-content:center;letter-spacing:1px}
-#btnSharePdf{flex:1;height:64px;border-radius:22px;border:2.5px solid #f0dcc8;background:#fffaf0;color:#1a73ff;font-weight:900;font-size:1.25rem;display:flex;align-items:center;justify-content:center;gap:6px}
+.pdfTool{position:sticky;top:0;background:#ffffff;padding:12px 12px;display:flex;justify-content:space-between;align-items:center;border-bottom:2px solid #f0e6d8;z-index:2}
+#btnClosePdf{width:72px;height:72px;min-width:72px;border-radius:18px;border:3px solid #111;background:#ff6b35;color:#fff;font-size:38px;font-weight:900;display:grid;place-items:center;line-height:1}
+#btnSharePdf{width:72px;height:72px;min-width:72px;border-radius:18px;border:3px solid #111;background:#fffaf0;color:#111;font-size:36px;display:grid;place-items:center;line-height:1}
 .pdfView{flex:1;overflow:auto;background:#333;padding:16px;display:flex;justify-content:center}
 .pdfPage{width:100%;max-width:800px;background:#fff;margin:0 auto}
 .pdfInner{padding:20mm;background:#fff;color:#000;box-sizing:border-box;font-size:18pt;line-height:1.6}
 </style>
 </head>
 <body>
-<!-- v2.0 最終：最好版 + 90道菜分行 + 橙/米白膠囊PDF頭 -->
 <div class="top"><img id="avatarTop" class="avatar" src="icon.png"><div style="display:flex;align-items:center;height:62px"><div style="font-weight:900;font-size:1.35rem;line-height:62px">每週菜單</div></div></div>
 <div class="pages">
 <div id="p-weekly" class="page active"><div class="card"><div class="topRowFixed"><input type="date" id="monPicker"><button class="iconBtn" onclick="saveWeekly()">💾</button><button class="iconBtn" onclick="exportWeeklyPDF()">📄</button></div></div><div id="weeklyGrid" class="weekWrap"></div></div>
@@ -72,12 +71,12 @@ select,input,textarea{width:100%;padding:14px;border-radius:14px;border:2px soli
 <div class="modal" id="mPickCat" style="z-index:10003"><div class="sheet"><div class="head"><b>分類</b><div class="x" onclick="closeM('mPickCat')">✕</div></div><div id="mPickCatBody" class="grid3" style="padding:12px"></div></div></div>
 <div class="modal" id="mPickDish" style="z-index:10004"><div class="sheet"><div class="head"><b>菜式</b><div class="x" onclick="closeM('mPickDish')">✕</div></div><div id="mPickDishBody"></div></div></div>
 <div class="modal" id="mAdd" style="z-index:10005"><div class="sheet"><div class="head"><b>新增/修改菜式</b><div class="x" onclick="closeM('mAdd')">✕</div></div><div style="padding:14px"><input id="fName" placeholder="中文菜名"><input id="fIndo" placeholder="印尼文" style="margin-top:10px"><textarea id="fNote" placeholder="備註 + 烹調方法" style="margin-top:10px;height:120px"></textarea><select id="fCat" style="margin-top:10px"></select><input type="hidden" id="fId"><button class="btn" style="width:100%;margin-top:12px" onclick="saveDish()">儲存</button></div></div></div>
-<div class="modal" id="mAnyDate" style="z-index:10006"><div class="sheet" style="border-radius:28px;border:3px solid #111"><div class="head"><b>加入到哪一天？</b><div class="x" onclick="closeM('mAnyDate')">✕</div></div><div style="padding:20px;display:flex;flex-direction:column;gap:14px;align-items:center"><input type="date" id="anyDate" style="width:92%!important;height:68px!important;min-height:68px!important"><button onclick="confirmAddToWeek()" style="width:92%!important;height:68px!important;border-radius:20px!important;border:3px solid #111!important;background:#ff6b35!important;color:#fff!important;font-weight:900!important;font-size:1.35rem!important">確認加入</button></div></div></div>
+<div class="modal" id="mAnyDate" style="z-index:10006"><div class="sheet" style="border-radius:28px;border:3px solid #111"><div class="head"><b>加入到哪一天？</b><div class="x" onclick="closeM('mAnyDate')">✕</div></div><div style="padding:20px;display:flex;flex-direction:column;gap:14px;align-items:center"><input type="date" id="anyDate" style="width:92%!important;height:68px!important"><button onclick="confirmAddToWeek()" style="width:92%!important;height:68px!important;border-radius:20px!important;border:3px solid #111!important;background:#ff6b35!important;color:#fff!important;font-weight:900!important;font-size:1.35rem!important">確認加入</button></div></div></div>
 
 <div id="pdfWrap">
   <div class="pdfTool">
-    <button id="btnClosePdf" type="button">× 關閉</button>
-    <button id="btnSharePdf" type="button">📤 傳送真PDF</button>
+    <button id="btnClosePdf" type="button">✕</button>
+    <button id="btnSharePdf" type="button">📤</button>
   </div>
   <div class="pdfView"><div class="pdfPage"><div class="pdfInner" id="pdfContent"></div></div></div>
 </div>
@@ -296,7 +295,7 @@ async function sharePDF(){
   let content=document.getElementById('pdfContent');
   let btn=document.getElementById('btnSharePdf');
   if(btn.dataset.busy==="1") return;
-  let old=btn.textContent; btn.textContent='⏳ 產生中...'; btn.disabled=true; btn.dataset.busy="1";
+  let old=btn.textContent; btn.textContent='⏳'; btn.disabled=true; btn.dataset.busy="1";
   try{
     let wrapper=document.createElement('div'); wrapper.style.width='794px'; wrapper.style.padding='0'; wrapper.style.background='#fff'; wrapper.style.position='fixed'; wrapper.style.left='-9999px'; wrapper.style.top='0';
     let clone=content.cloneNode(true); clone.style.width='794px'; clone.style.boxSizing='border-box'; clone.style.padding='76px'; wrapper.appendChild(clone); document.body.appendChild(wrapper);
