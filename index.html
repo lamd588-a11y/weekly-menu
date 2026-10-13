@@ -272,56 +272,65 @@ function toggleMy(open){document.querySelectorAll('.myBody').forEach(b=>b.style.
 function loadMenu(i){ let m=weeklyMenus[i]; document.getElementById('monPicker').value=m.monday; let mon=new Date(m.monday); current.mon=mon; current.days=m.days.map(d=>({date:new Date(d.date),dishes:d.dishes,diners:d.diners,takeaway:d.takeaway})); go('weekly',document.querySelectorAll('.nav')[0]); renderWeek(); }
 function delMenu(i){ if(!confirm('刪除?')) return; weeklyMenus.splice(i,1); localStorage.setItem('weeklyMenus',JSON.stringify(weeklyMenus)); renderMy(); }
 function makePDF(days, monStr){
-  let html = `<h1 style="text-align:center;border-bottom:3px solid #111;padding-bottom:12px;margin:0 0 12px 0;font-size:13pt;font-weight:900">每週菜單<br><span style="font-size:13pt">Daftar Menu Mingguan</span></h1><div style="text-align:center;margin:10px 0;font-weight:900;font-size:13pt">${monStr} 星期一 / Senin</div>`;
-  days.forEach((d,i)=>{
-    html += `<div style="border:2.5px solid #111;border-radius:14px;overflow:hidden;margin-bottom:16px;background:#fff;break-inside:avoid;page-break-inside:avoid"><div style="display:flex;justify-content:space-between;background:#fff3d6;padding:10px 14px;font-weight:900;border-bottom:2.5px solid #111;flex-wrap:wrap;gap:6px;font-size:13pt"><b>星期${cn[i]} / ${idn[i]} ${d.date}</b><span style="font-weight:900">用餐 / Makan: ${d.diners} &nbsp; 外帶 / Bungkus: ${d.takeaway}</span></div>`;
-    if(d.dishes.length===0){ html+=`<div style="padding:10px 14px;font-size:13pt;font-weight:900">無 / Belum ada</div>`; }
-    else{ d.dishes.forEach(dd=>{ html+=`<div style="padding:10px 14px;border-bottom:1px dashed #999;font-size:13pt"><b style="font-weight:900;font-size:13pt">${dd.name} / ${dd.indo||''}</b><div style="margin-top:6px;white-space:pre-wrap;font-size:13pt">備註 Catatan: ${dd.note||''}</div></div>`; }); }
-    html+=`</div>`;
-  });
-  return html;
+let html = `<h1 style="text-align:center;border-bottom:3px solid #111;padding-bottom:12px;margin:0 0 12px 0;font-size:13pt;font-weight:900">每週菜單<br><span style="font-size:13pt">Daftar Menu Mingguan</span></h1><div style="text-align:center;margin:10px 0;font-weight:900;font-size:13pt">${monStr} 星期一 / Senin</div>`;
+days.forEach((d,i)=>{
+html += `<div style="border:2.5px solid #111;border-radius:14px;overflow:hidden;margin-bottom:16px;background:#fff"><div style="display:flex;justify-content:space-between;background:#fff3d6;padding:10px 14px;font-weight:900;border-bottom:2.5px solid #111;flex-wrap:wrap;gap:6px;font-size:13pt"><b>星期${cn[i]} / ${idn[i]} ${d.date}</b><span style="font-weight:900">用餐 / Makan: ${d.diners} &nbsp; 外帶 / Bungkus: ${d.takeaway}</span></div>`;
+if(d.dishes.length===0){ html+=`<div style="padding:10px 14px;font-size:13pt">無 / Belum ada</div>`; }
+else{ d.dishes.forEach(dd=>{
+html+=`<div style="padding:10px 14px;border-bottom:1px dashed #999;font-size:13pt;break-inside:avoid;page-break-inside:avoid"><b style="font-size:13pt;font-weight:900">${dd.name} / ${dd.indo||''}</b><div style="margin-top:6px;white-space:pre-wrap;font-size:13pt">備註 Catatan: ${dd.note||''}</div></div>`;
+}); }
+html+=`</div>`;
+});
+return html;
 }
 function exportWeeklyPDF(){ showPDF(makePDF(current.days.map(d=>({date:fmt(d.date),dishes:d.dishes,diners:d.diners,takeaway:d.takeaway})), fmt(current.mon))); }
 function pdfSingle(i){ let m=weeklyMenus[i]; showPDF(makePDF(m.days,m.monday)); }
 function showPDF(inner){ document.getElementById('pdfContent').innerHTML=inner; document.getElementById('pdfWrap').classList.add('open'); }
 function closePDF(){ document.getElementById('pdfWrap').classList.remove('open'); }
 async function sharePDF(){
-  let content=document.getElementById('pdfContent');
-  let btn=document.getElementById('btnSharePdf');
-  if(btn.dataset.busy==="1") return;
-  let old=btn.textContent; btn.textContent='⏳'; btn.disabled=true; btn.dataset.busy="1";
-  try{
-    const { jsPDF } = window.jspdf;
-    const pdf = new jsPDF({orientation:'portrait',unit:'mm',format:'a4',compress:true});
-    const pageW=210, pageH=297, marginTop=15, marginBottom=20, marginX=15;
-    const usableW = pageW - marginX*2;
-    let curY = marginTop;
-    let headerWrap=document.createElement('div'); headerWrap.style.width='794px'; headerWrap.style.background='#fff'; headerWrap.style.position='fixed'; headerWrap.style.left='-9999px'; headerWrap.style.top='0';
-    let hClone=document.createElement('div');
-    hClone.innerHTML = content.children[0].outerHTML + content.children[1].outerHTML;
-    hClone.style.width='794px'; headerWrap.appendChild(hClone); document.body.appendChild(headerWrap);
-    let hCanvas = await html2canvas(hClone,{scale:1.2,useCORS:true,backgroundColor:'#ffffff'});
-    document.body.removeChild(headerWrap);
-    let hImg = hCanvas.toDataURL('image/jpeg',0.75);
-    let hH = hCanvas.height * usableW / hCanvas.width;
-    pdf.addImage(hImg,'JPEG',marginX,curY,usableW,hH,undefined,'FAST');
-    curY += hH + 6;
-    let days = content.querySelectorAll('div[style*="border:2.5px solid"]');
-    for(let dayEl of days){
-      let wrap=document.createElement('div'); wrap.style.width='794px'; wrap.style.background='#fff'; wrap.style.position='fixed'; wrap.style.left='-9999px'; wrap.style.top='0';
-      let clone=dayEl.cloneNode(true); clone.style.width='794px'; wrap.appendChild(clone); document.body.appendChild(wrap);
-      let c = await html2canvas(clone,{scale:1.2,useCORS:true,backgroundColor:'#ffffff'});
-      document.body.removeChild(wrap);
-      let imgData = c.toDataURL('image/jpeg',0.75);
-      let imgH = c.height * usableW / c.width;
-      if(curY + imgH > pageH - marginBottom){ pdf.addPage(); curY = marginTop; }
-      pdf.addImage(imgData,'JPEG',marginX,curY,usableW,imgH,undefined,'FAST');
-      curY += imgH + 4;
-    }
-    const blob = pdf.output('blob'); const file = new File([blob], `每週菜單_${fmt(new Date())}.pdf`, {type:'application/pdf'});
-    try{ if(navigator.canShare && navigator.canShare({files:[file]})){ await navigator.share({files:[file],title:'每週菜單'}); return; } }catch(e){ if(e.name==='AbortError' || String(e.message).includes('cancellation')){ return; } }
-    const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download=file.name; a.click(); setTimeout(()=>URL.revokeObjectURL(url),2000);
-  }catch(e){ if(e.name!=='AbortError') alert('PDF失敗: '+e.message); } finally{ btn.textContent=old; btn.disabled=false; btn.dataset.busy="0"; }
+let content=document.getElementById('pdfContent');
+let btn=document.getElementById('btnSharePdf');
+if(btn.dataset.busy==="1") return;
+let old=btn.textContent; btn.textContent='⏳'; btn.disabled=true; btn.dataset.busy="1";
+try{
+const { jsPDF } = window.jspdf;
+const pdf = new jsPDF({orientation:'portrait',unit:'mm',format:'a4',compress:true});
+const pageW=210, pageH=297, marginTop=15, marginBottom=20, marginX=15;
+const usableW = pageW - marginX*2;
+let curY = marginTop;
+let headerWrap=document.createElement('div'); headerWrap.style.width='794px'; headerWrap.style.background='#fff'; headerWrap.style.position='fixed'; headerWrap.style.left='-9999px'; headerWrap.style.top='0';
+let hClone=document.createElement('div');
+hClone.innerHTML = content.children[0].outerHTML + content.children[1].outerHTML;
+hClone.style.width='794px'; headerWrap.appendChild(hClone); document.body.appendChild(headerWrap);
+let hCanvas = await html2canvas(hClone,{scale:1.5,useCORS:true,backgroundColor:'#ffffff'});
+document.body.removeChild(headerWrap);
+let hImg = hCanvas.toDataURL('image/jpeg',0.85);
+let hH = hCanvas.height * usableW / hCanvas.width;
+pdf.addImage(hImg,'JPEG',marginX,curY,usableW,hH,undefined,'FAST');
+curY += hH + 6;
+let dayDivs = content.querySelectorAll('div[style*="border:2.5px solid"]');
+for(let dayEl of dayDivs){
+let dayHeader = dayEl.firstElementChild;
+let dishes = dayEl.querySelectorAll('div[style*="break-inside:avoid"]');
+for(let el of [dayHeader,...dishes]){
+let wrap=document.createElement('div'); wrap.style.width='794px'; wrap.style.background='#fff'; wrap.style.position='fixed'; wrap.style.left='-9999px'; wrap.style.top='0';
+let clone=el.cloneNode(true);
+clone.style.width='794px';
+wrap.appendChild(clone); document.body.appendChild(wrap);
+let c = await html2canvas(clone,{scale:1.5,useCORS:true,backgroundColor:'#ffffff'});
+document.body.removeChild(wrap);
+let imgData = c.toDataURL('image/jpeg',0.85);
+let imgH = c.height * usableW / c.width;
+if(curY + imgH > pageH - marginBottom){ pdf.addPage(); curY = marginTop; }
+pdf.addImage(imgData,'JPEG',marginX,curY,usableW,imgH,undefined,'FAST');
+curY += imgH + 1;
+}
+curY+=4;
+}
+const blob = pdf.output('blob'); const file = new File([blob], `每週菜單_${fmt(new Date())}.pdf`, {type:'application/pdf'});
+try{ if(navigator.canShare && navigator.canShare({files:[file]})){ await navigator.share({files:[file],title:'每週菜單'}); return; } }catch(e){ if(e.name==='AbortError' || String(e.message).includes('cancellation')){ return; } }
+const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download=file.name; a.click(); setTimeout(()=>URL.revokeObjectURL(url),2000);
+}catch(e){ if(e.name!=='AbortError') alert('PDF失敗: '+e.message); } finally{ btn.textContent=old; btn.disabled=false; btn.dataset.busy="0"; }
 }
 function exportLib(){ let blob=new Blob([JSON.stringify({cats,dishes},null,2)],{type:'application/json;charset=utf-8'}); let url=URL.createObjectURL(blob); let a=document.createElement('a'); a.href=url; a.download=`菜式庫_${fmt(new Date())}.json`; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(url),1000); }
 function importLib(e){ let f=e.target.files[0]; if(!f) return; let r=new FileReader(); r.onload=ev=>{ try{ let j=JSON.parse(ev.target.result); if(j.cats&&j.dishes){ cats=j.cats; dishes=j.dishes; localStorage.setItem('cats',JSON.stringify(cats)); localStorage.setItem('dishes',JSON.stringify(dishes)); renderCats(); renderCatOrder(); alert('匯入成功'); } }catch{ alert('失敗'); } }; r.readAsText(f); e.target.value=''; }
