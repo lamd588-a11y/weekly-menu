@@ -3,51 +3,61 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>每週菜單 - 暖木版完整版</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<link rel="apple-touch-icon" href="icon.png">
+<link rel="manifest" href="manifest.json">
+<title>每週菜單</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
-:root{--bg:#fdf3e7;--bg-wood:#f7e6d0;--card:#fff;--text:#3a2a1a;--muted:#a8917a;--primary:#c75c2c;--primary-dark:#a84a22;--primary-soft:#fbe8d9;--border:#f0dcc8;--shadow:0 12px 28px rgba(101,58,24,.14);--shadow-sm:0 4px 14px rgba(101,58,24,.08);--fs:18px}
-.dark{--bg:#1a1510;--bg-wood:#231c14;--card:#2a2118;--text:#f5ece2;--border:#3a2e22;--muted:#9a8a7a;--shadow:none;--primary-soft:#3a2618}
-*{box-sizing:border-box}html{font-size:var(--fs)}body{margin:0;background:linear-gradient(180deg,var(--bg) 0%, var(--bg-wood) 100%);color:var(--text);font-family:-apple-system,PingFang HK,Noto Sans TC,sans-serif;padding-bottom:110px;min-height:100vh;-webkit-font-smoothing:antialiased}
-.top{position:sticky;top:0;z-index:10;background:linear-gradient(135deg,#5e3816 0%, #a16a33 45%, #c78a5a 100%);color:#fff;padding:14px 18px;padding-top:calc(12px + env(safe-area-inset-top));display:flex;align-items:center;gap:14px;box-shadow:0 6px 22px rgba(80,40,10,.32)}
-.avatar{width:60px;height:60px;border-radius:50%;border:3px solid rgba(255,255,255,.92);object-fit:cover;box-shadow:0 3px 10px rgba(0,0,0,.2);background:#fff}
-.pages{max-width:520px;margin:0 auto;padding:12px 16px}
-.page{display:none}.page.active{display:block;animation:fade .22s ease}@keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
-.card{background:var(--card);border:1px solid var(--border);border-radius:22px;padding:14px;margin:0 0 14px 0;box-shadow:var(--shadow-sm);overflow:hidden}
-.row{display:flex;gap:10px;align-items:center}
-.btn{padding:14px 22px;border-radius:16px;border:none;background:linear-gradient(180deg,var(--primary) 0%, var(--primary-dark) 100%);color:#fff;font-weight:900;font-size:1rem;box-shadow:0 6px 16px rgba(199,92,44,.3);cursor:pointer;transition:transform .1s}.btn:active{transform:scale(.97)}
-.btn.full{width:100%;flex:1}
-.ghost{flex:1;padding:13px;border-radius:16px;border:1.5px solid var(--border);background:var(--card);font-weight:800;color:var(--text)}
-.iconBtn{width:48px;height:48px;border-radius:14px;border:1px solid var(--border);background:var(--card);font-size:22px;display:grid;place-items:center;box-shadow:var(--shadow-sm)}
-.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
-.catBox{aspect-ratio:1;border-radius:20px;border:1.5px solid rgba(255,255,255,.9);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;padding:10px;box-shadow:var(--shadow);transition:transform .12s}.catBox:active{transform:scale(.95)}
-.weekWrap{display:flex;flex-direction:column;gap:12px}.weekRow{display:flex;gap:10px;justify-content:center}
-.dayBox{width:32%;aspect-ratio:1;border-radius:20px;border:1px solid var(--border);background:var(--card);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;cursor:pointer;padding:10px;box-shadow:var(--shadow-sm);transition:all .12s}.dayBox:active{transform:scale(.96)}
-.bottom{position:fixed;bottom:0;left:0;right:0;background:rgba(255,255,255,.97);backdrop-filter:blur(18px);border-top:1px solid var(--border);display:flex;justify-content:space-around;padding:10px 0 calc(12px + env(safe-area-inset-bottom));z-index:20;box-shadow:0 -6px 22px rgba(60,30,10,.08)}
-.nav{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;color:var(--muted);font-size:11px;font-weight:800;cursor:pointer}
-.ic{font-size:28px!important;line-height:1!important;display:block}.nav.active{color:var(--primary)!important}
-.modal{position:fixed;inset:0;background:rgba(60,30,10,.48);backdrop-filter:blur(7px);display:none;z-index:9999;align-items:center;justify-content:center;padding:16px}.modal.open{display:flex}
-.sheet{width:100%;max-width:500px;max-height:86vh;overflow:auto;background:var(--card);border-radius:26px;border:1px solid var(--border);box-shadow:0 24px 60px rgba(0,0,0,.28)}
-.head{position:sticky;top:0;background:var(--card);padding:18px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
-.x{width:40px;height:40px;border-radius:50%;border:1px solid var(--border);background:var(--bg);display:grid;place-items:center;font-size:18px;cursor:pointer}
-.dishRow{display:flex;justify-content:space-between;align-items:center;padding:14px 4px;border-bottom:1px dashed var(--border);gap:10px}
-.act{display:flex;gap:6px}.act button{width:42px;height:42px;border-radius:12px;border:1px solid var(--border);background:var(--bg);font-size:18px}
-select,textarea,input[type=text],input[type=date]{width:100%;padding:16px;border-radius:14px;border:1.5px solid var(--border);background:var(--bg);color:var(--text);font-size:1rem;box-sizing:border-box}
-#pdfWrap{position:fixed;inset:0;background:#1c1510;display:none;flex-direction:column;z-index:10000}#pdfWrap.open{display:flex}
-.pdfTool{position:sticky;top:0;background:#fff9f0;padding:12px;display:flex;gap:12px;border-bottom:1px solid var(--border);z-index:2}
-.pdfView{flex:1;overflow:auto;background:#2b2118;padding:16px;display:flex;justify-content:center}
-.pdfPage{width:100%;max-width:800px;background:#fff;margin:0 auto;border-radius:16px;overflow:hidden;box-shadow:var(--shadow)}
-.pdfInner{padding:15mm 15mm 25mm 15mm!important;background:#fff;color:#000;box-sizing:border-box;font-size:16pt;line-height:1.5}
+:root{--bg:#fffaf0;--card:#fff;--text:#111;--muted:#888;--primary:#ff6b35;--border:#f0dcc8;--fs:20px}
+.dark{--bg:#121212;--card:#1e1e1e;--text:#f5f5f5;--border:#333;--muted:#aaa}
+html{font-size:var(--fs)}*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,PingFang HK,sans-serif;padding-bottom:140px;line-height:1.5}
+.top{position:sticky;top:0;z-index:10;background:var(--card);border-bottom:2px solid var(--border);padding:12px 16px;padding-top:calc(10px + env(safe-area-inset-top));display:flex;align-items:center;gap:12px}
+.avatar{width:62px;height:62px;border-radius:50%;border:3px solid var(--primary);object-fit:cover}
+.pages{max-width:520px;margin:0 auto;padding:0 16px 16px 16px;box-sizing:border-box}
+.page{display:none}.page.active{display:block}
+.card{background:var(--card);border:2px solid var(--border);border-radius:20px;padding:12px;margin:0 0 16px 0;width:100%;box-sizing:border-box;overflow:hidden}
+.row{display:flex;gap:8px;align-items:center}
+.btn{flex:1;padding:16px;border-radius:16px;border:none;background:var(--primary);color:#fff;font-weight:900;font-size:1.1rem}
+.ghost{flex:1;padding:14px;border-radius:16px;border:2px solid var(--border);background:var(--bg);font-weight:800;font-size:1rem}
+.iconBtn{width:48px;height:48px;min-width:48px;border-radius:14px;border:2px solid var(--border);background:var(--card);font-size:22px;display:grid;place-items:center;margin:0;box-sizing:border-box;flex-shrink:0}
+.grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;padding:12px;box-sizing:border-box;width:100%}
+.catBox{aspect-ratio:1;border-radius:18px;border:3px solid #111;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;padding:6px;width:100%;min-width:0;box-sizing:border-box}
+.weekWrap{display:flex;flex-direction:column;gap:8px}.weekRow{display:flex;gap:8px;justify-content:center}
+.dayBox{width:32%;aspect-ratio:1;border-radius:18px;border:3px solid #111;background:var(--card);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;cursor:pointer;padding:6px}
+.bottom{position:fixed;bottom:0;left:0;right:0;background:var(--card);border-top:2px solid var(--border);display:flex;justify-content:space-around;padding:16px 0 38px;z-index:20}
+.nav{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;color:var(--muted);font-size:13px;cursor:pointer}
+.ic{font-size:46px!important;line-height:1!important;display:block}
+.nav.active{color:var(--primary)!important}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.55);display:none;z-index:9999;align-items:center;justify-content:center;padding:12px}.modal.open{display:flex}
+.sheet{width:calc(100% - 24px);max-width:500px;max-height:88vh;overflow:auto;background:var(--card);border-radius:24px;border:3px solid #111;box-sizing:border-box;margin:0 auto}
+.head{position:sticky;top:0;background:var(--card);padding:14px;border-bottom:2px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+.x{width:48px;height:48px;border-radius:50%;border:2px solid var(--border);background:var(--bg);display:grid;place-items:center;font-size:24px;cursor:pointer}
+.dishRow{display:flex;justify-content:space-between;align-items:center;padding:14px;border-bottom:1.5px dashed var(--border);gap:8px}
+.act{display:flex;gap:6px}.act button{width:46px;height:46px;border-radius:12px;border:2px solid var(--border);background:var(--bg);font-size:20px}
+select,textarea{width:100%;padding:14px;border-radius:14px;border:2px solid var(--border);background:var(--bg);color:var(--text);font-size:1.05rem;box-sizing:border-box}
 .topRowFixed{display:flex;gap:8px;align-items:center;width:100%;box-sizing:border-box}
-.topRowFixed input{flex:1 1 0;min-width:0;width:0;text-align:center;font-weight:800;background:var(--primary-soft);border-radius:16px;padding:12px 6px;border:1.5px solid var(--border);box-sizing:border-box;font-size:1rem}
+.topRowFixed input{flex:1 1 0;min-width:0;width:0;text-align:center;font-weight:900;background:#fff7e6;border-radius:16px;padding:12px 6px;border:2px solid var(--border);box-sizing:border-box;font-size:1rem}
+#pdfWrap{position:fixed;inset:0;background:#222;z-index:10000;display:none;flex-direction:column}#pdfWrap.open{display:flex}
+.pdfTool{position:sticky;top:0;background:#fff;padding:12px;display:flex;gap:12px;border-bottom:2px solid #ccc;z-index:2}
+.pdfView{flex:1;overflow:auto;background:#333;padding:16px;display:flex;justify-content:center}
+.pdfPage{width:100%;max-width:800px;background:#fff;margin:0 auto}
+.pdfInner{padding:15mm 15mm 25mm 15mm!important;background:#fff;color:#000;box-sizing:border-box;font-size:16pt;line-height:1.5}
 </style>
 </head>
 <body>
-<div class="top"><img id="avatarTop" class="avatar" src="icon.png"><div><b>每週菜單</b><div style="font-size:.85rem;opacity:.9">Menu Mingguan • 暖木版</div></div></div>
+<div class="top"><img id="avatarTop" class="avatar" src="icon.png"><div style="display:flex;align-items:center;height:62px"><div style="font-weight:900;font-size:1.35rem;line-height:62px">每週菜單</div></div></div>
 <div class="pages">
-<div id="p-weekly" class="page active"><div class="card"><div class="row"><input type="date" id="monPicker" style="flex:1;padding:12px 10px;border-radius:14px;border:1.5px solid var(--border);background:var(--primary-soft);font-weight:800;text-align:center"><button class="iconBtn" onclick="saveWeekly()">💾</button><button class="iconBtn" onclick="exportWeeklyPDF()">📄</button></div></div><div id="weeklyGrid" class="weekWrap"></div></div>
-<div id="p-library" class="page"><div class="card row"><button class="ghost" onclick="exportLib()">匯出</button><button class="ghost" onclick="document.getElementById('impFile').click()">匯入</button><button class="btn full" onclick="openAdd()">新增菜式</button><input type="file" id="impFile" accept=".json" style="display:none"></div><div id="catGrid" class="grid3"></div></div>
+<div id="p-weekly" class="page active"><div class="card"><div class="topRowFixed"><input type="date" id="monPicker"><button class="iconBtn" onclick="saveWeekly()">💾</button><button class="iconBtn" onclick="exportWeeklyPDF()">📄</button></div></div><div id="weeklyGrid" class="weekWrap"></div></div>
+<div id="p-library" class="page"><div class="card row"><button class="ghost" onclick="exportLib()">匯出</button><button class="ghost" onclick="document.getElementById('impFile').click()">匯入</button><button class="btn" onclick="openAdd()">新增菜式</button><input type="file" id="impFile" accept=".json" style="display:none"></div><div id="catGrid" class="grid3"></div></div>
 <div id="p-mymenus" class="page"><div class="card row"><button class="ghost" onclick="toggleMy(true)">一鍵打開全部</button><button class="ghost" onclick="toggleMy(false)">一鍵關閉全部</button></div><div id="myList"></div></div>
-<div id="p-settings" class="page"><div class="card"><h3>分類排序</h3><div id="catOrder"></div><div class="row" style="margin-top:12px"><input id="newCat" placeholder="新分類名稱" style="flex:1;padding:14px 16px;border-radius:14px;border:1.5px solid var(--border)"><button class="btn" onclick="addCat()" style="min-width:90px">新增</button></div></div><div class="card"><h3>外觀</h3><div class="row"><span>深淺色</span><button class="ghost" onclick="toggleTheme()">切換</button></div><div style="margin-top:12px"><label>字體大小 <span id="fsVal">18</span>px</label><input type="range" id="fsRange" min="14" max="26" value="18" oninput="setFS(this.value)" style="width:100%"></div></div></div>
+<div id="p-settings" class="page"><div class="card"><h3>分類排序</h3><div id="catOrder"></div><div class="row" style="margin-top:12px;flex-wrap:nowrap"><input id="newCat" placeholder="新分類名稱" style="flex:1;min-width:0;padding:14px 16px;border-radius:16px;border:2px solid var(--border);background:var(--bg);color:var(--text);font-size:1rem;font-weight:800;box-sizing:border-box"><button class="btn" onclick="addCat()" style="flex:0 0 90px;min-width:90px">新增</button></div></div><div class="card"><h3>外觀</h3><div class="row"><span>深淺色</span><button class="ghost" onclick="toggleTheme()">切換</button></div><div style="margin-top:12px"><label>字體大小 <span id="fsVal">20</span>px</label><input type="range" id="fsRange" min="14" max="28" value="20" oninput="setFS(this.value)" style="width:100%"></div></div><div class="card"><h3>頭像</h3><div style="display:flex;gap:10px;align-items:center;margin:10px 0">
+  <label for="avFile" style="flex:0 0 auto;padding:16px 22px;border-radius:16px;background:var(--primary);color:#fff;font-weight:900;font-size:1.15rem;cursor:pointer">📁 選擇圖片</label>
+  <span id="avFileName" style="flex:1;font-size:1.1rem;font-weight:800;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">尚未選取檔案</span>
+</div>
+<input type="file" id="avFile" accept="image/*" style="display:none"><div style="width:260px;height:260px;margin:12px auto;border-radius:50%;overflow:hidden;border:3px solid var(--primary);background:#000;touch-action:none"><canvas id="avCanvas" width="600" height="600" style="width:100%;height:100%"></canvas></div><div class="row"><span>縮放</span><input type="range" id="avZoom" min="0.2" max="4" step="0.05" value="1" style="flex:1"><button class="ghost" onclick="resetAv()">重置</button></div><button class="btn" style="width:100%;margin-top:10px" onclick="saveAv()">儲存頭像</button></div></div>
 </div>
 <div class="bottom">
 <div class="nav active" onclick="go('weekly',this)"><span class="ic">📅</span>每週</div>
@@ -55,72 +65,307 @@ select,textarea,input[type=text],input[type=date]{width:100%;padding:16px;border
 <div class="nav" onclick="go('mymenus',this)"><span class="ic">🗂️</span>我的菜單</div>
 <div class="nav" onclick="go('settings',this)"><span class="ic">⚙️</span>設定</div>
 </div>
-<div class="modal" id="mCat"><div class="sheet"><div class="head"><b id="mCatTitle">分類</b><div class="x" onclick="closeM('mCat')">✕</div></div><div id="mCatBody"></div></div></div>
-<div class="modal" id="mNote"><div class="sheet"><div class="head"><b>備註</b><div class="x" onclick="closeM('mNote')">✕</div></div><div id="mNoteBody" style="padding:16px;white-space:pre-wrap"></div></div></div>
-<div class="modal" id="mWeek"><div class="sheet"><div class="head"><b id="mWeekTitle">日期</b><div class="x" onclick="closeM('mWeek')">✕</div></div><div style="padding:14px"><div class="row"><label>用餐</label><select id="diners"></select><label>外帶</label><select id="takeaway"></select></div><div id="selDishes" style="margin-top:12px"></div><button class="btn full" style="margin-top:12px" onclick="openPickCat()">選擇菜式</button></div></div></div>
-<div class="modal" id="mPickCat"><div class="sheet"><div class="head"><b>分類</b><div class="x" onclick="closeM('mPickCat')">✕</div></div><div id="mPickCatBody" class="grid3" style="padding:12px"></div></div></div>
-<div class="modal" id="mPickDish"><div class="sheet"><div class="head"><b>菜式</b><div class="x" onclick="closeM('mPickDish')">✕</div></div><div id="mPickDishBody"></div></div></div>
-<div class="modal" id="mAdd"><div class="sheet"><div class="head"><b>新增/修改菜式</b><div class="x" onclick="closeM('mAdd')">✕</div></div><div style="padding:14px"><input id="fName" placeholder="中文菜名"><input id="fIndo" placeholder="印尼文菜名" style="margin-top:12px"><textarea id="fNote" placeholder="備註 + 烹調方法" style="margin-top:12px;height:120px"></textarea><select id="fCat" style="margin-top:12px"></select><input type="hidden" id="fId"><button class="btn full" style="margin-top:12px" onclick="saveDish()">儲存</button></div></div></div>
-<div class="modal" id="mAnyDate"><div class="sheet"><div class="head"><b>加入到哪一天？</b><div class="x" onclick="closeM('mAnyDate')">✕</div></div><div style="padding:20px;display:flex;flex-direction:column;gap:14px;align-items:center"><input type="date" id="anyDate" style="width:92%;height:56px;border-radius:16px;text-align:center;font-weight:800"><button class="btn full" onclick="confirmAddToWeek()" style="width:92%;height:56px">確認加入</button></div></div></div>
-<div id="pdfWrap"><div class="pdfTool"><button class="btn" id="btnClosePdf">✕</button><button class="ghost" id="btnSharePdf">📤</button></div><div class="pdfView"><div class="pdfPage"><div class="pdfInner" id="pdfContent"></div></div></div></div>
+<div class="modal" id="mCat" style="z-index:10001"><div class="sheet"><div class="head"><b id="mCatTitle">分類</b><div class="x" onclick="closeM('mCat')">✕</div></div><div id="mCatBody"></div></div></div>
+<div class="modal" id="mNote" style="z-index:10010"><div class="sheet"><div class="head"><b>備註</b><div class="x" onclick="closeM('mNote')">✕</div></div><div id="mNoteBody" style="padding:16px;white-space:pre-wrap;font-size:1.1rem"></div></div></div>
+<div class="modal" id="mWeek" style="z-index:10002"><div class="sheet"><div class="head"><b id="mWeekTitle">日期</b><div class="x" onclick="closeM('mWeek')">✕</div></div><div style="padding:14px"><div class="row"><label>用餐</label><select id="diners"></select><label>外帶</label><select id="takeaway"></select></div><div id="selDishes" style="margin-top:12px"></div><button class="btn" style="width:100%;margin-top:12px" onclick="openPickCat()">選擇菜式</button></div></div></div>
+<div class="modal" id="mPickCat" style="z-index:10003"><div class="sheet"><div class="head"><b>分類</b><div class="x" onclick="closeM('mPickCat')">✕</div></div><div id="mPickCatBody" class="grid3" style="padding:12px"></div></div></div>
+<div class="modal" id="mPickDish" style="z-index:10004"><div class="sheet"><div class="head"><b>菜式</b><div class="x" onclick="closeM('mPickDish')">✕</div></div><div id="mPickDishBody"></div></div></div>
+<div class="modal" id="mAdd" style="z-index:10005"><div class="sheet"><div class="head"><b>新增/修改菜式</b><div class="x" onclick="closeM('mAdd')">✕</div></div><div style="padding:14px"><input id="fName" placeholder="中文菜名" style="width:100%;padding:16px;border-radius:14px;border:2px solid var(--border);background:var(--bg);color:var(--text);font-size:1.05rem;box-sizing:border-box;height:56px"><input id="fIndo" placeholder="印尼文菜名" style="margin-top:12px;width:100%;padding:16px;border-radius:14px;border:2px solid var(--border);background:var(--bg);color:var(--text);font-size:1.05rem;box-sizing:border-box;height:56px"><textarea id="fNote" placeholder="備註 + 烹調方法" style="margin-top:10px;height:120px"></textarea><select id="fCat" style="margin-top:10px"></select><input type="hidden" id="fId"><button class="btn" style="width:100%;margin-top:12px" onclick="saveDish()">儲存</button></div></div></div>
+<div class="modal" id="mAnyDate" style="z-index:10006"><div class="sheet" style="border-radius:28px;border:3px solid #111"><div class="head"><b>加入到哪一天？</b><div class="x" onclick="closeM('mAnyDate')">✕</div></div><div style="padding:20px;display:flex;flex-direction:column;gap:14px;align-items:center"><input type="date" id="anyDate" style="width:92%!important;height:68px!important;min-height:68px!important;line-height:68px!important;padding:0 12px!important;border-radius:20px!important;border:3px solid #111!important;background:#fffaf5!important;color:#111!important;font-weight:900!important;font-size:1.3rem!important;text-align:center!important;box-sizing:border-box!important;display:block!important"><button onclick="confirmAddToWeek()" style="width:92%!important;height:68px!important;min-height:68px!important;line-height:68px!important;padding:0!important;border-radius:20px!important;border:3px solid #111!important;background:#ff6b35!important;color:#fff!important;font-weight:900!important;font-size:1.35rem!important;box-sizing:border-box!important;display:grid!important;place-items:center!important;text-align:center!important">確認加入</button></div></div></div>
+<div id="pdfWrap"><div class="pdfTool"><button class="btn" id="btnClosePdf" type="button" style="font-size:38px!important;line-height:1!important">✕</button><button class="ghost" id="btnSharePdf" type="button" style="font-size:36px!important;line-height:1!important">📤</button></div><div class="pdfView"><div class="pdfPage"><div class="pdfInner" id="pdfContent"></div></div></div></div>
 <script>
-const CAT_META={"雞":{bg:"#",e:"🐔"},"牛":{bg:"#",e:"🐮"},"豬":{bg:"#",e:"🐷"},"魚":{bg:"#",e:"🐟"},"蔬菜":{bg:"#",e:"🥬"},"湯水":{bg:"#",e:"🍲"},"西式":{bg:"#",e:"🍔"},"罐頭":{bg:"#",e:"🥫"},"其他":{bg:"#",e:"🍱"}};
+const CAT_META={"雞":{bg:"#ffeb8a",e:"🐔"},"牛":{bg:"#d7b899",e:"🐮"},"豬":{bg:"#ffb3c1",e:"🐷"},"魚":{bg:"#8ecfff",e:"🐟"},"蔬菜":{bg:"#a8e6a3",e:"🥬"},"湯水":{bg:"#ffcc7a",e:"🍲"},"西式":{bg:"#e2c499",e:"🍔"},"罐頭":{bg:"#9ec6ff",e:"🥫"},"其他":{bg:"#d8b4fe",e:"🍱"}};
 let cats=JSON.parse(localStorage.getItem('cats')||'null')||Object.keys(CAT_META);
 let dishes=JSON.parse(localStorage.getItem('dishes')||'null')||[];
 let weeklyMenus=JSON.parse(localStorage.getItem('weeklyMenus')||'[]');
 let current={mon:null,days:[]}, lastCook=JSON.parse(localStorage.getItem('lastCook')||'{}'), editDay=null, pendDish=null;
-const cn=["一","二","三","四","五","六","日"], dayEmo=["🌅","🌤️","🌞","🌇","🌙","⭐","🎉"];
-function go(p,el){document.querySelectorAll('.page').forEach(e=>e.classList.remove('active'));document.getElementById('p-'+p).classList.add('active');document.querySelectorAll('.nav').forEach(e=>e.classList.remove('active'));if(el) el.classList.add('active');}
+const cn=["一","二","三","四","五","六","日"], idn=["Senin","Selasa","Rabu","Kamis","Jumat","Sabtu","Minggu"], dayEmo=["🌅","🌤️","🌞","🌇","🌙","⭐","🎉"];
+function go(p,el){document.querySelectorAll('.page').forEach(e=>e.classList.remove('active'));document.getElementById('p-'+p).classList.add('active');document.querySelectorAll('.nav').forEach(e=>e.classList.remove('active'));if(el) el.classList.add('active'); else document.querySelectorAll('.nav')[['weekly','library','mymenus','settings'].indexOf(p)].classList.add('active');}
 function getMon(d){let dt=new Date(d);let day=dt.getDay();let diff=dt.getDate()-day+(day==0?-6:1);return new Date(dt.setDate(diff));}
-function fmt(d){if(typeof d==='string') return d; return ${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')};}
+function fmt(d){if(typeof d==='string')return d;return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;}
 function openM(id){document.getElementById(id).classList.add('open');}function closeM(id){document.getElementById(id).classList.remove('open');}
 function makeDefaults(){
  if(dishes.length) return;
  const D={
- "雞":[["豉油雞","Ayam Kecap","中文：生抽2湯匙、老抽1湯匙、冰糖1小塊、薑片蔥段爆香，加水煮滾後放入雞慢火浸煮30分鐘。"],["海南雞","Ayam Hainan","原隻雞用鹽抹勻，放入蔥薑滾水中慢火煮25分鐘，撈出放入冰水冷卻。"],["蔥油雞","Ayam Minyak Daun Bawang","雞肉蒸熟撕開，大量蔥花薑末加鹽熱油淋面。"],["鹽焗雞","Ayam Panggang Garam","粗鹽沙薑粉醃雞，砂鍋加大量粗鹽焗熟。"],["涼瓜雞煲","Sup Ayam Pare","苦瓜汆水，雞件炒香加入苦瓜豆豉蒜頭燜20分鐘。"],["栗子炆雞","Ayam Masak Kastanye","雞件煎金黃，加入栗子蒜頭生抽蠔油燜25分鐘。"],["冬菇滑雞","Ayam Jamur Shiitake","雞件用冬菇絲生抽糖生粉麻油醃勻，大火蒸12分鐘。"],["三杯雞","Ayam Tiga Cangkir","麻油爆香薑蒜，加入雞件，米酒生抽魚露各一杯，收汁加九層塔。"],["土豆炆雞","Ayam Masak Kentang","薯仔煎香，與雞件加醬油糖水燜20分鐘。"],["西檸雞","Ayam Lemon","雞扒炸酥脆切件，淋新鮮檸檬汁酸甜汁。"]],
- "牛":[["番茄炒牛肉","Daging Sapi Tumis Tomat","牛肉切片醃好炒半熟，加入番茄塊茄汁炒勻。"],["洋蔥炒牛肉","Daging Sapi Tumis Bawang Bombay","洋蔥切件炒香，加入醃好牛肉片大火快炒。"],["彩椒炒牛肉","Daging Sapi Tumis Paprika","彩椒切塊與牛肉片快炒，加生抽蠔油蒜蓉。"],["沙爹牛肉","Daging Sapi Saus Satay","牛肉片用沙爹醬花生醬生抽醃製，與洋蔥快炒。"],["涼瓜炒牛肉","Daging Sapi Tumis Pare","苦瓜汆水，與醃好牛肉同炒加豆豉。"],["黑椒薯仔牛柳粒","Daging Sapi Lada Hitam Kentang","牛柳切粒煎香，薯仔粒炸金黃，加黑椒牛油洋蔥翻炒。"],["中式牛柳","Daging Sapi Gaya Cina","牛柳煎香，茄汁喼汁糖醋調醬汁，與洋蔥翻炒。"],["金菇肥牛煲","Sup Daging Sapi Jamur Enoki","肥牛汆水，砂鍋加金菇粉絲清湯煮滾，放入肥牛煮熟。"],["菜心炒牛肉","Daging Sapi Tumis Choy Sum","菜心切段，牛肉炒半熟撈起，重新炒菜心，最後回鍋。"],["柱侯牛腩煲","Sup Urat Sapi Saus Chu Hou","牛腩焯水，用柱侯醬薑蒜八角爆香，加水小火燉1.5小時。"]],
- "豬":[["咕嚕肉","Babi Asam Manis","豬肉切塊沾粉炸脆，與青椒菠蘿糖醋汁快炒。"],["椒鹽豬扒","Pork Chop Garam Merica","豬扒拍鬆醃味沾生粉炸金黃，加椒鹽蒜粒蔥花翻炒。"],["蒸肉餅","Daging Babi Cincang Kukus","豬肉剁碎加冬菇馬蹄生抽鹽生粉攪勻，蒸12分鐘。"],["梅菜扣肉","Babi Kukus Sayur Asin","五花肉煎香切片，鋪上梅菜加醬油蒸1小時。"],["回鍋肉","Babi Masak Dua Kali","五花肉煮熟切片，與椰菜燈籠椒豆瓣醬甜麵醬快炒。"],["糖醋排骨","Iga Babi Asam Manis","排骨炸金黃，用醋糖茄汁水煮糖醋汁包裹收汁。"],["涼瓜炒排骨","Iga Babi Tumis Pare","排骨煎微焦，加入苦瓜豆豉蒜頭水燜15分鐘。"],["粟米肉粒飯","Nasi Daging Cincang Saus Jagung","豬肉碎炒熟，加粟米雞湯糖鹽煮滾，勾芡淋飯。"],["鹹蛋蒸肉餅","Daging Babi Cincang Kukus Telur Asin","豬肉碎鋪鹹蛋黃切片，蒸15分鐘。"],["豉汁蒸排骨","Iga Babi Kukus Saus Hitam","排骨用豆豉蒜蓉生抽糖生粉拌勻，蒸10分鐘。"]],
- "魚":[["清蒸海鮮魚","Ikan Kukus","鮮魚鋪薑絲蔥段蒸8分鐘，淋熱油蒸魚豉油。"],["煎封黃花魚","Ikan Kuning Goreng","黃花魚煎兩面金黃酥脆，灒生抽醋。"],["茄汁魚片","Ikan Fillet Saus Tomat","魚片沾生粉煎香，加番茄醬洋蔥糖水醬汁翻炒。"],["豉汁蒸鯇魚","Ikan Carp Kukus Saus Tauco","鯇魚片鋪豆豉蒜蓉薑絲辣椒，蒸8分鐘灑蔥花。"],["酸菜魚","Ikan Sayur Asin Pedas","魚片蛋白醃好，酸菜炒香加水煮滾放入魚片，最後淋熱油。"],["粟米斑塊","Ikan Fillet Saus Jagung","石斑魚塊炸金黃，淋粟米粒雞湯生粉芡汁。"],["涼瓜魚頭煲","Sup Kepala Ikan Pare","魚頭煎金黃，加苦瓜豆豉蒜頭水燜20分鐘。"],["魚香茄子","Terong Saus Daging Ikan","茄子炸軟，與豬肉豆瓣醬蒜末鹹魚粒炒勻勾芡。"],["香煎三文魚","Salmon Pan-Seared","三文魚扒鹽黑椒調味，煎兩面金黃，伴檸檬汁。"],["豆腐魚頭湯","Sup Kepala Ikan Tahu","魚頭煎香加熱水豆腐薑片，大火滾20分鐘成奶白湯。"]],
- "蔬菜":[["蒜蓉炒菜心","Tumis Choy Sum Bawang Putih","菜心切段，大火爆蒜蓉，下菜心快炒加鹽水。"],["上湯浸娃娃菜","Wanshui Kukus Kuah Kaldu","娃娃菜切半，加皮蛋鹹蛋碎杞子雞湯煮軟。"],["蠔油生菜","Selada Saus Tiram","生菜燙熟，淋蠔油生抽糖蒜油醬汁。"],["炒椰菜","Tumis Kubis","椰菜切絲快炒，加鹽糖炒軟。"],["番茄炒蛋","Telur Tumis Tomat","雞蛋炒滑蛋備用，番茄炒出汁，加雞蛋糖鹽翻炒。"],["苦瓜炒蛋","Telur Tumis Pare","苦瓜汆水，加入蛋液煎熟。"],["椒絲腐乳通菜","Kangkung Tumis Tau Fu Fa","通菜切段，加腐乳紅椒絲蒜蓉大火快炒。"],["菜脯煎蛋","Dadar Telur Lobak Asin","菜脯炒香，加入蛋液煎金黃。"],["蝦米炒椰菜花","Tumis Kembang Kol Udang Kering","椰菜花汆水，與蝦米蒜頭翻炒加水燜熟。"],["涼瓜排骨湯","Sup Pare Iga Babi","苦瓜排骨黃豆薑片，大火滾小火燉1小時。"]],
- "湯水":[["蘿蔔排骨湯","Sup Lobak Iga","白蘿蔔排骨薑片燉1小時。"],["冬瓜薏米湯","Sup Labu Air Barli","冬瓜薏米排骨陳皮燉。"],["節瓜鹹蛋湯","Sup Labu Air Telur Asin","節瓜鹹蛋瘦肉煮。"],["紫菜蛋花湯","Sup Rumput Laut Telur","紫菜蛋花加少許鹽。"],["番茄薯仔湯","Sup Tomat Kentang","番茄薯仔洋蔥瘦肉湯。"]],
- "西式":[["香草烤雞翼","Sayap Ayam Panggang Herbal","雞翼香草鹽黑椒烤。"],["芝士焗意粉","Pasta Panggang Keju","意粉芝士焗。"],["黑椒豬扒","Pork Chop Lada Hitam","豬扒黑椒汁。"]],
- "罐頭":[["茄汁焗豆","Kacang Panggang Saus Tomat","茄汁豆加熱。"],["午餐肉煎蛋","Telur Dadar Luncheon Meat","午餐肉切片煎蛋。"]],
- "其他":[["白飯","Nasi Putih","白飯。"],["炒米粉","Bihun Goreng","米粉炒。"]]
- };
+  "雞": [
+    ["豉油雞", "Ayam Kecap", "中文：生抽2湯匙、老抽1湯匙、冰糖1小塊、薑片及蔥段爆香，加水煮滾後放入雞慢火浸煮30分鐘。\nIndonesia: 2 sdm kecap asin, 1 sdm kecap hitam, 1 potong kecil gula batu, tumis jahe dan daun bawang, masukkan air lalu rebus ayam dengan api kecil selama 30 menit."],
+    ["海南雞", "Ayam Hainan", "中文：原隻雞用鹽抹勻，放入蔥薑滾水中慢火煮25分鐘，撈出後放入冰水冷卻。\nIndonesia: Baluri ayam utuh dengan garam, masukkan ke dalam air mendidih berisi daun bawang dan jahe, rebus dengan api kecil selama 25 menit, lalu tiriskan dan rendam di air es."],
+    ["蔥油雞", "Ayam Minyak Daun Bawang", "中文：雞肉蒸熟後撕開，大量蔥花、薑末加鹽及熱油淋在雞肉表面拌勻。\nIndonesia: Ayam dikukus lalu disuwir, siram dengan campuran banyak irisan daun bawang, jahe cincang, garam, dan minyak panas di atasnya."],
+    ["鹽焗雞", "Ayam Panggang Garam", "中文：用粗鹽及沙薑粉將雞全身醃製，用砂鍋加大量粗鹽焗熟。\nIndonesia: Lumuri ayam dengan garam kasar dan bubuk jahe pasir, panggang dalam panci tanah liat menggunakan banyak garam kasar hingga matang."],
+    ["涼瓜雞煲", "Sup Ayam Pare", "中文：苦瓜切塊汆水，雞件炒香後加入苦瓜、豆豉、蒜頭及水燜煮20分鐘。\nIndonesia: Potong pare dan rebus sebentar, tumis potongan ayam lalu tambahkan pare, tauco, bawang putih, dan air, rebus selama 20 menit."],
+    ["栗子炆雞", "Ayam Masak Kastanye", "中文：雞件煎至金黃，加入去殼栗子、蒜頭、生抽、蠔油及適量清水燜煮25分鐘。\nIndonesia: Goreng potongan ayam hingga keemasan, masukkan kastanye kupas, bawang putih, kecap asin, saus tiram, dan air secukupnya, rebus selama 25 menit."],
+    ["冬菇滑雞", "Ayam Jamur Shiitake", "中文：雞件用冬菇絲、生抽、糖、生粉及麻油醃勻，鋪在碟上大火蒸12分鐘。\nIndonesia: Marinasi potongan ayam dengan jamur shiitake, kecap asin, gula, tepung maizena, dan minyak wijen, kukus dengan api besar selama 12 menit."],
+    ["三杯雞", "Ayam Tiga Cangkir", "中文：麻油爆香薑蒜，加入雞件，依次倒入米酒、生抽、魚露各一杯，收汁後加入九層塔。\nIndonesia: Tumis jahe dan bawang putih dengan minyak wijen, masukkan ayam, tambahkan masing-masing satu cangkir tuak beras, kecap asin, dan kecap ikan, masak hingga kuah menyusut lalu beri daun kemangi."],
+    ["土豆炆雞", "Ayam Masak Kentang", "中文：薯仔切塊煎香，與炒香的雞件一同加入醬油、糖和水，燜煮20分鐘至薯仔軟爛。\nIndonesia: Potong kentang dan goreng sebentar, rebus bersama potongan ayam yang sudah ditumis dengan kecap, gula, dan air selama 20 menit hingga kentang empuk."],
+    ["西檸雞", "Ayam Lemon", "中文：雞扒沾炸粉炸至酥脆切件，淋上由新鮮檸檬汁、糖和水煮成的酸甜檸檬汁。\nIndonesia: Balur dada ayam dengan tepung lalu goreng hingga renyah dan potong-potong, siram dengan saus lemon manis asam yang dibuat dari perasan jeruk lemon segar, gula, dan air."]
+  ],
+  "牛": [
+    ["番茄炒牛肉", "Daging Sapi Tumis Tomat", "中文：牛肉切片醃好炒至半熟，加入番茄塊、茄汁和少許水炒勻煮至番茄軟爛。\nIndonesia: Iris daging sapi dan marinasi lalu tumis setengah matang, masukkan potongan tomat, saus tomat, dan sedikit air, masak hingga tomat lunak."],
+    ["洋蔥炒牛肉", "Daging Sapi Tumis Bawang Bombay", "中文：洋蔥切件炒香，加入醃好的牛肉片大火快炒至牛肉變色即可。\nIndonesia: Tumis potongan bawang bombay hingga harum, masukkan irisan daging sapi yang sudah dimarinasi, aduk cepat dengan api besar hingga daging berubah warna."],
+    ["彩椒炒牛肉", "Daging Sapi Tumis Paprika", "中文：彩椒切塊與牛肉片一同快炒，加入少許生抽、蠔油及蒜蓉調味。\nIndonesia: Tumis cepat potongan paprika bersama irisan daging sapi, bumbui dengan sedikit kecap asin, saus tiram, dan bawang putih cincang."],
+    ["沙爹牛肉", "Daging Sapi Saus Satay", "中文：牛肉片用沙爹醬、花生醬、生抽和生粉醃製，與洋蔥快炒。\nIndonesia: Marinasi irisan daging sapi dengan saus sate, selai kacang, kecap asin, dan tepung maizena, lalu tumis bersama bawang bombay."],
+    ["涼瓜炒牛肉", "Daging Sapi Tumis Pare", "中文：苦瓜切片汆水去苦味，與醃好的牛肉片同炒，加入豆豉增添風味。\nIndonesia: Iris pare dan rebus sebentar untuk mengurangi pahit, tumis bersama irisan daging sapi, tambahkan tauco untuk menambah rasa."],
+    ["黑椒薯仔牛柳粒", "Daging Sapi Lada Hitam Kentang", "中文：牛柳切粒煎香，薯仔粒炸至金黃，加入黑椒碎、牛油和洋蔥大火翻炒。\nIndonesia: Potong daging tenderloin berbentuk dadu lalu goreng sebentar, goreng kentang dadu hingga keemasan, tumis dengan lada hitam, mentega, dan bawang bombay."],
+    ["中式牛柳", "Daging Sapi Gaya Cina", "中文：牛柳煎香，用茄汁、喼汁、糖和醋調配醬汁，與洋蔥一同翻炒均勻。\nIndonesia: Goreng daging sapi, buat saus dari saus tomat, saus Worcestershire, gula, dan cuka, lalu tumis bersama bawang bombay hingga merata."],
+    ["金菇肥牛煲", "Sup Daging Sapi Jamur Enoki", "中文：肥牛片汆水，砂鍋中加入金菇、粉絲、清湯及調味料煮滾，放入肥牛片煮熟。\nIndonesia: Celupkan irisan daging sapi tipis ke air panas sebentar, di dalam panci tanah liat didihkan jamur enoki, bihun, kaldu, dan bumbu, lalu masukkan daging sapi hingga matang."],
+    ["菜心炒牛肉", "Daging Sapi Tumis Choy Sum", "中文：菜心洗淨切段，牛肉片炒至半熟撈起；重新起鍋炒菜心，最後加入牛肉回鍋快炒。\nIndonesia: Cuci dan potong choy sum, tumis irisan daging sapi hingga setengah matang lalu angkat; tumis kembali choy sum, lalu masukkan daging sapi ke dalam wajan dan aduk cepat."],
+    ["柱侯牛腩煲", "Sup Urat Sapi Saus Chu Hou", "中文：牛腩切塊焯水，用柱侯醬、薑、蒜、八角爆香，加水小火慢燉1.5小時至軟爛。\nIndonesia: Potong daging sandung lamur dan rebus sebentar, tumis dengan saus chu hou, jahe, bawang putih, dan bunga lawang, tambahkan air lalu rebus dengan api kecil selama 1,5 jam hingga empuk."]
+  ],
+  "豬": [
+    ["咕嚕肉", "Babi Asam Manis", "中文：豬肉切塊沾粉炸脆，與青椒、紅椒、菠蘿塊及糖醋汁一同快炒。\nIndonesia: Potong daging babi, baluri tepung lalu goreng hingga renyah, tumis bersama paprika hijau, paprika merah, potongan nanas, dan saus asam manis."],
+    ["椒鹽豬扒", "Pork Chop Garam Merica", "中文：豬扒拍鬆醃味後沾上生粉炸至金黃，加入椒鹽、蒜粒及蔥花翻炒。\nIndonesia: Pukul-pukul daging bork chop, marinasi lalu balur tepung maizena dan goreng hingga keemasan, tumis dengan garam merica, bawang putih, dan daun bawang."],
+    ["蒸肉餅", "Daging Babi Cincang Kukus", "中文：豬肉剁碎加入冬菇粒、馬蹄碎、生抽、鹽和生粉攪勻，壓平後大火蒸12分鐘。\nIndonesia: Cincang daging babi, campur dengan jamur cincang, bengkuang cincang, kecap asin, garam, dan tepung maizena, ratakan di piring lalu kukus dengan api besar selama 12 menit."],
+    ["梅菜扣肉", "Babi Kukus Sayur Asin", "中文：五花肉煎香表面，切片鋪上洗淨浸泡的梅菜，加醬油蒸煮1小時。\nIndonesia: Goreng permukaan daging babi perut hingga harum, iris lalu susun di atas sayur asin (mei cai) yang sudah dicuci dan direndam, kukus dengan kecap selama 1 jam."],
+    ["回鍋肉", "Babi Masak Dua Kali", "中文：五花肉煮熟切片，與椰菜、燈籠椒及豆瓣醬、甜麵醬一起大火快炒。\nIndonesia: Rebus daging babi perut lalu iris, tumis dengan kol, paprika, saus doubanjiang, dan saus manis dengan api besar."],
+    ["糖醋排骨", "Iga Babi Asam Manis", "中文：排骨炸至金黃，用醋、糖、茄汁和水煮成的糖醋汁包裹排骨收汁。\nIndonesia: Goreng iga babi hingga keemasan, masak dengan saus asam manis yang terbuat dari cuka, gula, saus tomat, dan air hingga kuah meresap."],
+    ["涼瓜炒排骨", "Iga Babi Tumis Pare", "中文：排骨煎至微焦，加入苦瓜片、豆豉、蒜頭及水燜煮15分鐘入味。\nIndonesia: Goreng iga babi hingga sedikit kecokelatan, masukkan potongan pare, tauco, bawang putih, dan air, rebus selama 15 menit hingga meresap."],
+    ["粟米肉粒飯", "Nasi Daging Cincang Saus Jagung", "中文：豬肉碎炒熟，加入粟米粒、雞湯、糖和鹽煮滾，用生粉水勾芡淋在飯上。\nIndonesia: Tumis daging babi cincang, masukkan jagung manis pipil, kaldu ayam, gula, dan garam, lalu kentalkan dengan larutan tepung maizena dan siram di atas nasi."],
+    ["鹹蛋蒸肉餅", "Daging Babi Cincang Kukus Telur Asin", "中文：豬肉碎加入調味料搓勻，鋪上鹹蛋黃切片，大火蒸15分鐘。\nIndonesia: Campur daging babi cincang dengan bumbu, letakkan irisan kuning telur asin di atasnya, kukus dengan api besar selama 15 menit."],
+    ["豉汁蒸排骨", "Iga Babi Kukus Saus Hitam", "中文：排骨用豆豉、蒜蓉、生抽、糖、生粉和少許油拌勻，大火蒸10分鐘。\nIndonesia: Campur iga babi dengan tauco, bawang putih cincang, kecap asin, gula, tepung maizena, dan sedikit minyak, kukus dengan api besar selama 10 menit."]
+  ],
+  "魚": [
+    ["清蒸海鮮魚", "Ikan Kukus", "中文：鮮魚洗淨抹乾，鋪上薑絲蔥段大火蒸8分鐘，出爐後淋上熱油及蒸魚豉油。\nIndonesia: Cuci bersih ikan dan keringkan, beri jahe dan daun bawang, kukus dengan api besar selama 8 menit, lalu siram dengan minyak panas dan kecap ikan kukus."],
+    ["煎封黃花魚", "Ikan Kuning Goreng", "中文：黃花魚洗淨抹乾，下鍋煎至兩面金黃酥脆，灒少許生抽和醋即可。\nIndonesia: Cuci dan keringkan ikan kuning,goreng dalam wajan hingga kedua sisi keemasan dan renyah, lalu beri sedikit kecap asin dan cuka."],
+    ["茄汁魚片", "Ikan Fillet Saus Tomat", "中文：魚肉片沾生粉煎香，加入番茄醬、洋蔥、糖和水煮成的醬汁翻炒均勻。\nIndonesia: Balur fillet ikan dengan tepung maizena lalu goreng, tumis bersama saus yang terbuat dari saus tomat, bawang bombay, gula, dan air hingga merata."],
+    ["豉汁蒸鯇魚", "Ikan Carp Kukus Saus Tauco", "中文：鯇魚片鋪上豆豉、蒜蓉、薑絲和辣椒，大火蒸8分鐘後灑上蔥花。\nIndonesia: Susun fillet ikan carp, beri tauco, bawang putih cincang, jahe, dan cabai, kukus dengan api besar selama 8 menit lalu taburi daun bawang."],
+    ["酸菜魚", "Ikan Sayur Asin Pedas", "中文：魚片用蛋白醃好；酸菜切絲炒香，加入水煮滾後放入魚片煮熟，最後淋熱油。\nIndonesia: Marinasi fillet ikan dengan putih telur; tumis sayur asin, tambahkan air lalu didihkan, masukkan ikan hingga matang, terakhir siram minyak panas."],
+    ["粟米斑塊", "Ikan Fillet Saus Jagung", "中文：石斑魚塊沾炸粉炸至金黃，淋上由粟米粒、雞湯和生粉水煮成的粟米芡汁。\nIndonesia: Balur potongan ikan kerapu dengan tepung lalu goreng hingga keemasan, siram dengan kuah kental jagung yang terbuat dari pipilan jagung, kaldu ayam, dan larutan maizena."],
+    ["涼瓜魚頭煲", "Sup Kepala Ikan Pare", "中文：魚頭煎至金黃，加入苦瓜片、豆豉、蒜頭及水燜煮20分鐘。\nIndonesia: Goreng kepala ikan hingga keemasan, masukkan potongan pare, tauco, bawang putih, dan air, rebus selama 20 menit."],
+    ["魚香茄子", "Terong Saus Daging Ikan", "中文：茄子切條炸軟，與免治豬肉、豆瓣醬、蒜末及少許鹹魚粒炒勻勾芡。\nIndonesia: Potong terong memanjang lalu goreng hingga lunak, tumis bersama daging babi cincang, saus doubanjiang, bawang putih cincang, dan sedikit ikan asin lalu kentalkan."],
+    ["香煎三文魚", "Salmon Pan-Seared", "中文：三文魚扒用鹽和黑椒調味，下鍋煎至兩面金黃熟透，伴以檸檬汁食用。\nIndonesia: Bumbui salmon dengan garam dan lada hitam, goreng dalam wajan hingga kedua sisi matang dan keemasan, sajikan dengan perasan lemon."],
+    ["豆腐魚頭湯", "Sup Kepala Ikan Tahu", "中文：魚頭煎香後加入熱水、豆腐和薑片，大火滾煮20分鐘成奶白色濃湯。\nIndonesia: Goreng kepala ikan hingga harum, tambahkan air panas, tahu, dan jahe, rebus dengan api besar selama 20 menit hingga berkuah putih kental."]
+  ],
+  "蔬菜": [
+    ["蒜蓉炒菜心", "Tumis Choy Sum Bawang Putih", "中文：菜心洗淨切段，大火熱油爆香蒜蓉，下菜心快炒並加入少許鹽和水煮熟。\nIndonesia: Cuci dan potong choy sum, tumis bawang putih dengan minyak panas, masukkan choy sum, aduk cepat, beri sedikit garam dan air hingga matang."],
+    ["上湯浸娃娃菜", "Wanshui Kukus Kuah Kaldu Telur Asin", "中文：娃娃菜切半，加入皮蛋、鹹蛋碎、杞子及雞湯煮滾，煮至菜變軟。\nIndonesia: Belah sawi putih (baby napa cabbage), rebus bersama telur pidan, potongan telur asin, goji berry, dan kaldu ayam hingga sayur lunak."],
+    ["蠔油生菜", "Selada Saus Tiram", "中文：生菜洗淨放入滾水中燙熟撈起，淋上由蠔油、生抽、糖和蒜油調成的醬汁。\nIndonesia: Cuci selada lalu celupkan ke air mendidih sebentar hingga matang, angkat, lalu siram dengan saus tiram, kecap asin, gula, dan minyak bawang."],
+    ["炒椰菜", "Tumis Kubis", "中文：椰菜切絲，熱油下鍋快炒，加入少許鹽、糖調味，炒至軟身即可。\nIndonesia: Iris kubis, tumis dengan minyak panas, bumbui dengan sedikit garam dan gula, masak hingga kubis lunak."],
+    ["番茄炒蛋", "Telur Tumis Tomat", "中文：雞蛋打散炒至滑蛋備用；番茄切塊炒至出汁，加入雞蛋和少許糖鹽翻炒均勻。\nIndonesia: Kocok telur lalu masak orak-arik; potong tomat dan tumis hingga mengeluarkan jus, masukkan telur beserta sedikit garam dan gula, aduk rata."],
+    ["苦瓜炒蛋", "Telur Tumis Pare", "中文：苦瓜切片汆水去苦味，加入打散的雞蛋液中煎熟成苦瓜炒蛋。\nIndonesia: Iris pare dan rebus sebentar untuk mengurangi pahit, campurkan ke dalam kocokan telur lalu masak hingga matang."],
+    ["椒絲腐乳通菜", "Kangkung Tumis Tau Fu Fa", "中文：通菜洗淨切段，熱油下鍋，加入腐乳碎、紅椒絲和蒜蓉大火快炒。\nIndonesia: Cuci dan potong kangkung, tumis dengan minyak panas, masukkan hancuran tahu fermentasi (furu), irisan cabai merah, dan bawang putih cincang, aduk cepat."],
+    ["菜脯煎蛋", "Dadar Telur Lobak Asin", "中文：菜脯粒洗淨炒香，加入打散的雞蛋液中，煎至兩面金黃即可。\nIndonesia: Cuci bersih lobak asin cincang lalu tumis sebentar, campurkan ke dalam kocokan telur, goreng hingga kedua sisi keemasan."],
+    ["蝦米炒椰菜花", "Tumis Kembang Kol Udang Kering", "中文：椰菜花切小朵汆水，與浸軟的蝦米、蒜頭一同翻炒，加入少許水燜熟。\nIndonesia: Potong kembang kol kecil-kecil dan rebus sebentar, tumis bersama udang kering (ebi) yang sudah direndam dan bawang putih, tambahkan sedikit air hingga matang."],
+    ["涼瓜排骨湯", "Sup Pare Iga Babi", "中文：苦瓜切塊、排骨焯水，加水、黃豆和薑片，大火滾開後小火慢燉1小時。\nIndonesia: Potong pare, rebus iga babi sebentar, tambahkan air, kedelai kuning, dan jahe, didihkan lalu rebus dengan api kecil selama 1 jam."]
+  ],
+  "湯水": [
+    ["西洋菜陳腎豬腱湯", "Sup Selada Air Bebek Asin", "中文：西洋菜洗淨，陳腎（乾鴨腎）切片，豬腱肉焯水，加水慢火煲2小時。\nIndonesia: Cuci selada air, iris ampela bebek kering, rebus sebentar daging babi, tambahkan air lalu rebus dengan api kecil selama 2 jam."],
+    ["粟米紅蘿蔔豬骨湯", "Sup Jagung Wortel Tulang Babi", "中文：豬骨焯水，粟米切段，紅蘿蔔切塊，加水大火煮滾後小火煲1.5小時。\nIndonesia: Rebus tulang babi sebentar, potong jagung dan wortel, tambahkan air, didihkan lalu rebus dengan api kecil selama 1,5 jam."],
+    ["蓮藕綠豆排骨湯", "Sup Akar Lotus Kacang Hijau Iga", "中文：蓮藕切片，綠豆洗淨，排骨焯水，加水一起煲1.5小時至蓮藕軟糯。\nIndonesia: Iris akar lotus, cuci kacang hijau, rebus iga babi, tambahkan air lalu rebus selama 1,5 jam hingga akar lotus empuk."],
+    ["番茄薯仔豬骨湯", "Sup Tomat Kentang Tulang Babi", "中文：番茄、薯仔切塊，豬骨焯水，加水煮滾後轉小火煲1小時。\nIndonesia: Potong tomat dan kentang, rebus tulang babi, tambahkan air, didihkan lalu rebus dengan api kecil selama 1 jam."],
+    ["木瓜雪耳豬腱湯", "Sup Pepaya Jamur Putih Daging", "中文：木瓜去皮切塊，雪耳泡發撕小塊，豬腱肉焯水，慢火煲1.5小時。\nIndonesia: Kupas dan potong pepaya, rendam jamur putih dan suwir kecil, rebus daging babi, rebus dengan api kecil selama 1,5 jam."],
+    ["冬瓜肉片湯", "Sup Labu Air Daging Sapi/Babi", "中文：冬瓜切片，肉片用生抽生粉醃好，加水滾煮冬瓜至軟，放入肉片滾熟。\nIndonesia: Iris labu air (winter melon), marinasi irisan daging, rebus labu air hingga lunak, lalu masukkan daging hingga matang."],
+    ["淮山杞子雞湯", "Sup Ayam Ubi Cina Goji Berry", "中文：淮山切片，杞子洗淨，雞肉焯水，加水慢火燉煮1.5小時。\nIndonesia: Iris ubi cina (huai shan), cuci goji berry, rebus ayam, tambahkan air lalu rebus dengan api kecil selama 1,5 jam."],
+    ["節瓜粉絲鹹蛋湯", "Sup Labu Mini Bihun Telur Asin", "中文：節瓜去皮切片，鹹蛋黃切碎，加水煮滾後放入粉絲和節瓜煮熟。\nIndonesia: Kupas dan iris labu mini (hairy gourd), cincang kuning telur asin, didihkan air lalu masukkan bihun dan labu hingga matang."],
+    ["蘿蔔牛腩湯", "Sup Lobak Putih Daging Sapi", "中文：白蘿蔔切塊，牛腩焯水後加薑片、八角和水，慢火燜煮1.5小時。\nIndonesia: Potong lobak putih, rebus daging sapi, tambahkan jahe, bunga lawang, dan air, rebus dengan api kecil selama 1,5 jam."],
+    ["西洋菜排骨湯", "Sup Selada Air Iga Babi", "中文：西洋菜洗淨，排骨焯水，加水及南北杏慢火煲1.5小時。\nIndonesia: Cuci selada air, rebus iga babi, tambahkan air serta biji aprikot utara dan selatan, rebus dengan api kecil selama 1,5 jam."]
+  ],
+  "西式": [
+    ["意式肉醬意粉", "Spaghetti Bolognese", "中文：意粉煮熟備用；免治牛肉或豬肉炒香，加入洋蔥碎、番茄醬和意粉醬煮滾淋在面上。\nIndonesia: Rebus spaghetti hingga matang; tumis daging cincang, masukkan bawang bombay, saus tomat, dan saus pasta, lalu siram di atas spaghetti."],
+    ["白汁忌廉雞皇飯", "Chicken à la King", "中文：雞肉和蘑菇切片炒熟，加入忌廉、牛油和牛奶煮成濃白汁，淋在白飯上。\nIndonesia: Tumis potongan ayam dan jamur, masukkan krim, mentega, dan susu untuk membuat saus putih kental, lalu siram di atas nasi putih."],
+    ["焗豬扒飯", "Baked Pork Chop Rice", "中文：豬扒煎香鋪在炒飯上，淋上番茄洋蔥醬汁和芝士，放入焗爐烤至芝士融化金黃。\nIndonesia: Letakkan pork chop goreng di atas nasi goreng, siram dengan saus tomat bawang bombay dan keju, panggang hingga keju meleleh dan keemasan."],
+    ["黑椒牛扒", "Steak Lada Hitam", "中文：牛扒用鹽和黑椒調味，煎至喜愛生熟度，配上黑椒汁及薯條。\nIndonesia: Bumbui steak dengan garam dan lada hitam, panggang tingkat kematangan yang diinginkan, sajikan dengan saus lada hitam dan kentang goreng."],
+    ["公司三文治", "Club Sandwich", "中文：三文治麵包烘底，夾入煎蛋、火腿、番茄、生菜和沙律醬切成三角形。\nIndonesia: Panggang roti tawar, isi dengan telur goreng, ham, tomat, selada, dan saus mayones, lalu potong berbentuk segitiga."],
+    ["羅宋湯", "Borscht (Sup Merah Ala Hong Kong)", "中文：椰菜、紅蘿蔔、薯仔、西芹加牛肉塊及茄膏，慢火熬煮2小時成濃郁酸甜湯。\nIndonesia: Rebus kubis, wortel, kentang, seledri, potongan daging sapi, dan pasta tomat dengan api kecil selama 2 jam hingga menjadi sup asam manis."],
+    ["吞拿魚沙律三文治", "Sandwich Salad Tuna", "中文：吞拿魚罐頭隔水，加入沙律醬、黑椒和粟米粒拌勻，夾在方包中。\nIndonesia: Tiriskan tuna kaleng, campur dengan mayones, lada hitam, dan jagung pipil, lalu jepit di antara roti tawar."],
+    ["忌廉蘑菇湯", "Sup Krim Jamur", "中文：蘑菇切片炒香，加入牛油、麵粉、牛奶和忌廉打成糊狀煮滾。\nIndonesia: Tumis irisan jamur, tambahkan mentega, tepung, susu, dan krim lalu blender hingga halus dan didihkan."],
+    ["意式卡邦尼意粉", "Spaghetti Carbonara", "中文：意粉煮熟；意式煙肉炒香，熄火後加入蛋黃、巴馬臣芝士和煮面水拌勻成濃汁。\nIndonesia: Rebus spaghetti; tumis bacon, matikan api lalu campurkan kuning telur, keju parmesan, dan air rebusan pasta hingga kental."],
+    ["焗薯皮", "Loaded Potato Skins", "中文：焗薯挖出部分薯肉，填入芝士、煙肉碎和酸奶油，放入焗爐焗至芝士融化。\nIndonesia: Keruk sedikit daging kentang panggang, isi dengan keju, remahan bacon, dan sour cream, panggang hingga keju meleleh."]
+  ],
+  "罐頭": [
+    ["五香肉丁炒公仔麵", "Mi Instan Tumis Daging Babi Spiced", "中文：公仔麵煮熟撈起；起鍋炒香五香肉丁罐頭，加入椰菜絲和公仔麵拌勻。\nIndonesia: Rebus mi instan lalu tiriskan; tumis daging babi kaleng spiced, masukkan irisan kubis dan mi instan, aduk rata."],
+    ["沙甸魚炒蛋", "Telur Tumis Sarden", "中文：沙甸魚罐頭去骨壓碎，加入打散的雞蛋液中，下鍋煎至兩面金黃。\nIndonesia: Hancurkan sarden kaleng tanpa duri, campurkan ke dalam kocokan telur, lalu goreng di wajan hingga kedua sisi keemasan."],
+    ["午餐肉煎蛋公仔麵", "Mi Instan Telur & Spam", "中文：公仔麵煮好，鋪上煎好的厚切午餐肉和太陽蛋。\nIndonesia: Masak mi instan, letakkan luncheon meat (spam) tebal goreng dan telur mata sapi di atasnya."],
+    ["豆豉鯪魚炒麥菜", "Selada Tumis Ikan Dace Tauco", "中文：蒜頭爆香，加入豆豉鯪魚罐頭炒散，放入麥菜大火快炒熟透。\nIndonesia: Tumis bawang putih, masukkan ikan dace kaleng dengan tauco, aduk hancur, masukkan sayur lettuce (cai xin/macai) dan aduk cepat hingga matang."],
+    ["番茄牛肉通心粉", "Makaroni Kaleng Daging Sapi Tomat", "中文：通心粉煮熟；鍋中加入番茄汁牛肉罐頭和水煮滾，倒入通心粉煮熱。\nIndonesia: Rebus makaroni; di panci tambahkan daging sapi kuah tomat kaleng dan air, didihkan lalu masukkan makaroni."],
+    ["咖喱牛肉飯", "Nasi Daging Sapi Kari Kaleng", "中文：咖喱牛肉罐頭加熱，可加入少許椰漿或水調味，淋在熱白飯上。\nIndonesia: Panaskan kari daging sapi kaleng, tambahkan sedikit santan atau air sesuai selera, lalu siram di atas nasi panas."],
+    ["榨菜肉碎拌麵", "Mi Daging Cincang Zha Cai", "中文：榨菜切碎，與免治豬肉炒熟調味，淋在煮好的幼麵上拌勻。\nIndonesia: Cincang sayur asin zha cai, tumis bersama daging babi cincang, lalu siram di atas mi kuah yang sudah matang."],
+    ["粟米吞拿魚多士", "Toast Tuna Jagung Kaleng", "中文：吞拿魚罐頭與粟米粒及沙律醬拌勻，鋪在方包上，放入多士爐烤脆。\nIndonesia: Campur tuna kaleng dengan pipilan jagung dan mayones, oleskan di atas roti tawar, lalu panggang hingga renyah."],
+    ["鹹牛肉炒蛋", "Telur Tumis Kornet Sapi", "中文：鹹牛肉罐頭與打散的雞蛋拌勻，下鍋用慢火炒至滑蛋狀態。\nIndonesia: Campur kornet sapi kaleng dengan kocokan telur, masak di wajan dengan api kecil hingga menjadi orak-arik telur lembut."],
+    ["回鍋肉罐頭炒椰菜", "Kubis Tumis Daging Babi Kaleng", "中文：椰菜切塊炒軟，加入回鍋肉罐頭一同翻炒均勻即可。\nIndonesia: Potong kubis lalu tumis hingga lunak, masukkan daging babi tumis kaleng, aduk rata hingga matang."]
+  ],
+  "其他": [
+    ["蛋炒飯", "Nasi Goreng Telur", "中文：隔夜飯壓散，熱油炒香雞蛋，倒入白飯大火翻炒，加入蔥花和鹽調味。\nIndonesia: Pecahkan gumpalan nasi sisa kemarin, tumis telur hingga harum, masukkan nasi putih, aduk cepat dengan api besar, beri daun bawang dan garam."],
+    ["揚州炒飯", "Nasi Goreng Yangzhou", "中文：白飯與蝦仁、叉燒粒、雞蛋、青豆和蔥花一同大火翻炒均勻。\nIndonesia: Tumis nasi putih bersama udang, potongan char siu, telur, kacang polong, dan daun bawang dengan api besar hingga merata."],
+    ["干炒牛河", "Kuey Teow Goreng Sapi", "中文：河粉下鍋大火煎香，與醃好的牛肉片、芽菜、洋蔥及老抽生抽快炒。\nIndonesia: Goreng mie kwetiau dengan api besar hingga harum, tumis bersama irisan daging sapi, tauge, bawang bombay, kecap hitam, dan kecap asin."],
+    ["星洲炒米粉", "Bihun Goreng Singapura", "中文：米粉泡軟，與义燒絲、蝦仁、芽菜、洋蔥及咖喱粉大火快炒均勻。\nIndonesia: Rendam bihun hingga lunak, tumis bersama irisan char siu, udang, tauge, bawang bombay, dan bubuk kari dengan api besar."],
+    ["滑蛋蝦仁", "Udang Orak-Arik Telur", "中文：蝦仁炒至半熟，倒入打散的雞蛋液中，輕輕翻炒至半熟滑蛋狀態即可。\nIndonesia: Tumis udang hingga setengah matang, tuang ke dalam kocokan telur, aduk perlahan hingga berbentuk telur orak-arik yang lembut."],
+    ["鹹魚雞粒炒飯", "Nasi Goreng Ayam Ikan Asin", "中文：鹹魚粒爆香，加入雞肉粒、白飯、雞蛋和蔥花大火翻炒均勻。\nIndonesia: Tumis potongan ikan asin hingga harum, masukkan potongan ayam, nasi putih, telur, dan daun bawang, aduk rata dengan api besar."],
+    ["蝦醬炒通菜", "Kangkung Tumis Saus Udang", "中文：蝦醬與蒜蓉爆香，加入洗淨的通菜大火快炒至軟身。\nIndonesia: Tumis pasta udang (belacan) dan bawang putih cincang hingga harum, masukkan kangkung dan aduk cepat dengan api besar hingga lunak."],
+    ["菠蘿咕嚕肉", "Babi Asam Manis Nanas", "中文：炸豬肉塊與新鮮菠蘿、燈籠椒及甜酸醬汁快速翻炒裹勻。\nIndonesia: Tumis cepat potongan daging babi goreng bersama nanas segar, paprika, dan saus asam manis hingga merata."],
+    ["椒鹽鮮魷", "Cumi Goreng Garam Merica", "中文：鮮魷魚切塊沾粉炸至金黃，加入椒鹽、蒜蓉、紅椒粒及蔥花翻炒。\nIndonesia: Potong cumi, balur tepung lalu goreng hingga keemasan, tumis dengan garam merica, bawang putih cincang, cabai merah, dan daun bawang."],
+    ["豉汁炒蜆", "Kerang Tumis Saus Hitam", "中文：蜆吐沙後，用蒜頭、豆豉、辣椒及生抽大火爆炒至開口。\nIndonesia: Setelah kerang dibersihkan pasirnya, tumis dengan bawang putih, tauco, cabai, dan kecap asin dengan api besar hingga kerang terbuka."]
+]
+};
  Object.entries(D).forEach(([cat,arr])=>{arr.forEach(([n,i,t])=>{dishes.push({id:Date.now()+Math.random(),name:n,indo:i,note:t,cat});});});
  localStorage.setItem('dishes',JSON.stringify(dishes));
 }
-function init(){let mon=getMon(new Date());document.getElementById('monPicker').valueAsDate=mon;onMon(mon);renderCats();renderWeek();renderMy();renderCatOrder();loadAll();let sel=document.getElementById('diners');sel.innerHTML=[...Array(10).keys()].map(n=>`<option value="${n}">${n}</option>`).join('');document.getElementById('takeaway').innerHTML=sel.innerHTML;document.getElementById('monPicker').addEventListener('change',e=>{let d=e.target.valueAsDate;if(!d)return;if(d.getDay()!==1){alert('只可以星期一');let m=getMon(d);e.target.valueAsDate=m;d=m;}onMon(d);});}
-function onMon(d){current.mon=d;current.days=[];for(let i=0;i<7;i++){let day=new Date(d);day.setDate(d.getDate()+i);current.days.push({date:day,dishes:[],diners:0,takeaway:0});}renderWeek();}
-function loadAll(){let th=localStorage.getItem('theme');if(th==='dark') document.body.classList.add('dark');let fs=localStorage.getItem('fs');if(fs){document.getElementById('fsRange').value=fs;setFS(fs);}}
-function renderCats(){let g=document.getElementById('catGrid');g.innerHTML='';document.getElementById('fCat').innerHTML=cats.map(c=>`<option>${c}</option>`).join('');cats.forEach(cat=>{let meta=CAT_META[cat]||{bg:'#eee',e:'🍱'};let cnt=dishes.filter(d=>d.cat===cat).length;g.innerHTML+=`<div class="catBox" style="background:${meta.bg}" onclick="openCat('${cat}')"><div style="font-size:56px;line-height:1">${meta.e}</div><div style="margin-top:6px;font-weight:900">${cat} (${cnt})</div></div>`;});}
-function openCat(cat){document.getElementById('mCatTitle').innerText=cat;let list=dishes.filter(d=>d.cat===cat);document.getElementById('mCatBody').innerHTML=list.map(d=>`<div class="dishRow"><div style="flex:1;cursor:pointer" onclick="showNote(${d.id})"><b>${d.name}</b><div style="font-size:.9rem;color:var(--muted)">${d.indo||''}</div></div><div class="act"><button onclick="openAnyDate(${d.id})">📅</button><button onclick="editDish(${d.id})">✏️</button><button onclick="delDish(${d.id})">🗑️</button></div></div>`).join('')||'<div style="padding:20px">暫無</div>';openM('mCat');}
-function showNote(id){let d=dishes.find(x=>x.id==id);if(!d) return;document.getElementById('mNoteBody').innerText=`${d.name} / ${d.indo||''}\n\n${d.note||''}`;openM('mNote');}
-function openAnyDate(id){pendDish=id;document.getElementById('anyDate').valueAsDate=new Date();openM('mAnyDate');}
-function confirmAddToWeek(){let v=document.getElementById('anyDate').value;if(!v) return;let date=new Date(v);let mon=getMon(date);if(fmt(mon)!==fmt(current.mon)){alert('請先選包含此日的星期一');return;}let idx=Math.round((date-current.mon)/86400000);if(idx<0||idx>6) return;let d=dishes.find(x=>x.id==pendDish);current.days[idx].dishes.push({...d});lastCook[d.id]=fmt(date);localStorage.setItem('lastCook',JSON.stringify(lastCook));renderWeek();closeM('mAnyDate');}
-function openAdd(){document.getElementById('fId').value='';document.getElementById('fName').value='';document.getElementById('fIndo').value='';document.getElementById('fNote').value='';openM('mAdd');}
-function editDish(id){let d=dishes.find(x=>x.id==id);openAdd();document.getElementById('fId').value=d.id;document.getElementById('fName').value=d.name;document.getElementById('fIndo').value=d.indo||'';document.getElementById('fNote').value=d.note||'';document.getElementById('fCat').value=d.cat;}
-function saveDish(){let id=document.getElementById('fId').value,n=document.getElementById('fName').value.trim(),i=document.getElementById('fIndo').value.trim(),t=document.getElementById('fNote').value.trim(),c=document.getElementById('fCat').value;if(!n) return alert('中文必填');if(id){let d=dishes.find(x=>x.id==id);d.name=n;d.indo=i;d.note=t;d.cat=c;} else dishes.push({id:Date.now()+Math.random(),name:n,indo:i,note:t,cat:c});localStorage.setItem('dishes',JSON.stringify(dishes));renderCats();closeM('mAdd');}
-function delDish(id){if(!confirm('刪除?')) return;dishes=dishes.filter(x=>x.id!=id);localStorage.setItem('dishes',JSON.stringify(dishes));renderCats();openCat(document.getElementById('mCatTitle').innerText);}
-function renderWeek(){let wrap=document.getElementById('weeklyGrid');wrap.innerHTML='';let rows=[[0,1],[2,3],[4,5,6]];rows.forEach(r=>{let row=document.createElement('div');row.className='weekRow';r.forEach(idx=>{let day=current.days[idx];if(!day) return;let div=document.createElement('div');div.className='dayBox';div.innerHTML=`<div style="font-size:28px">${dayEmo[idx]}</div><div style="font-size:.9rem;font-weight:800;margin-top:4px">星期${cn[idx]}<br>${fmt(day.date).slice(5)}<br><span style="color:var(--primary)">${day.dishes.length}道</span></div>`;div.onclick=()=>openWeek(idx);row.appendChild(div);});wrap.appendChild(row);});}
-function openWeek(idx){editDay=idx;let day=current.days[idx];document.getElementById('mWeekTitle').innerText=`${fmt(day.date)} 星期${cn[idx]}`;document.getElementById('diners').value=day.diners;document.getElementById('takeaway').value=day.takeaway;document.getElementById('diners').onchange=e=>day.diners=+e.target.value;document.getElementById('takeaway').onchange=e=>day.takeaway=+e.target.value;document.getElementById('selDishes').innerHTML=day.dishes.map((d,i)=>`<div class="dishRow"><span style="flex:1"><b>${d.name}</b> ${d.indo?'<span style="font-size:.9rem;color:var(--muted)"> '+d.indo+'</span>':''}</span><button class="ghost" style="width:auto" onclick="remDay(${idx},${i})">✕</button></div>`).join('')||'<div style="color:var(--muted)">尚未選擇</div>';openM('mWeek');}
-function remDay(a,b){if(!confirm('確定刪除？')) return;current.days[a].dishes.splice(b,1);openWeek(a);renderWeek();}
-function openPickCat(){let b=document.getElementById('mPickCatBody');b.innerHTML='';cats.forEach(cat=>{let m=CAT_META[cat]||{bg:'#eee',e:'🍱'};let cnt=dishes.filter(d=>d.cat===cat).length;b.innerHTML+=`<div class="catBox" style="background:${m.bg}" onclick="openPickDish('${cat}')"><div style="font-size:48px">${m.e}</div><div style="font-weight:800;margin-top:4px">${cat} (${cnt})</div></div>`;});openM('mPickCat');}
-function openPickDish(cat){let list=dishes.filter(d=>d.cat===cat);document.getElementById('mPickDishBody').innerHTML=list.map(d=>`<div class="dishRow"><span style="flex:1"><b>${d.name}</b> ${d.indo?'<div style="font-size:.9rem">'+d.indo+'</div>':''}</span><button class="btn" style="width:auto" onclick="pickToWeek(${d.id})">加入</button></div>`).join('');openM('mPickDish');}
-function pickToWeek(id){let d=dishes.find(x=>x.id==id);if(!confirm(`確定加入「${d.name}」？`)) return;current.days[editDay].dishes.push({...d});lastCook[id]=fmt(current.days[editDay].date);localStorage.setItem('lastCook',JSON.stringify(lastCook));openWeek(editDay);renderWeek();}
-function saveWeekly(){if(!current.mon) return;let fname=fmt(current.mon);let ex=weeklyMenus.findIndex(m=>m.monday===fname);if(ex>=0){if(!confirm(`菜單 ${fname} 已存在，取代？`)) return;weeklyMenus.splice(ex,1);}let toSave={monday:fname,days:current.days.map(d=>({date:fmt(d.date),dishes:d.dishes,diners:d.diners,takeaway:d.takeaway}))};weeklyMenus.push(toSave);if(weeklyMenus.length>10) weeklyMenus.shift();localStorage.setItem('weeklyMenus',JSON.stringify(weeklyMenus));renderMy();alert('已儲存 '+fname);}
-function renderMy(){let box=document.getElementById('myList');box.innerHTML=weeklyMenus.map((m,i)=>`<div class="card"><div class="head" style="cursor:pointer"><b>${m.monday} 星期一</b><span>▼</span></div><div class="myBody" style="display:none">${m.days.map((d,di)=>`<div style="border-top:1px dashed var(--border);padding:8px 0"><b>星期${cn[di]} ${d.date} 用餐:${d.diners} 外帶:${d.takeaway}</b>${d.dishes.map(dd=>`<div>${dd.name} / ${dd.indo||''}</div>`).join('')}</div>`).join('')}</div></div>`).join('')||'<div class="card">暫無菜單</div>';box.querySelectorAll('.head').forEach(h=>{h.onclick=()=>{let b=h.nextElementSibling;b.style.display=b.style.display==='none'?'block':'none';};});}
+makeDefaults();
+function init(){
+ let mon=getMon(new Date()); document.getElementById('monPicker').valueAsDate=mon; onMon(mon);
+ renderCats(); renderWeek(); renderMy(); renderCatOrder(); loadAll();
+ let sel=document.getElementById('diners'); sel.innerHTML=[...Array(10).keys()].map(n=>`<option value="${n}">${n}</option>`).join(''); document.getElementById('takeaway').innerHTML=sel.innerHTML;
+ document.getElementById('monPicker').addEventListener('change',e=>{let d=e.target.valueAsDate;if(!d)return;if(d.getDay()!==1){alert('只可以選擇星期一作起始日');let m=getMon(d);e.target.valueAsDate=m;d=m;} onMon(d);});
+ document.getElementById('impFile').addEventListener('change',importLib);
+ document.getElementById('btnClosePdf').addEventListener('click',e=>{e.stopPropagation();closePDF();});
+ document.getElementById('btnSharePdf').addEventListener('click',e=>{e.stopPropagation();sharePDF();});
+}
+function onMon(d){ current.mon=d; current.days=[]; for(let i=0;i<7;i++){let day=new Date(d); day.setDate(d.getDate()+i); current.days.push({date:day,dishes:[],diners:0,takeaway:0});} renderWeek(); }
+function loadAll(){ let th=localStorage.getItem('theme'); if(th==='dark') document.body.classList.add('dark'); let fs=localStorage.getItem('fs'); if(fs){ document.getElementById('fsRange').value=fs; setFS(fs);} let av=localStorage.getItem('avatar'); if(av) document.getElementById('avatarTop').src=av; }
+function renderCats(){
+ let g=document.getElementById('catGrid'); g.innerHTML=''; document.getElementById('fCat').innerHTML=cats.map(c=>`<option>${c}</option>`).join('');
+ cats.forEach(cat=>{
+  let meta=CAT_META[cat]||{bg:'#eee',e:'🍱'}; let cnt=dishes.filter(d=>d.cat===cat).length;
+  g.innerHTML+=`<div class="catBox" style="background:${meta.bg}" onclick="openCat('${cat}')"><div class="em" style="font-size:68px!important;line-height:1!important;display:block!important">${meta.e}</div><div class="lb" style="font-size:16px!important">${cat} (${cnt})</div></div>`;
+ });
+}
+function openCat(cat){
+ document.getElementById('mCatTitle').innerText=cat;
+ let list=dishes.filter(d=>d.cat===cat);
+ document.getElementById('mCatBody').innerHTML=list.map(d=>`<div class="dishRow"><div style="flex:1;cursor:pointer" onclick="showNote(${d.id})"><b>${d.name}</b><div style="font-size:.9rem;color:var(--muted)">${d.indo||''} ${lastCook[d.id]?'| 上次:'+lastCook[d.id]:''}</div></div><div class="act"><button onclick="openAnyDate(${d.id})">📅</button><button onclick="editDish(${d.id})">✏️</button><button onclick="delDish(${d.id})">🗑️</button></div></div>`).join('')||'<div style="padding:20px">暫無</div>';
+ openM('mCat');
+}
+function showNote(id){ let d=dishes.find(x=>x.id==id); if(!d) return; document.getElementById('mNoteBody').innerText=`${d.name} / ${d.indo||''}\n\n${d.note||''}`; openM('mNote'); }
+function openAnyDate(id){ pendDish=id; document.getElementById('anyDate').valueAsDate=new Date(); openM('mAnyDate'); }
+function confirmAddToWeek(){ let v=document.getElementById('anyDate').value; if(!v) return; let date=new Date(v); let mon=getMon(date); if(fmt(mon)!==fmt(current.mon)){alert('請先選包含此日的星期一'); return;} let idx=Math.round((date-current.mon)/86400000); if(idx<0||idx>6) return; let d=dishes.find(x=>x.id==pendDish); current.days[idx].dishes.push({...d}); lastCook[d.id]=fmt(date); localStorage.setItem('lastCook',JSON.stringify(lastCook)); renderWeek(); closeM('mAnyDate'); }
+function openAdd(){ document.getElementById('fId').value=''; document.getElementById('fName').value=''; document.getElementById('fIndo').value=''; document.getElementById('fNote').value=''; openM('mAdd'); }
+function editDish(id){ let d=dishes.find(x=>x.id==id); openAdd(); document.getElementById('fId').value=d.id; document.getElementById('fName').value=d.name; document.getElementById('fIndo').value=d.indo||''; document.getElementById('fNote').value=d.note||''; document.getElementById('fCat').value=d.cat; }
+function saveDish(){ let id=document.getElementById('fId').value,n=document.getElementById('fName').value.trim(),i=document.getElementById('fIndo').value.trim(),t=document.getElementById('fNote').value.trim(),c=document.getElementById('fCat').value; if(!n) return alert('中文必填'); if(id){let d=dishes.find(x=>x.id==id);d.name=n;d.indo=i;d.note=t;d.cat=c;} else dishes.push({id:Date.now()+Math.random(),name:n,indo:i,note:t,cat:c}); localStorage.setItem('dishes',JSON.stringify(dishes)); renderCats(); closeM('mAdd'); }
+function delDish(id){ if(!confirm('刪除?')) return; dishes=dishes.filter(x=>x.id!=id); localStorage.setItem('dishes',JSON.stringify(dishes)); renderCats(); openCat(document.getElementById('mCatTitle').innerText); }
+function renderWeek(){
+ let wrap=document.getElementById('weeklyGrid'); wrap.innerHTML='';
+ let rows=[[0,1],[2,3],[4,5,6]];
+ rows.forEach(r=>{
+  let row=document.createElement('div'); row.className='weekRow';
+  r.forEach(idx=>{
+   let day=current.days[idx]; if(!day) return;
+   let div=document.createElement('div'); div.className='dayBox';
+   div.innerHTML=`<div class="d1">${dayEmo[idx]}</div><div class="d2">星期${cn[idx]}<br>${fmt(day.date).slice(5)}<br><span style="color:var(--primary)">${day.dishes.length}道</span></div>`;
+   div.onclick=()=>openWeek(idx); row.appendChild(div);
+  });
+  wrap.appendChild(row);
+ });
+}
+function openWeek(idx){
+ editDay=idx; let day=current.days[idx];
+ document.getElementById('mWeekTitle').innerText=`${fmt(day.date)} 星期${cn[idx]}`;
+ document.getElementById('diners').value=day.diners; document.getElementById('takeaway').value=day.takeaway;
+ document.getElementById('diners').onchange=e=>day.diners=+e.target.value;
+ document.getElementById('takeaway').onchange=e=>day.takeaway=+e.target.value;
+ document.getElementById('selDishes').innerHTML=day.dishes.map((d,i)=>`<div class="dishRow"><span style="flex:1;cursor:pointer" onclick="showNote(${d.id})"><b>${d.name}</b> ${d.indo?'<span style="font-size:.9rem;color:var(--muted)"> '+d.indo+'</span>':''}</span><button class="ghost" style="width:auto" onclick="remDay(${idx},${i})">✕</button></div>`).join('')||'<div style="color:var(--muted)">尚未選擇</div>';
+ openM('mWeek');
+}
+function remDay(a,b){ if(!confirm('確定刪除此菜式？')) return; current.days[a].dishes.splice(b,1); openWeek(a); renderWeek(); }
+function openPickCat(){ let b=document.getElementById('mPickCatBody'); b.innerHTML=''; cats.forEach(cat=>{let m=CAT_META[cat]||{bg:'#eee',e:'🍱'}; let cnt=dishes.filter(d=>d.cat===cat).length; b.innerHTML+=`<div class="catBox" style="background:${m.bg}" onclick="openPickDish('${cat}')"><div class="em" style="font-size:68px!important;line-height:1!important;display:block!important">${m.e}</div><div class="lb" style="font-size:16px!important">${cat} (${cnt})</div></div>`;}); openM('mPickCat'); }
+function openPickDish(cat){ let list=dishes.filter(d=>d.cat===cat); document.getElementById('mPickDishBody').innerHTML=list.map(d=>`<div class="dishRow"><span style="flex:1;cursor:pointer" onclick="showNote(${d.id})"><b>${d.name}</b> ${d.indo?'<div style="font-size:.9rem">'+d.indo+'</div>':''}</span><button class="btn" style="width:auto;padding:10px 14px" onclick="pickToWeek(${d.id})">加入</button></div>`).join(''); openM('mPickDish'); }
+function pickToWeek(id){ let d=dishes.find(x=>x.id==id); if(!confirm(`確定加入「${d.name}」？`)) return; current.days[editDay].dishes.push({...d}); lastCook[id]=fmt(current.days[editDay].date); localStorage.setItem('lastCook',JSON.stringify(lastCook)); openWeek(editDay); renderWeek(); }
+function saveWeekly(){
+ if(!current.mon) return; let fname=fmt(current.mon);
+ let ex=weeklyMenus.findIndex(m=>m.monday===fname);
+ if(ex>=0){ let rep=confirm(`菜單 ${fname} 已存在，取代？`); if(!rep){ let nd=prompt('輸入新星期一 YYYY-MM-DD'); if(!nd) return; let d=new Date(nd); if(d.getDay()!==1){alert('只可以星期一'); return;} fname=fmt(d); current.mon=d; } else weeklyMenus.splice(ex,1); }
+ let toSave={monday:fname,days:current.days.map(d=>({date:fmt(d.date),dishes:d.dishes,diners:d.diners,takeaway:d.takeaway}))};
+ let idx=weeklyMenus.findIndex(m=>m.monday===fname); if(idx>=0) weeklyMenus[idx]=toSave; else weeklyMenus.push(toSave);
+ if(weeklyMenus.length>10) weeklyMenus.shift();
+ localStorage.setItem('weeklyMenus',JSON.stringify(weeklyMenus)); renderMy(); alert('已儲存 '+fname);
+}
+function renderMy(){
+ let box=document.getElementById('myList');
+ box.innerHTML=weeklyMenus.map((m,i)=>`<div class="card"><div class="head" style="cursor:pointer"><b>${m.monday} 星期一</b><span>▼</span></div><div class="myBody" style="display:none"><div class="row" style="margin-bottom:8px"><button class="ghost" onclick="loadMenu(${i})">修改</button><button class="ghost" onclick="delMenu(${i})">刪除</button><button class="iconBtn" onclick="pdfSingle(${i})">📄</button></div>${m.days.map((d,di)=>`<div style="border-top:1.5px dashed var(--border);padding:8px 0"><b>星期${cn[di]} ${d.date} 用餐:${d.diners} 外帶:${d.takeaway}</b>${d.dishes.map(dd=>`<div class="dishRow" style="padding:6px 0"><span style="flex:1;cursor:pointer" onclick="this.querySelector('.note').style.display=this.querySelector('.note').style.display==='none'?'block':'none'">${dd.name} / ${dd.indo||''}<div class="note" style="display:none;white-space:pre-wrap;background:var(--bg);padding:8px;border-radius:10px;margin-top:6px">${dd.note||''}</div></span></div>`).join('')}</div>`).join('')}</div></div>`).join('')||'<div class="card">暫無菜單</div>';
+ box.querySelectorAll('.head').forEach(h=>{h.onclick=()=>{let b=h.nextElementSibling; b.style.display=b.style.display==='none'?'block':'none';};});
+}
 function toggleMy(open){document.querySelectorAll('.myBody').forEach(b=>b.style.display=open?'block':'none');}
-function exportLib(){let blob=new Blob([JSON.stringify(dishes)],{type:'application/json'});let url=URL.createObjectURL(blob);let a=document.createElement('a');a.href=url;a.download='dishes.json';a.click();}
-function setFS(v){document.documentElement.style.setProperty('--fs',v+'px');document.getElementById('fsVal').innerText=v;localStorage.setItem('fs',v);}
-function toggleTheme(){document.body.classList.toggle('dark');localStorage.setItem('theme',document.body.classList.contains('dark')?'dark':'light');}
-function renderCatOrder(){let box=document.getElementById('catOrder');box.innerHTML=cats.map((c,i)=>`<div class="row" style="margin-bottom:6px"><span style="flex:1">${c}</span><button class="ghost" style="flex:0 0 40px" onclick="moveCat(${i},-1)">↑</button><button class="ghost" style="flex:0 0 40px" onclick="moveCat(${i},1)">↓</button></div>`).join('');}
-function moveCat(i,d){let j=i+d;if(j<0||j>=cats.length) return;let t=cats[i];cats[i]=cats[j];cats[j]=t;localStorage.setItem('cats',JSON.stringify(cats));renderCats();renderCatOrder();}
-function addCat(){let v=document.getElementById('newCat').value.trim();if(!v) return;if(cats.includes(v)) return alert('已存在');cats.push(v);CAT_META[v]={bg:'#ffe8a0',e:'🍱'};localStorage.setItem('cats',JSON.stringify(cats));document.getElementById('newCat').value='';renderCats();renderCatOrder();}
-window.addEventListener('load',()=>{let mon=getMon(new Date());document.getElementById('monPicker').valueAsDate=mon;onMon(mon);renderCats();renderWeek();renderMy();renderCatOrder();loadAll();let sel=document.getElementById('diners');sel.innerHTML=[...Array(10).keys()].map(n=>`<option value="${n}">${n}</option>`).join('');document.getElementById('takeaway').innerHTML=sel.innerHTML;document.getElementById('monPicker').addEventListener('change',e=>{let d=e.target.valueAsDate;if(!d)return;if(d.getDay()!==1){alert('只可以星期一');let m=getMon(d);e.target.valueAsDate=m;d=m;}onMon(d);});document.getElementById('impFile').addEventListener('change',e=>{let f=e.target.files[0];if(!f) return;let r=new FileReader();r.onload=()=>{try{dishes=JSON.parse(r.result);localStorage.setItem('dishes',JSON.stringify(dishes));renderCats();}catch(err){alert('格式錯誤');}};r.readAsText(f);});});
-function onMon(d){current.mon=d;current.days=[];for(let i=0;i<7;i++){let day=new Date(d);day.setDate(d.getDate()+i);current.days.push({date:day,dishes:[],diners:0,takeaway:0});}renderWeek();}
-function loadAll(){let th=localStorage.getItem('theme');if(th==='dark') document.body.classList.add('dark');let fs=localStorage.getItem('fs');if(fs){document.getElementById('fsRange').value=fs;setFS(fs);}}
-function exportWeeklyPDF(){alert('PDF匯出用原版功能，暖木版先睇樣板');}
+function loadMenu(i){ let m=weeklyMenus[i]; document.getElementById('monPicker').value=m.monday; let mon=new Date(m.monday); current.mon=mon; current.days=m.days.map(d=>({date:new Date(d.date),dishes:d.dishes,diners:d.diners,takeaway:d.takeaway})); go('weekly',document.querySelectorAll('.nav')[0]); renderWeek(); }
+function delMenu(i){ if(!confirm('刪除?')) return; weeklyMenus.splice(i,1); localStorage.setItem('weeklyMenus',JSON.stringify(weeklyMenus)); renderMy(); }
+function makePDF(days, monStr){
+let html = `<h1 style="text-align:center;border-bottom:3px solid #111;padding-bottom:12px;margin:0 0 12px 0;font-size:13pt;font-weight:900">每週菜單<br><span style="font-size:13pt">Daftar Menu Mingguan</span></h1><div style="text-align:center;margin:10px 0;font-weight:900;font-size:13pt">${monStr} 星期一 / Senin</div>`;
+days.forEach((d,i)=>{
+html += `<div style="border:2.5px solid #111;border-radius:14px;overflow:hidden;margin-bottom:16px;background:#fff"><div style="display:flex;justify-content:space-between;background:#fff3d6;padding:12px 14px;font-weight:900;border-bottom:2.5px solid #111;flex-wrap:wrap;gap:6px;font-size:15pt"><b style="font-size:15pt;font-weight:900">星期${cn[i]} / ${idn[i]} ${d.date}</b><span style="font-size:15pt;font-weight:900">用餐 / Makan: ${d.diners} &nbsp; 外帶 / Bungkus: ${d.takeaway}</span></div>`;
+if(d.dishes.length===0){ html+=`<div style="padding:10px 14px;font-size:13pt">無 / Belum ada</div>`; }
+else{ d.dishes.forEach(dd=>{
+let raw = (dd.note||'').trim();
+let zh = raw, idNote = '';
+if(raw.includes('Indonesia:')){ let p = raw.split('Indonesia:'); zh = p[0]; idNote = p[1]; }
+else if(raw.includes('Indonesia：')){ let p = raw.split('Indonesia：'); zh = p[0]; idNote = p[1]; }
+zh = zh.replace('備註 Catatan:','').replace('備註','').replace('Catatan:','').replace('中文：','').replace('中文:','').replace('：','').trim();
+idNote = idNote.replace('：','').trim();
+if(!idNote){ idNote = zh; }
+html+=`<div style="padding:10px 14px;border-bottom:1px dashed #999;font-size:13pt;break-inside:avoid;page-break-inside:avoid"><b style="font-size:13pt;font-weight:900">${dd.name} / ${dd.indo||''}</b><div style="margin-top:8px;white-space:pre-wrap;font-size:13pt;line-height:1.5">備註：${zh}</div><div style="margin-top:6px;white-space:pre-wrap;font-size:13pt;line-height:1.5">Catatan: ${idNote}</div></div>`;
+}); }
+html+=`</div>`;
+});
+return html;
+}
+function exportWeeklyPDF(){ showPDF(makePDF(current.days.map(d=>({date:fmt(d.date),dishes:d.dishes,diners:d.diners,takeaway:d.takeaway})), fmt(current.mon))); }
+function pdfSingle(i){ let m=weeklyMenus[i]; showPDF(makePDF(m.days,m.monday)); }
+function showPDF(inner){ document.getElementById('pdfContent').innerHTML=inner; document.getElementById('pdfWrap').classList.add('open'); }
+function closePDF(){ document.getElementById('pdfWrap').classList.remove('open'); }
+async function sharePDF(){
+let content=document.getElementById('pdfContent');
+let btn=document.getElementById('btnSharePdf');
+if(btn.dataset.busy==="1") return;
+let old=btn.textContent; btn.textContent='⏳'; btn.disabled=true; btn.dataset.busy="1";
+try{
+const { jsPDF } = window.jspdf;
+const pdf = new jsPDF({orientation:'portrait',unit:'mm',format:'a4',compress:true});
+const pageW=210, pageH=297, marginTop=15, marginBottom=20, marginX=15;
+const usableW = pageW - marginX*2;
+let curY = marginTop;
+let headerWrap=document.createElement('div'); headerWrap.style.width='794px'; headerWrap.style.background='#fff'; headerWrap.style.position='fixed'; headerWrap.style.left='-9999px'; headerWrap.style.top='0';
+let hClone=document.createElement('div');
+hClone.innerHTML = content.children[0].outerHTML + content.children[1].outerHTML;
+hClone.style.width='794px'; headerWrap.appendChild(hClone); document.body.appendChild(headerWrap);
+let hCanvas = await html2canvas(hClone,{scale:1.5,useCORS:true,backgroundColor:'#ffffff'});
+document.body.removeChild(headerWrap);
+let hImg = hCanvas.toDataURL('image/jpeg',0.85);
+let hH = hCanvas.height * usableW / hCanvas.width;
+pdf.addImage(hImg,'JPEG',marginX,curY,usableW,hH,undefined,'FAST');
+curY += hH + 6;
+let dayDivs = content.querySelectorAll('div[style*="border:2.5px solid"]');
+for(let dayEl of dayDivs){
+let dayHeader = dayEl.firstElementChild;
+let dishes = dayEl.querySelectorAll('div[style*="break-inside:avoid"]');
+for(let el of [dayHeader,...dishes]){
+let wrap=document.createElement('div'); wrap.style.width='794px'; wrap.style.background='#fff'; wrap.style.position='fixed'; wrap.style.left='-9999px'; wrap.style.top='0';
+let clone=el.cloneNode(true);
+clone.style.width='794px';
+wrap.appendChild(clone); document.body.appendChild(wrap);
+let c = await html2canvas(clone,{scale:1.5,useCORS:true,backgroundColor:'#ffffff'});
+document.body.removeChild(wrap);
+let imgData = c.toDataURL('image/jpeg',0.85);
+let imgH = c.height * usableW / c.width;
+if(curY + imgH > pageH - marginBottom){ pdf.addPage(); curY = marginTop; }
+pdf.addImage(imgData,'JPEG',marginX,curY,usableW,imgH,undefined,'FAST');
+curY += imgH + 1;
+}
+curY+=4;
+}
+const blob = pdf.output('blob'); const file = new File([blob], `每週菜單_${fmt(new Date())}.pdf`, {type:'application/pdf'});
+try{ if(navigator.canShare && navigator.canShare({files:[file]})){ await navigator.share({files:[file],title:'每週菜單'}); return; } }catch(e){ if(e.name==='AbortError' || String(e.message).includes('cancellation')){ return; } }
+const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download=file.name; a.click(); setTimeout(()=>URL.revokeObjectURL(url),2000);
+}catch(e){ if(e.name!=='AbortError') alert('PDF失敗: '+e.message); } finally{ btn.textContent=old; btn.disabled=false; btn.dataset.busy="0"; }
+}
+function exportLib(){ let blob=new Blob([JSON.stringify({cats,dishes},null,2)],{type:'application/json;charset=utf-8'}); let url=URL.createObjectURL(blob); let a=document.createElement('a'); a.href=url; a.download=`菜式庫_${fmt(new Date())}.json`; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(url),1000); }
+function importLib(e){ let f=e.target.files[0]; if(!f) return; let r=new FileReader(); r.onload=ev=>{ try{ let j=JSON.parse(ev.target.result); if(j.cats&&j.dishes){ cats=j.cats; dishes=j.dishes; localStorage.setItem('cats',JSON.stringify(cats)); localStorage.setItem('dishes',JSON.stringify(dishes)); renderCats(); renderCatOrder(); alert('匯入成功'); } }catch{ alert('失敗'); } }; r.readAsText(f); e.target.value=''; }
+function renderCatOrder(){ let b=document.getElementById('catOrder'); b.innerHTML=cats.map((c,i)=>`<div class="card row" style="justify-content:space-between"><span>${i+1}. ${c}</span><span class="row"><button class="iconBtn" onclick="moveCat(${i},-1)">↑</button><button class="iconBtn" onclick="moveCat(${i},1)">↓</button><button class="ghost" style="width:auto" onclick="delCat(${i})">刪除</button></span></div>`).join(''); }
+function moveCat(i,dir){ let ni=i+dir; if(ni<0||ni>=cats.length) return; let t=cats[i]; cats[i]=cats[ni]; cats[ni]=t; localStorage.setItem('cats',JSON.stringify(cats)); renderCatOrder(); renderCats(); }
+function addCat(){ let v=document.getElementById('newCat').value.trim(); if(!v) return; cats.push(v); localStorage.setItem('cats',JSON.stringify(cats)); document.getElementById('newCat').value=''; renderCatOrder(); renderCats(); }
+function delCat(i){ let cat=cats[i]; if(!confirm(`刪除「${cat}」會全部移到「其他」？`)) return; dishes.forEach(d=>{ if(d.cat===cat) d.cat='其他'; }); if(!cats.includes('其他')) cats.push('其他'); cats.splice(i,1); localStorage.setItem('cats',JSON.stringify(cats)); localStorage.setItem('dishes',JSON.stringify(dishes)); renderCatOrder(); renderCats(); }
+function toggleTheme(){ document.body.classList.toggle('dark'); localStorage.setItem('theme',document.body.classList.contains('dark')?'dark':'light'); }
+function setFS(v){ document.documentElement.style.setProperty('--fs',v+'px'); document.getElementById('fsVal').innerText=v; localStorage.setItem('fs',v); }
+let img=new Image(), scale=1, px=0, py=0, drag=false, lx=0, ly=0, initS=1;
+let canvas=document.getElementById('avCanvas');
+function drawAv(){ let ctx=canvas.getContext('2d'); ctx.clearRect(0,0,600,600); if(!img.src) return; let w=img.width*scale, h=img.height*scale; ctx.drawImage(img,300-w/2+px,300-h/2+py,w,h); }
+document.getElementById('avFile').addEventListener('change',e=>{ let f=e.target.files[0];
+  let nameEl=document.getElementById('avFileName'); if(nameEl) nameEl.textContent=f?f.name:'尚未選取檔案';
+  if(!f) return; let r=new FileReader(); r.onload=ev=>{ img.src=ev.target.result; img.onload=()=>{ initS=500/Math.min(img.width,img.height); scale=initS; px=0; py=0; document.getElementById('avZoom').value=scale; drawAv(); }; }; r.readAsDataURL(f); });
+document.getElementById('avZoom').addEventListener('input',e=>{ scale=parseFloat(e.target.value); drawAv(); });
+canvas.addEventListener('mousedown',e=>{drag=true; lx=e.clientX; ly=e.clientY;});
+canvas.addEventListener('touchstart',e=>{drag=true; lx=e.touches[0].clientX; ly=e.touches[0].clientY;},{passive:false});
+window.addEventListener('mousemove',e=>{if(!drag) return; px+=e.clientX-lx; py+=e.clientY-ly; lx=e.clientX; ly=e.clientY; drawAv();});
+window.addEventListener('touchmove',e=>{if(!drag) return; e.preventDefault(); px+=e.touches[0].clientX-lx; py+=e.touches[0].clientY-ly; lx=e.touches[0].clientX; ly=e.touches[0].clientY; drawAv();},{passive:false});
+window.addEventListener('mouseup',()=>drag=false); window.addEventListener('touchend',()=>drag=false);
+function resetAv(){ px=0; py=0; scale=initS; document.getElementById('avZoom').value=scale; drawAv(); }
+function saveAv(){ let d=canvas.toDataURL('image/png'); localStorage.setItem('avatar',d); document.getElementById('avatarTop').src=d; alert('已儲存'); }
+init();
 </script>
 </body>
 </html>
