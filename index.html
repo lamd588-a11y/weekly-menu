@@ -204,7 +204,17 @@ function makeDefaults(){
   ["鹹蛋蒸肉餅", "Daging Cincang Kukus Telur Asin", "豬肉碎調味撻好。鹹蛋白拌入肉碎中，鹹蛋黃切件放在肉餅面，大火蒸12分鐘。", "Bumbui daging babi cincang. Campurkan putih telur asin ke dalam daging, potong kuning telur asin lalu letakkan di atasnya, kukus 12 menit dengan api besar."]
 ]
 };
- Object.entries(D).forEach(([cat,arr])=>{arr.forEach(([n,i,t])=>{dishes.push({id:Date.now()+Math.random(),name:n,indo:i,note:t,cat});});});
+ Object.entries(D).forEach(([cat,arr])=>{
+  arr.forEach(a=>{
+    let n=a[0], i=a[1], zh=a[2]||'', idn=a[3]||'';
+    if(!idn && zh.includes('Indonesia:') || zh.includes('中文：')){
+      let tmp=zh; tmp=tmp.replace(/中文：/g,'').replace(/中文:/g,'');
+      let p=tmp.split(/Indonesia:/);
+      zh=(p[0]||'').trim(); idn=(p[1]||'').trim();
+    }
+    dishes.push({id:Date.now()+Math.random(),name:n,indo:i,noteZh:zh,noteId:idn,note:zh,cat});
+  });
+});
  localStorage.setItem('dishes',JSON.stringify(dishes));
 }
 makeDefaults();
