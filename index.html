@@ -189,6 +189,17 @@ function makeDefaults(){
   ["榨菜肉碎即食麵", "Mie Instan Daging Cincang Sayur Zha Cai", "公仔麵煮熟。用榨菜碎與免治豬肉快炒作餸菜，鋪在湯麵上。", "Rebus mie instan. Tumis cepat cincangan zha cai (sayur asin khas) dengan daging babi cincang, lalu letakkan di atas mie kuah."],
   ["沙爹牛肉麵", "Mie Instan Daging Sapi Saus Satay Kaleng/Instant", "公仔麵煮熟。將罐頭沙爹牛肉加熱（或用沙爹醬炒牛肉），鋪在麵面上。", "Rebus mie instan. Panaskan daging sapi satay kaleng (atau tumis daging dengan saus satay), lalu letakkan di atas mie."],
   ["火腿通粉", "Makaroni Sup Ham", "通粉煮熟過冷河。用雞湯或水煮滾，加入切粒火腿煮熱，下通粉即成。", "Rebus makaroni lalu bilas air dingin. Didihkan kaldu ayam atau air, masukkan potongan ham, lalu masukkan makaroni."]
+"其他": [
+  ["揚州炒飯", "Nasi Goreng Yangzhou", "白飯炒散。加入义燒粒、蝦仁、雞蛋碎、青豆及蔥花，大火拋勻下鹽調味。", "Goreng lepas nasi putih. Masukkan potongan char siu, udang, orak-arik telur, kacang polong, dan daun bawang, aduk rata dengan api besar dan bumbui garam."],
+  ["蝦仁炒蛋", "Telur Orak-Arik Udang", "蝦仁洗淨印乾醃味炒至半熟。倒入拂好的蛋液，慢火炒至滑蛋狀態即成。", "Cuci udang, keringkan, marinasi, lalu tumis hingga setengah matang. Tuang kocokan telur, masak dengan api kecil hingga bertekstur lembut."],
+  ["菜脯蛋", "Telur Dadar Lobak Asin (Cai脯)", "菜脯粒浸水洗淨切碎榨乾水分。加入蛋液中拌勻，用平底鍋煎至兩面金黃。", "Rendam dan cuci lobak asin, cincang dan peras airnya. Campur ke dalam kocokan telur, goreng dalam wajan datar hingga kedua sisi keemasan."],
+  ["鹹魚蒸肉餅", "Daging Cincang Kukus Ikan Asin", "鹹魚肉切極碎。與豬肉碎、生抽、糖、生粉撈勻，鋪在碟上大火蒸12分鐘。", "Cincang sangat halus ikan asin. Campur dengan daging babi cincang, kecap asin, gula, dan maizena, ratakan di piring lalu kukus 12 menit."],
+  ["蝦米蒸豆腐", "Tahu Kukus Udang Kering (Xia Mi)", "豆腐切塊。蝦米浸軟切碎，與蒜蓉、生抽、油鋪在豆腐面蒸8分鐘。", "Potong tahu. Rendam dan cincang udang kering (ebi), campur dengan bawang putih, kecap asin, dan minyak, letakkan di atas tahu lalu kukus 8 menit."],
+  ["滑蛋牛肉飯", "Nasi Daging Sapi Telur Lembut", "牛肉片醃好炒至半熟。加入水和調味料煮開，勾芡後淋入蛋液成半熟滑蛋，淋在飯上。", "Marinasi dan tumis daging sapi hingga setengah matang. Tambahkan air dan bumbu, kentalkan dengan maizena, tuang kocokan telur hingga setengah matang, lalu siram di atas nasi."],
+  ["蘿蔔糕", "Kue Lobak (Luobogao)", "白蘿蔔切絲煮軟。與粘米粉、臘腸粒、蝦米混合蒸熟，切片煎香食用。", "Parut lobak putih dan rebus hingga lunak. Campur dengan tepung beras, potongan sosis lap cheong, dan udang kering, kukus hingga matang, lalu potong dan goreng."],
+  ["煎釀三寶", "Tiga Harta Karun Isi (Tauhu, Terong, Lada Isi Pasta Ikan)", "豆腐、茄子、青椒釀入免治鯪魚膠，用平底鍋煎至金黃，灒生抽芡汁食用。", "Isi tahu, terong, dan paprika hijau dengan adonan pasta ikan dace, pan-searing hingga keemasan, lalu sirami dengan saus kecap asin."],
+  ["豉椒炒片", "Tumis Cumi Saus Tahu Hitam dan Cabai", "鮮魷切花切片焯水。爆香蒜蓉、豆豉、椒絲，下魷魚片大火快炒勾芡。", "Potong cumi bentuk kembang lalu blansir sebentar. Tumis bawang putih, taosi, dan irisan cabai, masukkan cumi, aduk cepat dengan api besar lalu kentalkan."],
+  ["鹹蛋蒸肉餅", "Daging Cincang Kukus Telur Asin", "豬肉碎調味撻好。鹹蛋白拌入肉碎中，鹹蛋黃切件放在肉餅面，大火蒸12分鐘。", "Bumbui daging babi cincang. Campurkan putih telur asin ke dalam daging, potong kuning telur asin lalu letakkan di atasnya, kukus 12 menit dengan api besar."]
 ]
 };
  Object.entries(D).forEach(([cat,arr])=>{arr.forEach(([n,i,zh,idn])=>{dishes.push({id:Date.now()+Math.random(),name:n,indo:i,noteZh:zh,noteId:idn,note:zh,cat});});});
