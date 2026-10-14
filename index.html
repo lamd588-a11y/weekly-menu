@@ -6,243 +6,42 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <link rel="apple-touch-icon" href="icon.png">
 <link rel="manifest" href="manifest.json">
-<title>每週菜單 - 和式木系</title>
+<title>每週菜單</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
-:root{
-  --bg: #f7f4ed;            /* 溫潤和紙白背景 */
-  --card: #fffdf9;          /* 柔和米白卡片 */
-  --text: #2c2522;          /* 沉穩竹炭黑 */
-  --muted: #8c7e75;         /* 溫暖木灰棕 */
-  --primary: #a36d4f;       /* 和風自然木色 / 栗子棕 */
-  --border: #e2d5c3;        /* 柔和木紋淺框 */
-  --fs: 20px;
-}
-.dark{
-  --bg: #1a1715;            /* 深色日式黑檀 */
-  --card: #25211e;          /* 深木色卡片 */
-  --text: #f0eae1;          /* 暖米白字體 */
-  --border: #3d3530;        /* 深木框線 */
-  --muted: #a6988d;
-}
+:root{--bg:#fffaf0;--card:#fff;--text:#111;--muted:#888;--primary:#ff6b35;--border:#f0dcc8;--fs:20px}
+.dark{--bg:#121212;--card:#1e1e1e;--text:#f5f5f5;--border:#333;--muted:#aaa}
 html{font-size:var(--fs)}*{box-sizing:border-box}
-body{
-  margin:0;
-  background:var(--bg);
-  color:var(--text);
-  font-family: "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Yu Gothic", -apple-system, PingFang HK, sans-serif;
-  padding-bottom:140px;
-  line-height:1.6;
-}
-.top{
-  position:sticky;top:0;z-index:10;
-  background:var(--card);
-  border-bottom:2px solid var(--border);
-  padding:12px 16px;
-  padding-top:calc(10px + env(safe-area-inset-top));
-  display:flex;align-items:center;gap:12px;
-  box-shadow: 0 2px 6px rgba(44,37,34,0.03);
-}
-.avatar{
-  width:62px;height:62px;
-  border-radius:50%;
-  border:3px solid var(--primary);
-  object-fit:cover;
-}
+body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,PingFang HK,sans-serif;padding-bottom:140px;line-height:1.5}
+.top{position:sticky;top:0;z-index:10;background:var(--card);border-bottom:2px solid var(--border);padding:12px 16px;padding-top:calc(10px + env(safe-area-inset-top));display:flex;align-items:center;gap:12px}
+.avatar{width:62px;height:62px;border-radius:50%;border:3px solid var(--primary);object-fit:cover}
 .pages{max-width:520px;margin:0 auto;padding:0 16px 16px 16px;box-sizing:border-box}
 .page{display:none}.page.active{display:block}
-.card{
-  background:var(--card);
-  border:1.5px solid var(--border);
-  border-radius:18px;
-  padding:14px;
-  margin:0 0 16px 0;
-  width:100%;
-  box-sizing:border-box;
-  overflow:hidden;
-  box-shadow: 0 2px 8px rgba(163, 109, 79, 0.04);
-}
+.card{background:var(--card);border:2px solid var(--border);border-radius:20px;padding:12px;margin:0 0 16px 0;width:100%;box-sizing:border-box;overflow:hidden}
 .row{display:flex;gap:8px;align-items:center}
-.btn{
-  flex:1;padding:16px;
-  border-radius:14px;
-  border:none;
-  background:var(--primary);
-  color:#fff;
-  font-weight:900;
-  font-size:1.1rem;
-  box-shadow: 0 4px 12px rgba(163, 109, 79, 0.2);
-  cursor:pointer;
-}
-.ghost{
-  flex:1;padding:14px;
-  border-radius:14px;
-  border:2px solid var(--border);
-  background:var(--bg);
-  font-weight:800;
-  font-size:1rem;
-  color:var(--text);
-  cursor:pointer;
-}
-.iconBtn{
-  width:48px;height:48px;min-width:48px;
-  border-radius:14px;
-  border:2px solid var(--border);
-  background:var(--card);
-  font-size:22px;
-  display:grid;place-items:center;
-  margin:0;box-sizing:border-box;flex-shrink:0;
-  cursor:pointer;
-}
-.grid3{
-  display:grid;
-  grid-template-columns:repeat(3,minmax(0,1fr));
-  gap:10px;
-  padding:12px;
-  box-sizing:border-box;
-  width:100%;
-}
-.catBox{
-  aspect-ratio:1;
-  border-radius:16px;
-  border:2px solid var(--border);
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
-  cursor:pointer;
-  padding:6px;
-  width:100%;
-  min-width:0;
-  box-sizing:border-box;
-  transition: transform 0.15s ease;
-}
-.catBox:active{ transform: scale(0.97); }
-.weekWrap{display:flex;flex-direction:column;gap:8px}
-.weekRow{display:flex;gap:8px;justify-content:center}
-.dayBox{
-  width:32%;
-  aspect-ratio:1;
-  border-radius:16px;
-  border:2px solid var(--border);
-  background:var(--card);
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
-  text-align:center;
-  cursor:pointer;
-  padding:6px;
-  box-shadow: 0 2px 6px rgba(44,37,34,0.02);
-}
-.bottom{
-  position:fixed;bottom:0;left:0;right:0;
-  background:var(--card);
-  border-top:2px solid var(--border);
-  display:flex;justify-content:space-around;
-  padding:16px 0 38px;
-  z-index:20;
-  box-shadow: 0 -4px 12px rgba(44,37,34,0.03);
-}
-.nav{
-  flex:1;display:flex;
-  flex-direction:column;
-  align-items:center;
-  gap:6px;
-  color:var(--muted);
-  font-size:13px;
-  cursor:pointer;
-}
+.btn{flex:1;padding:16px;border-radius:16px;border:none;background:var(--primary);color:#fff;font-weight:900;font-size:1.1rem}
+.ghost{flex:1;padding:14px;border-radius:16px;border:2px solid var(--border);background:var(--bg);font-weight:800;font-size:1rem}
+.iconBtn{width:48px;height:48px;min-width:48px;border-radius:14px;border:2px solid var(--border);background:var(--card);font-size:22px;display:grid;place-items:center;margin:0;box-sizing:border-box;flex-shrink:0}
+.grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;padding:12px;box-sizing:border-box;width:100%}
+.catBox{aspect-ratio:1;border-radius:18px;border:3px solid #111;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;padding:6px;width:100%;min-width:0;box-sizing:border-box}
+.weekWrap{display:flex;flex-direction:column;gap:8px}.weekRow{display:flex;gap:8px;justify-content:center}
+.dayBox{width:32%;aspect-ratio:1;border-radius:18px;border:3px solid #111;background:var(--card);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;cursor:pointer;padding:6px}
+.bottom{position:fixed;bottom:0;left:0;right:0;background:var(--card);border-top:2px solid var(--border);display:flex;justify-content:space-around;padding:16px 0 38px;z-index:20}
+.nav{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;color:var(--muted);font-size:13px;cursor:pointer}
 .ic{font-size:46px!important;line-height:1!important;display:block}
 .nav.active{color:var(--primary)!important}
-.modal{
-  position:fixed;inset:0;
-  background:rgba(44,37,34,0.45);
-  backdrop-filter: blur(2px);
-  display:none;z-index:9999;
-  align-items:center;justify-content:center;
-  padding:12px;
-}
-.modal.open{display:flex}
-.sheet{
-  width:calc(100% - 24px);
-  max-width:500px;
-  max-height:88vh;
-  overflow:auto;
-  background:var(--card);
-  border-radius:20px;
-  border:2px solid var(--border);
-  box-sizing:border-box;
-  margin:0 auto;
-  box-shadow: 0 10px 30px rgba(44,37,34,0.15);
-}
-.head{
-  position:sticky;top:0;
-  background:var(--card);
-  padding:14px;
-  border-bottom:2px solid var(--border);
-  display:flex;justify-content:space-between;align-items:center;
-  z-index:2;
-}
-.x{
-  width:48px;height:48px;
-  border-radius:50%;
-  border:2px solid var(--border);
-  background:var(--bg);
-  display:grid;place-items:center;
-  font-size:24px;
-  cursor:pointer;
-}
-.dishRow{
-  display:flex;justify-content:space-between;align-items:center;
-  padding:14px;
-  border-bottom:1.5px dashed var(--border);
-  gap:8px;
-}
-.act{display:flex;gap:6px}
-.act button{
-  width:46px;height:46px;
-  border-radius:12px;
-  border:2px solid var(--border);
-  background:var(--bg);
-  font-size:20px;
-  cursor:pointer;
-}
-select,textarea{
-  width:100%;padding:14px;
-  border-radius:14px;
-  border:2px solid var(--border);
-  background:var(--bg);
-  color:var(--text);
-  font-size:1.05rem;
-  box-sizing:border-box;
-}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.55);display:none;z-index:9999;align-items:center;justify-content:center;padding:12px}.modal.open{display:flex}
+.sheet{width:calc(100% - 24px);max-width:500px;max-height:88vh;overflow:auto;background:var(--card);border-radius:24px;border:3px solid #111;box-sizing:border-box;margin:0 auto}
+.head{position:sticky;top:0;background:var(--card);padding:14px;border-bottom:2px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+.x{width:48px;height:48px;border-radius:50%;border:2px solid var(--border);background:var(--bg);display:grid;place-items:center;font-size:24px;cursor:pointer}
+.dishRow{display:flex;justify-content:space-between;align-items:center;padding:14px;border-bottom:1.5px dashed var(--border);gap:8px}
+.act{display:flex;gap:6px}.act button{width:46px;height:46px;border-radius:12px;border:2px solid var(--border);background:var(--bg);font-size:20px}
+select,textarea{width:100%;padding:14px;border-radius:14px;border:2px solid var(--border);background:var(--bg);color:var(--text);font-size:1.05rem;box-sizing:border-box}
 .topRowFixed{display:flex;gap:8px;align-items:center;width:100%;box-sizing:border-box}
-.topRowFixed input{
-  flex:1 1 0;min-width:0;width:0;
-  text-align:center;font-weight:900;
-  background:#f0e9df;
-  border-radius:14px;
-  padding:12px 6px;
-  border:2px solid var(--border);
-  box-sizing:border-box;
-  font-size:1rem;
-}
-#pdfWrap{
-  position:fixed;inset:0;
-  background:#222;z-index:10000;
-  display:none;flex-direction:column;
-}
-#pdfWrap.open{display:flex}
-.pdfTool{
-  position:sticky;top:0;
-  background:var(--card);
-  padding:12px;
-  display:flex;gap:12px;
-  border-bottom:2px solid var(--border);
-  z-index:2;
-}
+.topRowFixed input{flex:1 1 0;min-width:0;width:0;text-align:center;font-weight:900;background:#fff7e6;border-radius:16px;padding:12px 6px;border:2px solid var(--border);box-sizing:border-box;font-size:1rem}
+#pdfWrap{position:fixed;inset:0;background:#222;z-index:10000;display:none;flex-direction:column}#pdfWrap.open{display:flex}
+.pdfTool{position:sticky;top:0;background:#fff;padding:12px;display:flex;gap:12px;border-bottom:2px solid #ccc;z-index:2}
 .pdfView{flex:1;overflow:auto;background:#333;padding:16px;display:flex;justify-content:center}
 .pdfPage{width:100%;max-width:800px;background:#fff;margin:0 auto}
 .pdfInner{padding:15mm 15mm 25mm 15mm!important;background:#fff;color:#000;box-sizing:border-box;font-size:16pt;line-height:1.5}
@@ -254,8 +53,8 @@ select,textarea{
 <div id="p-weekly" class="page active"><div class="card"><div class="topRowFixed"><input type="date" id="monPicker"><button class="iconBtn" onclick="saveWeekly()">💾</button><button class="iconBtn" onclick="exportWeeklyPDF()">📄</button></div></div><div id="weeklyGrid" class="weekWrap"></div></div>
 <div id="p-library" class="page"><div class="card row"><button class="ghost" onclick="exportLib()">匯出</button><button class="ghost" onclick="document.getElementById('impFile').click()">匯入</button><button class="btn" onclick="openAdd()">新增菜式</button><input type="file" id="impFile" accept=".json" style="display:none"></div><div id="catGrid" class="grid3"></div></div>
 <div id="p-mymenus" class="page"><div class="card row"><button class="ghost" onclick="toggleMy(true)">一鍵打開全部</button><button class="ghost" onclick="toggleMy(false)">一鍵關閉全部</button></div><div id="myList"></div></div>
-<div id="p-settings" class="page"><div class="card"><h3>分類排序</h3><div id="catOrder"></div><div class="row" style="margin-top:12px;flex-wrap:nowrap"><input id="newCat" placeholder="新分類名稱" style="flex:1;min-width:0;padding:14px 16px;border-radius:14px;border:2px solid var(--border);background:var(--bg);color:var(--text);font-size:1rem;font-weight:800;box-sizing:border-box"><button class="btn" onclick="addCat()" style="flex:0 0 90px;min-width:90px">新增</button></div></div><div class="card"><h3>外觀</h3><div class="row"><span>深淺色</span><button class="ghost" onclick="toggleTheme()">切換</button></div><div style="margin-top:12px"><label>字體大小 <span id="fsVal">20</span>px</label><input type="range" id="fsRange" min="14" max="28" value="20" oninput="setFS(this.value)" style="width:100%"></div></div><div class="card"><h3>頭像</h3><div style="display:flex;gap:10px;align-items:center;margin:10px 0">
-  <label for="avFile" style="flex:0 0 auto;padding:16px 22px;border-radius:14px;background:var(--primary);color:#fff;font-weight:900;font-size:1.15rem;cursor:pointer">📁 選擇圖片</label>
+<div id="p-settings" class="page"><div class="card"><h3>分類排序</h3><div id="catOrder"></div><div class="row" style="margin-top:12px;flex-wrap:nowrap"><input id="newCat" placeholder="新分類名稱" style="flex:1;min-width:0;padding:14px 16px;border-radius:16px;border:2px solid var(--border);background:var(--bg);color:var(--text);font-size:1rem;font-weight:800;box-sizing:border-box"><button class="btn" onclick="addCat()" style="flex:0 0 90px;min-width:90px">新增</button></div></div><div class="card"><h3>外觀</h3><div class="row"><span>深淺色</span><button class="ghost" onclick="toggleTheme()">切換</button></div><div style="margin-top:12px"><label>字體大小 <span id="fsVal">20</span>px</label><input type="range" id="fsRange" min="14" max="28" value="20" oninput="setFS(this.value)" style="width:100%"></div></div><div class="card"><h3>頭像</h3><div style="display:flex;gap:10px;align-items:center;margin:10px 0">
+  <label for="avFile" style="flex:0 0 auto;padding:16px 22px;border-radius:16px;background:var(--primary);color:#fff;font-weight:900;font-size:1.15rem;cursor:pointer">📁 選擇圖片</label>
   <span id="avFileName" style="flex:1;font-size:1.1rem;font-weight:800;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">尚未選取檔案</span>
 </div>
 <input type="file" id="avFile" accept="image/*" style="display:none"><div style="width:260px;height:260px;margin:12px auto;border-radius:50%;overflow:hidden;border:3px solid var(--primary);background:#000;touch-action:none"><canvas id="avCanvas" width="600" height="600" style="width:100%;height:100%"></canvas></div><div class="row"><span>縮放</span><input type="range" id="avZoom" min="0.2" max="4" step="0.05" value="1" style="flex:1"><button class="ghost" onclick="resetAv()">重置</button></div><button class="btn" style="width:100%;margin-top:10px" onclick="saveAv()">儲存頭像</button></div></div>
@@ -272,10 +71,10 @@ select,textarea{
 <div class="modal" id="mPickCat" style="z-index:10003"><div class="sheet"><div class="head"><b>分類</b><div class="x" onclick="closeM('mPickCat')">✕</div></div><div id="mPickCatBody" class="grid3" style="padding:12px"></div></div></div>
 <div class="modal" id="mPickDish" style="z-index:10004"><div class="sheet"><div class="head"><b>菜式</b><div class="x" onclick="closeM('mPickDish')">✕</div></div><div id="mPickDishBody"></div></div></div>
 <div class="modal" id="mAdd" style="z-index:10005"><div class="sheet"><div class="head"><b>新增/修改菜式</b><div class="x" onclick="closeM('mAdd')">✕</div></div><div style="padding:14px"><input id="fName" placeholder="菜名（中文）" style="width:100%;padding:16px;border-radius:14px;border:2px solid var(--border);background:var(--bg);color:var(--text);font-size:1.05rem;box-sizing:border-box;height:56px"><input id="fIndo" placeholder="菜名（印尼文）" style="margin-top:12px;width:100%;padding:16px;border-radius:14px;border:2px solid var(--border);background:var(--bg);color:var(--text);font-size:1.05rem;box-sizing:border-box;height:56px"><textarea id="fNoteZh" placeholder="備註 + 烹調方法（中文）" style="margin-top:10px;height:110px"></textarea><textarea id="fNoteId" placeholder="備註 + 烹調方法（印尼文）" style="margin-top:10px;height:110px"></textarea><select id="fCat" style="margin-top:10px"></select><input type="hidden" id="fId"><button class="btn" style="width:100%;margin-top:12px" onclick="saveDish()">儲存</button></div></div></div>
-<div class="modal" id="mAnyDate" style="z-index:10006"><div class="sheet" style="border-radius:20px;border:2px solid var(--border)"><div class="head"><b>加入到哪一天？</b><div class="x" onclick="closeM('mAnyDate')">✕</div></div><div style="padding:20px;display:flex;flex-direction:column;gap:14px;align-items:center"><input type="date" id="anyDate" style="width:92%!important;height:68px!important;min-height:68px!important;line-height:68px!important;padding:0 12px!important;border-radius:16px!important;border:2px solid var(--border)!important;background:var(--bg)!important;color:var(--text)!important;font-weight:900!important;font-size:1.3rem!important;text-align:center!important;box-sizing:border-box!important;display:block!important"><button onclick="confirmAddToWeek()" style="width:92%!important;height:68px!important;min-height:68px!important;line-height:68px!important;padding:0!important;border-radius:16px!important;border:none!important;background:var(--primary)!important;color:#fff!important;font-weight:900!important;font-size:1.35rem!important;box-sizing:border-box!important;display:grid!important;place-items:center!important;text-align:center!important;cursor:pointer">確認加入</button></div></div></div>
+<div class="modal" id="mAnyDate" style="z-index:10006"><div class="sheet" style="border-radius:28px;border:3px solid #111"><div class="head"><b>加入到哪一天？</b><div class="x" onclick="closeM('mAnyDate')">✕</div></div><div style="padding:20px;display:flex;flex-direction:column;gap:14px;align-items:center"><input type="date" id="anyDate" style="width:92%!important;height:68px!important;min-height:68px!important;line-height:68px!important;padding:0 12px!important;border-radius:20px!important;border:3px solid #111!important;background:#fffaf5!important;color:#111!important;font-weight:900!important;font-size:1.3rem!important;text-align:center!important;box-sizing:border-box!important;display:block!important"><button onclick="confirmAddToWeek()" style="width:92%!important;height:68px!important;min-height:68px!important;line-height:68px!important;padding:0!important;border-radius:20px!important;border:3px solid #111!important;background:#ff6b35!important;color:#fff!important;font-weight:900!important;font-size:1.35rem!important;box-sizing:border-box!important;display:grid!important;place-items:center!important;text-align:center!important">確認加入</button></div></div></div>
 <div id="pdfWrap"><div class="pdfTool"><button class="btn" id="btnClosePdf" type="button" style="font-size:38px!important;line-height:1!important">✕</button><button class="ghost" id="btnSharePdf" type="button" style="font-size:36px!important;line-height:1!important">📤</button></div><div class="pdfView"><div class="pdfPage"><div class="pdfInner" id="pdfContent"></div></div></div></div>
 <script>
-const CAT_META={"雞":{bg:"#f4ecd8",e:"🐔"},"牛":{bg:"#efe5d5",e:"🐮"},"豬":{bg:"#f6e5e2",e:"🐷"},"魚":{bg:"#e1edea",e:"🐟"},"蔬菜":{bg:"#e2ece1",e:"🥬"},"湯水":{bg:"#f7eee0",e:"🍲"},"西式":{bg:"#ede4da",e:"🍔"},"罐頭":{bg:"#e2ecef",e:"🥫"},"其他":{bg:"#ece2f0",e:"🍱"}};
+const CAT_META={"雞":{bg:"#ffeb8a",e:"🐔"},"牛":{bg:"#d7b899",e:"🐮"},"豬":{bg:"#ffb3c1",e:"🐷"},"魚":{bg:"#8ecfff",e:"🐟"},"蔬菜":{bg:"#a8e6a3",e:"🥬"},"湯水":{bg:"#ffcc7a",e:"🍲"},"西式":{bg:"#e2c499",e:"🍔"},"罐頭":{bg:"#9ec6ff",e:"🥫"},"其他":{bg:"#d8b4fe",e:"🍱"}};
 let cats=JSON.parse(localStorage.getItem('cats')||'null')||Object.keys(CAT_META);
 let dishes=JSON.parse(localStorage.getItem('dishes')||'null')||[];
 let weeklyMenus=JSON.parse(localStorage.getItem('weeklyMenus')||'[]');
@@ -300,6 +99,7 @@ function makeDefaults(){
   ["西檸雞", "Ayam Lemon", "雞扒沾上生粉炸至金黃酥脆切件。用鮮檸檬汁、糖、水煮成酸甜汁淋在雞肉上。", "Balur paha ayam dengan tepung maizena, goreng hingga keemasan dan renyah, lalu potong-potong. Masak jus lemon segar, gula, dan air untuk membuat saus asam manis lalu siram di atas ayam."],
   ["三杯雞", "Ayam Tiga Cangkir (San Bei Ji)", "雞件下麻油、米酒、生抽各一杯的比例（或適量調配），加入九層塔及蒜頭慢火收汁。", "Masak ayam dengan perbandingan minyak wijen, anggur beras, dan kecap asin (atau sesuaikan), tambahkan daun kemangi dan bawang putih, masak dengan api kecil hingga kuah menyusut."]
 ],
+
 "牛": [
   ["番茄炒牛肉", "Daging Sapi Tumis Tomat", "牛肉切片用生抽、糖、生粉醃好。先炒香番茄出汁，下牛肉片快炒至熟即可。", "Iris daging sapi, marinasi dengan kecap asin, gula, dan maizena. Tumis tomat hingga mengeluarkan jus, lalu masukkan daging sapi dan aduk cepat hingga matang."],
   ["洋蔥炒牛肉", "Daging Sapi Tumis Bawang Bombay", "牛肉切片醃味。爆香洋蔥條至半透明，下牛肉大火快炒，加入少許生抽和蠔油調味。", "Iris daging sapi dan marinasi. Tumis irisan bawang bombay hingga setengah transparan, masukkan daging sapi, aduk cepat dengan api besar, beri kecap asin dan saus tiram."],
@@ -312,6 +112,7 @@ function makeDefaults(){
   ["羅宋湯牛尾", "Sup Ekor Sapi ala Borscht", "牛尾出水。與番茄、椰菜、薯仔、紅蘿蔔加水大火煲滾後轉小火煮2小時。", "Blansir ekor sapi. Masak bersama tomat, kol, kentang, wortel, dan air, didihkan lalu rebus dengan api kecil selama 2 jam."],
   ["薯仔炆牛肉", "Daging Sapi Masak Kentang", "牛肉切件飛水。薯仔切塊煎香，與牛肉、洋蔥、生抽、蠔油及水一同炆至軟稔。", "Potong dan blansir daging sapi. Goreng potongan kentang hingga harum, lalu rebus bersama daging, bawang bombay, kecap asin, saus tiram, dan air hingga empuk."]
 ],
+
 "豬": [
   ["粟米紅蘿蔔豬骨湯", "Sup Jagung Wortel Tulang Babi", "豬骨焯水，粟米切段，紅蘿蔔切塊，加水大火煮滾後小火煲1.5小時。", "Rebus tulang babi sebentar, potong jagung dan wortel, tambahkan air, didihkan lalu rebus dengan api kecil selama 1,5 jam."],
   ["菠蘿咕嚕肉", "Babi Asam Manis Nanas", "豬梅頭肉切塊醃好沾炸粉炸至香脆。炒香三色椒與菠蘿，加入甜酸汁與肉塊兜勻。", "Potong daging babi, marinasi, balur tepung, lalu goreng hingga renyah. Tumis paprika dan nanas, masukkan saus asam manis dan daging, aduk rata."],
@@ -324,6 +125,7 @@ function makeDefaults(){
   ["生炒排骨", "Iga Babi Tumis Kering (Sheng Chao Pai Gu)", "排骨炸至酥脆。用白醋、糖、茄汁煮成醬汁，快速將排骨回鑊翻炒上碟。", "Goreng iga babi hingga renyah. Masak cuka putih, gula, dan saus tomat sebagai saus, lalu aduk cepat bersama iga babi yang digoreng."],
   ["叉燒", "Char Siu (Babi Panggang Merah)", "梅頭肉用叉燒醬、生抽、蠔油、糖、南乳及玫瑰露酒醃過夜，入爐燒烤至熟並掃蜜糖。", "Marinasi daging babi dengan saus char siu, kecap asin, saus tiram, gula, nanru, dan anggur beras semalaman, lalu panggang hingga matang dan olesi madu."]
 ],
+
 "魚": [
   ["清蒸海鮮魚", "Ikan Kukus Kecap Asin", "鮮魚洗淨抹乾，放薑蔥蒸8-10分鐘倒去水。鋪上蔥絲，淋上滾油及蒸魚豉油。", "Cuci dan keringkan ikan, kukus dengan jahe dan daun bawang selama 8-10 menit, buang airnya. Beri irisan daun bawang, siram minyak panas dan kecap ikan/kecap kukus."],
   ["煎封魚", "Ikan Goreng Pan-Seared", "魚洗淨印乾水分，下鑊用中小火煎至兩面金黃香脆，灒少許生抽和水略燒。", "Cuci dan keringkan ikan, goreng dengan api sedang-kecil menggunakan wajan hingga kedua sisi keemasan dan renyah, beri sedikit kecap asin dan air lalu didihkan sebentar."],
@@ -336,6 +138,7 @@ function makeDefaults(){
   ["鹹菜豆腐魚湯", "Sup Ikan Tahu Sayur Asin", "鹹菜切片洗淨。魚煎香後加水、鹹菜和豆腐，大火煮滾轉小火滾20分鐘。", "Potong dan cuci sayur asin. Goreng ikan, lalu tambahkan air, sayur asin, dan tahu, didihkan dengan api besar lalu kecilkan dan rebus selama 20 menit."],
   ["豉汁蒸魚雲", "Kepala Ikan Kukus Saus Tahu Hitam", "魚雲洗淨，鋪上蒜蓉、豆豉碎、生抽、糖、果皮碎及油，大火蒸10分鐘。", "Cuci bagian kepala ikan, beri taburan bawang putih, cincangan taosi, kecap asin, gula, kulit jeruk mandarin kering, dan minyak, kukus 10 menit dengan api besar."]
 ],
+
 "蔬菜": [
   ["蒜蓉炒菜心", "Tumis Chaisim Bawang Putih", "菜心洗淨切段。起鑊爆香蒜蓉，下菜心大火快炒，贊少許水及下鹽調味炒熟。", "Cuci dan potong chaisim. Panaskan wajan, tumis bawang putih hingga harum, masukkan chaisim, aduk cepat dengan api besar, beri sedikit air dan garam lalu masak hingga matang."],
   ["腐乳通菜", "Kangkung Tumis Tau Fu Fa/Oncom", "通菜洗淨切段。爆香蒜頭及腐乳，下通菜大火翻炒至軟身熟透。", "Cuci dan potong kangkung. Tumis bawang putih dan tahu fermentasi (fururu), masukkan kangkung dan aduk cepat hingga layu dan matang."],
@@ -348,6 +151,7 @@ function makeDefaults(){
   ["黃金鮮魷蒸豆腐", "Tahu Kukus Telur Asin", "豆腐切片鋪底，放上鮮魷片，鋪上鹹蛋黃碎，大火蒸8分鐘灑蔥花。", "Tata potongan tahu di dasar piring, letakkan irisan cumi, beri taburan hancuran kuning telur asin, kukus 8 menit dengan api besar lalu taburi daun bawang."],
   ["清炒荷蘭豆", "Tumis Kacang Polong Manis (He Lan Dou)", "荷蘭豆撕去根部洗淨。起鑊下蒜片，大火快炒荷蘭豆至轉翠綠，下鹽調味上碟。", "Buang serat dan cuci kacang polong manis. Panaskan wajan dengan irisan bawang putih, tumis cepat hingga berwarna hijau cerah, bumbui dengan garam."]
 ],
+
 "湯水": [
   ["淮山杞子排骨湯", "Sup Iga Babi Yam dan Goji Berries", "排骨飛水。淮山、杞子、茨實洗淨，與排骨加水煲2小時。", "Blansir iga babi. Cuci yam (chinese yam), goji berries, dan fox nut, rebus bersama iga dengan air selama 2 jam."],
   ["西洋菜豬骨湯", "Sup Tulang Babi Selada Air", "西洋菜洗淨。豬骨焯水，加南北杏、蜜棗及水大火煲滾後轉小火煲1.5小時。", "Cuci selada air. Blansir tulang babi, tambahkan kacang almond utuh, kurma kering (mizao), dan air, didihkan lalu rebus dengan api kecil selama 1,5 jam."],
@@ -358,8 +162,9 @@ function makeDefaults(){
   ["生魚坊黨參湯", "Sup Ikan Gabus (Sheng Yu) dengan Codonopsis", "生魚煎香。黨參、黃耆、紅棗洗淨，加水與生魚大火滾起轉小火煲1小時。", "Goreng ikan gabus hingga harum. Cuci codonopsis, astragalus, dan kurma merah, rebus bersama ikan dengan air mendidih lalu kecilkan api selama 1 jam."],
   ["老黃瓜赤小豆扁豆湯", "Sup Mentua Tua, Kacang Merah Kecil dan Kacang Lablab", "老黃瓜洗淨切塊（不去皮）。赤小豆、扁豆、陳皮及豬骨加水煲2小時。", "Cuci dan potong mentimun tua/old cucumber (tanpa dikupas). Rebus bersama kacang azuki kecil, kacang lablab, kulit jeruk kering, dan tulang babi selama 2 jam."],
   ["金針雲耳豆腐湯", "Sup Tahu Jamur Jarum Emas dan Jamur Hitam", "金針菜浸軟打結，雲耳浸軟。豆腐切塊，加瘦肉片及水滾20分鐘。", "Rendam dan ikat jamur jarum emas (jinzhencai), rendam jamur hitam. Potong tahu, rebus bersama irisan daging babi kurus dan air selama 20 menit."],
-  ["蘿蔔生魚湯", "Sup Ikan Gabus dan Lobak Putih", "生魚煎香。白蘿蔔切絲或塊，加薑片與生魚大火煲成奶白湯，下鹽調味。", "Goreng ikan gabus. Potong lobak putih, rebus bersama jahe dan ikan dengan air mendidih lalu berkuah putih susu, bumbui dengan garam."]
+  ["蘿蔔生魚湯", "Sup Ikan Gabus dan Lobak Putih", "生魚煎香。白蘿蔔切絲或塊，加薑片與生魚大火煲成奶白湯，下鹽調味。", "Goreng ikan gabus. Potong lobak putih, rebus bersama jahe dan ikan dengan air mendidih hingga berkuah putih susu, bumbui dengan garam."]
 ],
+
 "西式": [
   ["忌廉三文魚意粉", "Pasta Salmon saus Krim (Creamy Salmon Pasta)", "三文魚煎熟拆肉。意粉煮熟。用牛油炒香洋蔥蘑菇，加入淡忌廉及三文魚肉煮勻撈意粉。", "Goreng salmon lalu suwir dagingnya. Rebus pasta. Tumis bawang bombay dan jamur dengan mentega, tambahkan krim kental dan salmon, aduk rata dengan pasta."],
   ["黑椒意粉", "Pasta Sapi Lada Hitam", "意粉煮熟。牛肉片炒香，加入洋蔥絲及黑椒醬炒勻，放入意粉拌勻即成。", "Rebus pasta. Tumis daging sapi hingga harum, masukkan irisan bawang bombay dan saus lada hitam, aduk rata bersama pasta."],
@@ -372,6 +177,7 @@ function makeDefaults(){
   ["芝士煙肉焗薯", "Loaded Baked Potato (Kentang Panggang Keju Bacon)", "原個薯仔連皮入焗爐烤熟。切開中間釀入牛油、芝士碎、煙肉碎及酸忌廉再焗溶。", "Panggang utuh kentang bersama kulitnya dalam oven. Belah tengahnya, isi dengan mentega, keju parut, remahan bacon, dan sour cream, lalu panggang kembali hingga meleleh."],
   ["經典肉丸意粉", "Pasta Bakso Sapi (Spaghetti and Meatballs)", "免治牛肉搓成肉丸煎熟。加入意式番茄醬煮熱，淋在煮好的意粉上。", "Bentuk daging sapi cincang menjadi bakso lalu goreng. Masak bersama saus tomat italia hingga panas, lalu siram di atas pasta yang sudah direbus."]
 ],
+
 "罐頭": [
   ["午餐肉煎蛋公仔麵", "Mie Instan Telur dan Spam Luncheon Meat", "公仔麵煮熟。午餐肉切片煎香，煎荷包蛋一隻，放在麵上即成。", "Rebus mie instan. Goreng irisan spam luncheon meat hingga harum, goreng satu telur mata sapi, letakkan di atas mie."],
   ["沙甸魚通粉", "Makaroni Sarden Kaleng", "通粉煮熟。開罐沙甸魚連茄汁倒入鍋中加熱，加少許水和通粉煮滾調味。", "Rebus makaroni. Buka kaleng sarden, tuang bersama saus tomatnya ke wajan, tambahkan sedikit air dan makaroni, didihkan dan bumbui."],
@@ -384,6 +190,7 @@ function makeDefaults(){
   ["沙爹牛肉麵", "Mie Instan Daging Sapi Saus Satay Kaleng/Instant", "公仔麵煮熟。將罐頭沙爹牛肉加熱（或用沙爹醬炒牛肉），鋪在麵面上。", "Rebus mie instan. Panaskan daging sapi satay kaleng (atau tumis daging dengan saus satay), lalu letakkan di atas mie."],
   ["火腿通粉", "Makaroni Sup Ham", "通粉煮熟過冷河。用雞湯或水煮滾，加入切粒火腿煮熱，下通粉即成。", "Rebus makaroni lalu bilas air dingin. Didihkan kaldu ayam atau air, masukkan potongan ham, lalu masukkan makaroni."]
 ],
+
 "其他": [
   ["揚州炒飯", "Nasi Goreng Yangzhou", "白飯炒散。加入义燒粒、蝦仁、雞蛋碎、青豆及蔥花，大火拋勻下鹽調味。", "Goreng lepas nasi putih. Masukkan potongan char siu, udang, orak-arik telur, kacang polong, dan daun bawang, aduk rata dengan api besar dan bumbui garam."],
   ["蝦仁炒蛋", "Telur Orak-Arik Udang", "蝦仁洗淨印乾醃味炒至半熟。倒入拂好的蛋液，慢火炒至滑蛋狀態即成。", "Cuci udang, keringkan, marinasi, lalu tumis hingga setengah matang. Tuang kocokan telur, masak dengan api kecil hingga bertekstur lembut."],
@@ -493,7 +300,7 @@ function delMenu(i){ if(!confirm('刪除?')) return; weeklyMenus.splice(i,1); lo
 function makePDF(days, monStr){
 let html = `<h1 style="text-align:center;border-bottom:3px solid #111;padding-bottom:12px;margin:0 0 12px 0;font-size:13pt;font-weight:900">每週菜單<br><span style="font-size:13pt">Daftar Menu Mingguan</span></h1><div style="text-align:center;margin:10px 0;font-weight:900;font-size:13pt">${monStr} 星期一 / Senin</div>`;
 days.forEach((d,i)=>{
-html += `<div style="border:2.5px solid #111;border-radius:14px;overflow:hidden;margin-bottom:16px;background:#fff"><div style="display:flex;justify-content:space-between;background:#f0e9df;padding:12px 14px;font-weight:900;border-bottom:2.5px solid #111;flex-wrap:wrap;gap:6px;font-size:15pt"><b style="font-size:15pt;font-weight:900">星期${cn[i]} / ${idn[i]} ${d.date}</b><span style="font-size:15pt;font-weight:900">用餐 / Makan: ${d.diners} &nbsp; 外帶 / Bungkus: ${d.takeaway}</span></div>`;
+html += `<div style="border:2.5px solid #111;border-radius:14px;overflow:hidden;margin-bottom:16px;background:#fff"><div style="display:flex;justify-content:space-between;background:#fff3d6;padding:12px 14px;font-weight:900;border-bottom:2.5px solid #111;flex-wrap:wrap;gap:6px;font-size:15pt"><b style="font-size:15pt;font-weight:900">星期${cn[i]} / ${idn[i]} ${d.date}</b><span style="font-size:15pt;font-weight:900">用餐 / Makan: ${d.diners} &nbsp; 外帶 / Bungkus: ${d.takeaway}</span></div>`;
 if(d.dishes.length===0){ html+=`<div style="padding:10px 14px;font-size:13pt">無 / Belum ada</div>`; }
 else{ d.dishes.forEach(dd=>{
 let zh = (dd.noteZh||dd.note||'').replace(/中文：/g,'').replace(/中文:/g,'').trim();
@@ -558,7 +365,7 @@ function importLib(e){ let f=e.target.files[0]; if(!f) return; let r=new FileRea
 function renderCatOrder(){ let b=document.getElementById('catOrder'); b.innerHTML=cats.map((c,i)=>`<div class="card row" style="justify-content:space-between"><span>${i+1}. ${c}</span><span class="row"><button class="iconBtn" onclick="moveCat(${i},-1)">↑</button><button class="iconBtn" onclick="moveCat(${i},1)">↓</button><button class="ghost" style="width:auto" onclick="delCat(${i})">刪除</button></span></div>`).join(''); }
 function moveCat(i,dir){ let ni=i+dir; if(ni<0||ni>=cats.length) return; let t=cats[i]; cats[i]=cats[ni]; cats[ni]=t; localStorage.setItem('cats',JSON.stringify(cats)); renderCatOrder(); renderCats(); }
 function addCat(){ let v=document.getElementById('newCat').value.trim(); if(!v) return; cats.push(v); localStorage.setItem('cats',JSON.stringify(cats)); document.getElementById('newCat').value=''; renderCatOrder(); renderCats(); }
-function delCat(i){ let cat=cats[i]; if(!confirm(`刪除「${cat}」會全部移到「其他」？`)) return; dishes.forEach(d=>{ if(d.cat===cat) d.cat='其他'; }); if(!cats.includes('other')) cats.push('其他'); cats.splice(i,1); localStorage.setItem('cats',JSON.stringify(cats)); localStorage.setItem('dishes',JSON.stringify(dishes)); renderCatOrder(); renderCats(); }
+function delCat(i){ let cat=cats[i]; if(!confirm(`刪除「${cat}」會全部移到「其他」？`)) return; dishes.forEach(d=>{ if(d.cat===cat) d.cat='其他'; }); if(!cats.includes('其他')) cats.push('其他'); cats.splice(i,1); localStorage.setItem('cats',JSON.stringify(cats)); localStorage.setItem('dishes',JSON.stringify(dishes)); renderCatOrder(); renderCats(); }
 function toggleTheme(){ document.body.classList.toggle('dark'); localStorage.setItem('theme',document.body.classList.contains('dark')?'dark':'light'); }
 function setFS(v){ document.documentElement.style.setProperty('--fs',v+'px'); document.getElementById('fsVal').innerText=v; localStorage.setItem('fs',v); }
 let img=new Image(), scale=1, px=0, py=0, drag=false, lx=0, ly=0, initS=1;
