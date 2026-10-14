@@ -227,12 +227,7 @@ function init(){
  document.getElementById('btnClosePdf').addEventListener('click',e=>{e.stopPropagation();closePDF();});
  document.getElementById('btnSharePdf').addEventListener('click',e=>{e.stopPropagation();sharePDF();});
 }
-function onMon(d){
- if(current.mon && fmt(current.mon)===fmt(d)) return;
- current.mon=d; current.days=[];
- for(let i=0;i<7;i++){let day=new Date(d); day.setDate(d.getDate()+i); current.days.push({date:day,dishes:[],diners:0,takeaway:0});}
- renderWeek();
-}
+function onMon(d){ current.mon=d; current.days=[]; for(let i=0;i<7;i++){let day=new Date(d); day.setDate(d.getDate()+i); current.days.push({date:day,dishes:[],diners:0,takeaway:0});} renderWeek(); }
 function loadAll(){ let th=localStorage.getItem('theme'); if(th==='dark') document.body.classList.add('dark'); let fs=localStorage.getItem('fs'); if(fs){ document.getElementById('fsRange').value=fs; setFS(fs);} let av=localStorage.getItem('avatar'); if(av) document.getElementById('avatarTop').src=av; }
 function renderCats(){
  let g=document.getElementById('catGrid'); g.innerHTML=''; document.getElementById('fCat').innerHTML=cats.map(c=>`<option>${c}</option>`).join('');
@@ -249,7 +244,7 @@ function openCat(cat){
 }
 function showNote(id){ let d=dishes.find(x=>x.id==id); if(!d) return; document.getElementById('mNoteBody').innerText=`${d.name} / ${d.indo||''}\n\n${d.noteZh||d.note||''}\n\n${d.noteId||''}`; openM('mNote'); }
 function openAnyDate(id){ pendDish=id; document.getElementById('anyDate').valueAsDate=new Date(); openM('mAnyDate'); }
-function confirmAddToWeek(){ let v=document.getElementById('anyDate').value; if(!v) return; let date=new Date(v); let mon=getMon(date); if(fmt(mon)!==fmt(current.mon)){alert('請先選包含此日的星期一'); return;} let let idx=Math.floor((new Date(fmt(date)) - new Date(fmt(current.mon)))/86400000); if(idx<0||idx>6) return; let d=dishes.find(x=>x.id==pendDish); current.days[idx].dishes.push({...d}); lastCook[d.id]=fmt(date); localStorage.setItem('lastCook',JSON.stringify(lastCook)); renderWeek(); closeM('mAnyDate'); }
+function confirmAddToWeek(){ let v=document.getElementById('anyDate').value; if(!v) return; let date=new Date(v); let mon=getMon(date); if(fmt(mon)!==fmt(current.mon)){alert('請先選包含此日的星期一'); return;} let idx=Math.round((date-current.mon)/86400000); if(idx<0||idx>6) return; let d=dishes.find(x=>x.id==pendDish); current.days[idx].dishes.push({...d}); lastCook[d.id]=fmt(date); localStorage.setItem('lastCook',JSON.stringify(lastCook)); renderWeek(); closeM('mAnyDate'); }
 function openAdd(){document.getElementById('fId').value=''; document.getElementById('fName').value=''; document.getElementById('fIndo').value=''; document.getElementById('fNoteZh').value=''; document.getElementById('fNoteId').value=''; openM('mAdd'); }
 function editDish(id){ let d=dishes.find(x=>x.id==id); openAdd(); document.getElementById('fId').value=d.id; document.getElementById('fName').value=d.name; document.getElementById('fIndo').value=d.indo||''; let raw = d.noteZh || d.note || ''; let rawId = d.noteId || '';
 if(!rawId && raw.includes('Indonesia:')){ let p=raw.split('Indonesia:'); raw=p[0]; rawId=p[1]||''; }
