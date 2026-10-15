@@ -84,6 +84,23 @@ function go(p,el){document.querySelectorAll('.page').forEach(e=>e.classList.remo
 function getMon(d){let dt=new Date(d);let day=dt.getDay();let diff=dt.getDate()-day+(day==0?-6:1);return new Date(dt.setDate(diff));}
 function fmt(d){if(typeof d==='string')return d;return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;}
 function openM(id){document.getElementById(id).classList.add('open');}function closeM(id){document.getElementById(id).classList.remove('open');}
+let zh2idTimer = null;
+async function autoTransZh2Id(zhText, targetEl){
+  if(!zhText || !zhText.trim()) return;
+  try{
+    let q = encodeURIComponent(zhText);
+    let res = await fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=zh-CN&tl=id&dt=t&q=${q}`);
+    let data = await res.json();
+    let translated = data[0].map(x=>x[0]).join('');
+    targetEl.value = translated;
+  }catch(e){ alert('翻譯失敗，請檢查網絡'); }
+}
+function debounceTrans(fn, delay){
+  return function(...args){
+    clearTimeout(zh2idTimer);
+    zh2idTimer = setTimeout(()=>fn(...args), delay);
+  }
+}
 function makeDefaults(){
  if(dishes.length) return;
  const D={
@@ -245,7 +262,33 @@ function openCat(cat){
 function showNote(id){ let d=dishes.find(x=>x.id==id); if(!d) return; document.getElementById('mNoteBody').innerText=`${d.name} / ${d.indo||''}\n\n${d.noteZh||d.note||''}\n\n${d.noteId||''}`; openM('mNote'); }
 function openAnyDate(id){ pendDish=id; document.getElementById('anyDate').valueAsDate=new Date(); openM('mAnyDate'); }
 function confirmAddToWeek(){ let v=document.getElementById('anyDate').value; if(!v) return; let date=new Date(v); let mon=getMon(date); if(fmt(mon)!==fmt(current.mon)){alert('請先選包含此日的星期一'); return;} let idx=Math.round((date-current.mon)/86400000); if(idx<0||idx>6) return; let d=dishes.find(x=>x.id==pendDish); current.days[idx].dishes.push({...d}); lastCook[d.id]=fmt(date); localStorage.setItem('lastCook',JSON.stringify(lastCook)); renderWeek(); closeM('mAnyDate'); }
-function openAdd(){document.getElementById('fId').value=''; document.getElementById('fName').value=''; document.getElementById('fIndo').value=''; document.getElementById('fNoteZh').value=''; document.getElementById('fNoteId').value=''; openM('mAdd'); }
+function openAdd(){
+  document.getElementById('fId').value='';
+  document.getElementById('fName').value='';
+  document.getElementById('fIndo').value='';
+  document.getElementById('fNoteZh').value='';
+  document.getElementById('fNoteId').value='';
+  openM('mAdd');
+  let fName = document.getElementById('fName');
+  let fIndo = document.getElementById('fIndo');
+  let fNoteZh = document.getElementById('fNoteZh');
+  let fNoteId = document.getElementById('fNoteId');
+  fIndo.dataset.manual=""; fNoteId.dataset.manual="";
+  fName.oninput = debounceTrans(async ()=>{
+    if(!fName.value.trim() || fIndo.dataset.manual==="1") return;
+    if(confirm(`是否將菜名翻譯成印尼文並填入？`)){
+      await autoTransZh2Id(fName.value, fIndo);
+    }
+  }, 800);
+  fNoteZh.oninput = debounceTrans(async ()=>{
+    if(!fNoteZh.value.trim() || fNoteId.dataset.manual==="1") return;
+    if(confirm(`是否將備註翻譯成印尼文並填入？\n\n${fNoteZh.value.slice(0,60)}...`)){
+      await autoTransZh2Id(fNoteZh.value, fNoteId);
+    }
+  }, 1200);
+  fIndo.oninput = ()=>fIndo.dataset.manual="1";
+  fNoteId.oninput = ()=>fNoteId.dataset.manual="1";
+}
 function editDish(id){ let d=dishes.find(x=>x.id==id); openAdd(); document.getElementById('fId').value=d.id; document.getElementById('fName').value=d.name; document.getElementById('fIndo').value=d.indo||''; let raw = d.noteZh || d.note || ''; let rawId = d.noteId || '';
 if(!rawId && raw.includes('Indonesia:')){ let p=raw.split('Indonesia:'); raw=p[0]; rawId=p[1]||''; }
 raw = raw.replace(/中文：/g,'').replace(/中文:/g,'').replace(/備註/g,'').replace(/Catatan:/g,'').trim();
