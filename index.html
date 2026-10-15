@@ -10,36 +10,39 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
-:root{--bg:#fffaf0;--card:#fff;--text:#111;--muted:#888;--primary:#ff6b35;--border:#f0dcc8;--fs:20px}
-.dark{--bg:#121212;--card:#1e1e1e;--text:#f5f5f5;--border:#333;--muted:#aaa}
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Noto+Sans+HK:wght@400;700;900&display=swap');
+:root{--bg:#F7F1E8;--card:#FFFBF3;--text:#1A1A1A;--muted:#9A8E7D;--primary:#111111;--gold:#C6A86B;--border:#E8DCCA;--border-2:#DCCAB0;--fs:20px}
+.dark{--bg:#121212;--card:#1E1B17;--text:#F5F5F5;--border:#2A2A2A;--muted:#AAA}
 html{font-size:var(--fs)}*{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,PingFang HK,sans-serif;padding-bottom:140px;line-height:1.5}
-.top{position:sticky;top:0;z-index:10;background:var(--card);border-bottom:2px solid var(--border);padding:12px 16px;padding-top:calc(10px + env(safe-area-inset-top));display:flex;align-items:center;gap:12px}
-.avatar{width:62px;height:62px;border-radius:50%;border:3px solid var(--primary);object-fit:cover}
+body{margin:0;background:var(--bg);color:var(--text);font-family:'Noto Sans HK',-apple-system,PingFang HK,sans-serif;padding-bottom:140px;line-height:1.5}
+.top{position:sticky;top:0;z-index:10;background:#111111;border-bottom:2px solid #C6A86B;padding:12px 16px;padding-top:calc(10px + env(safe-area-inset-top));display:flex;align-items:center;gap:12px}
+.top div{color:#E8DCCA!important;font-family:'Playfair Display',serif!important;letter-spacing:1px}
+.avatar{width:62px;height:62px;border-radius:50%;border:2px solid #C6A86B;object-fit:cover;box-shadow:0 0 0 4px rgba(198,168,107,0.2)}
 .pages{max-width:520px;margin:0 auto;padding:0 16px 16px 16px;box-sizing:border-box}
 .page{display:none}.page.active{display:block}
-.card{background:var(--card);border:2px solid var(--border);border-radius:20px;padding:12px;margin:0 0 16px 0;width:100%;box-sizing:border-box;overflow:hidden}
+.card{background:var(--card);border:1.5px solid var(--border);border-radius:14px;padding:12px;margin:0 0 16px 0;width:100%;box-sizing:border-box;overflow:hidden;box-shadow:0 8px 20px rgba(31,28,24,0.06), inset 0 0 0 1px rgba(198,168,107,0.12)}
 .row{display:flex;gap:8px;align-items:center}
-.btn{flex:1;padding:16px;border-radius:16px;border:none;background:var(--primary);color:#fff;font-weight:900;font-size:1.1rem}
-.ghost{flex:1;padding:14px;border-radius:16px;border:2px solid var(--border);background:var(--bg);font-weight:800;font-size:1rem}
-.iconBtn{width:48px;height:48px;min-width:48px;border-radius:14px;border:2px solid var(--border);background:var(--card);font-size:22px;display:grid;place-items:center;margin:0;box-sizing:border-box;flex-shrink:0}
+.btn{flex:1;padding:16px;border-radius:12px;border:1.5px solid #C6A86B;background:#111111;color:#E8DCCA;font-weight:900;font-size:1.1rem;font-family:'Playfair Display',serif;letter-spacing:1px}
+.ghost{flex:1;padding:14px;border-radius:12px;border:1.5px solid var(--border);background:var(--card);font-weight:800;font-size:1rem}
+.iconBtn{width:48px;height:48px;min-width:48px;border-radius:12px;border:1.5px solid var(--border);background:var(--card);font-size:22px;display:grid;place-items:center;margin:0;box-sizing:border-box;flex-shrink:0}
 .grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;padding:12px;box-sizing:border-box;width:100%}
-.catBox{aspect-ratio:1;border-radius:18px;border:3px solid #111;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;padding:6px;width:100%;min-width:0;box-sizing:border-box}
+.catBox{aspect-ratio:1;border-radius:14px;border:1.5px solid #C6A86B!important;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;padding:6px;width:100%;min-width:0;box-sizing:border-box;background:#FFFBF3!important;box-shadow:0 4px 12px rgba(0,0,0,0.04)}
 .weekWrap{display:flex;flex-direction:column;gap:8px}.weekRow{display:flex;gap:8px;justify-content:center}
-.dayBox{width:32%;aspect-ratio:1;border-radius:18px;border:3px solid #111;background:var(--card);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;cursor:pointer;padding:6px}
-.bottom{position:fixed;bottom:0;left:0;right:0;background:var(--card);border-top:2px solid var(--border);display:flex;justify-content:space-around;padding:16px 0 38px;z-index:20}
-.nav{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;color:var(--muted);font-size:13px;cursor:pointer}
+.dayBox{width:32%;aspect-ratio:1;border-radius:14px;border:1.5px solid var(--border);background:var(--card);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;cursor:pointer;padding:6px;box-shadow:0 4px 12px rgba(0,0,0,0.03)}
+.bottom{position:fixed;bottom:0;left:0;right:0;background:#111111;border-top:2px solid #C6A86B;display:flex;justify-content:space-around;padding:16px 0 38px;z-index:20}
+.nav{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;color:#8A8A8A;font-size:13px;cursor:pointer}
 .ic{font-size:46px!important;line-height:1!important;display:block}
-.nav.active{color:var(--primary)!important}
+.nav.active{color:#C6A86B!important}
+.nav.active::after{content:'';position:absolute;bottom:-2px;left:50%;transform:translateX(-50%);width:20px;height:3px;background:#C6A86B;border-radius:99px}
 .modal{position:fixed;inset:0;background:rgba(0,0,0,.55);display:none;z-index:9999;align-items:center;justify-content:center;padding:12px}.modal.open{display:flex}
-.sheet{width:calc(100% - 24px);max-width:500px;max-height:88vh;overflow:auto;background:var(--card);border-radius:24px;border:3px solid #111;box-sizing:border-box;margin:0 auto}
-.head{position:sticky;top:0;background:var(--card);padding:14px;border-bottom:2px solid var(--border);display:flex;justify-content:space-between;align-items:center}
-.x{width:48px;height:48px;border-radius:50%;border:2px solid var(--border);background:var(--bg);display:grid;place-items:center;font-size:24px;cursor:pointer}
+.sheet{width:calc(100% - 24px);max-width:500px;max-height:88vh;overflow:auto;background:var(--card);border-radius:16px;border:1.5px solid #C6A86B;box-sizing:border-box;margin:0 auto}
+.head{position:sticky;top:0;background:var(--card);padding:14px;border-bottom:1.5px solid var(--border);display:flex;justify-content:space-between;align-items:center;font-family:'Playfair Display',serif}
+.x{width:48px;height:48px;border-radius:50%;border:1.5px solid var(--border);background:var(--bg);display:grid;place-items:center;font-size:24px;cursor:pointer}
 .dishRow{display:flex;justify-content:space-between;align-items:center;padding:14px;border-bottom:1.5px dashed var(--border);gap:8px}
-.act{display:flex;gap:6px}.act button{width:46px;height:46px;border-radius:12px;border:2px solid var(--border);background:var(--bg);font-size:20px}
-select,textarea{width:100%;padding:14px;border-radius:14px;border:2px solid var(--border);background:var(--bg);color:var(--text);font-size:1.05rem;box-sizing:border-box}
+.act{display:flex;gap:6px}.act button{width:46px;height:46px;border-radius:12px;border:1.5px solid var(--border);background:var(--bg);font-size:20px}
+select,textarea{width:100%;padding:14px;border-radius:12px;border:1.5px solid var(--border);background:var(--bg);color:var(--text);font-size:1.05rem;box-sizing:border-box}
 .topRowFixed{display:flex;gap:8px;align-items:center;width:100%;box-sizing:border-box}
-.topRowFixed input{flex:1 1 0;min-width:0;width:0;text-align:center;font-weight:900;background:#fff7e6;border-radius:16px;padding:12px 6px;border:2px solid var(--border);box-sizing:border-box;font-size:1rem}
+.topRowFixed input{flex:1 1 0;min-width:0;width:0;text-align:center;font-weight:900;background:#FFFBF3;border-radius:12px;padding:12px 6px;border:1.5px solid var(--border);box-sizing:border-box;font-size:1rem}
 #pdfWrap{position:fixed;inset:0;background:#222;z-index:10000;display:none;flex-direction:column}#pdfWrap.open{display:flex}
 .pdfTool{position:sticky;top:0;background:#fff;padding:12px;display:flex;gap:12px;border-bottom:2px solid #ccc;z-index:2}
 .pdfView{flex:1;overflow:auto;background:#333;padding:16px;display:flex;justify-content:center}
@@ -53,11 +56,7 @@ select,textarea{width:100%;padding:14px;border-radius:14px;border:2px solid var(
 <div id="p-weekly" class="page active"><div class="card"><div class="topRowFixed"><input type="date" id="monPicker"><button class="iconBtn" onclick="saveWeekly()">💾</button><button class="iconBtn" onclick="exportWeeklyPDF()">📄</button></div></div><div id="weeklyGrid" class="weekWrap"></div></div>
 <div id="p-library" class="page"><div class="card row"><button class="ghost" onclick="exportLib()">匯出</button><button class="ghost" onclick="document.getElementById('impFile').click()">匯入</button><button class="btn" onclick="openAdd()">新增菜式</button><input type="file" id="impFile" accept=".json" style="display:none"></div><div id="catGrid" class="grid3"></div></div>
 <div id="p-mymenus" class="page"><div class="card row"><button class="ghost" onclick="toggleMy(true)">一鍵打開全部</button><button class="ghost" onclick="toggleMy(false)">一鍵關閉全部</button></div><div id="myList"></div></div>
-<div id="p-settings" class="page"><div class="card"><h3>分類排序</h3><div id="catOrder"></div><div class="row" style="margin-top:12px;flex-wrap:nowrap"><input id="newCat" placeholder="新分類名稱" style="flex:1;min-width:0;padding:14px 16px;border-radius:16px;border:2px solid var(--border);background:var(--bg);color:var(--text);font-size:1rem;font-weight:800;box-sizing:border-box"><button class="btn" onclick="addCat()" style="flex:0 0 90px;min-width:90px">新增</button></div></div><div class="card"><h3>外觀</h3><div class="row"><span>深淺色</span><button class="ghost" onclick="toggleTheme()">切換</button></div><div style="margin-top:12px"><label>字體大小 <span id="fsVal">20</span>px</label><input type="range" id="fsRange" min="14" max="28" value="20" oninput="setFS(this.value)" style="width:100%"></div></div><div class="card"><h3>頭像</h3><div style="display:flex;gap:10px;align-items:center;margin:10px 0">
-  <label for="avFile" style="flex:0 0 auto;padding:16px 22px;border-radius:16px;background:var(--primary);color:#fff;font-weight:900;font-size:1.15rem;cursor:pointer">📁 選擇圖片</label>
-  <span id="avFileName" style="flex:1;font-size:1.1rem;font-weight:800;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">尚未選取檔案</span>
-</div>
-<input type="file" id="avFile" accept="image/*" style="display:none"><div style="width:260px;height:260px;margin:12px auto;border-radius:50%;overflow:hidden;border:3px solid var(--primary);background:#000;touch-action:none"><canvas id="avCanvas" width="600" height="600" style="width:100%;height:100%"></canvas></div><div class="row"><span>縮放</span><input type="range" id="avZoom" min="0.2" max="4" step="0.05" value="1" style="flex:1"><button class="ghost" onclick="resetAv()">重置</button></div><button class="btn" style="width:100%;margin-top:10px" onclick="saveAv()">儲存頭像</button></div></div>
+<div id="p-settings" class="page"><div class="card"><h3>分類排序</h3><div id="catOrder"></div><div class="row" style="margin-top:12px;flex-wrap:nowrap"><input id="newCat" placeholder="新分類名稱" style="flex:1;min-width:0;padding:14px 16px;border-radius:12px;border:1.5px solid var(--border);background:var(--bg);color:var(--text);font-size:1rem;font-weight:800;box-sizing:border-box"><button class="btn" onclick="addCat()" style="flex:0 0 90px;min-width:90px">新增</button></div></div><div class="card"><h3>外觀</h3><div class="row"><span>深淺色</span><button class="ghost" onclick="toggleTheme()">切換</button></div><div style="margin-top:12px"><label>字體大小 <span id="fsVal">20</span>px</label><input type="range" id="fsRange" min="14" max="28" value="20" oninput="setFS(this.value)" style="width:100%"></div></div><div class="card"><h3>頭像</h3><div style="display:flex;gap:10px;align-items:center;margin:10px 0"><label for="avFile" style="flex:0 0 auto;padding:12px 18px;border-radius:12px;background:#111111;color:#E8DCCA;border:1px solid #C6A86B;font-weight:900;font-size:1rem;cursor:pointer">📁 選擇圖片</label><span id="avFileName" style="flex:1;font-size:1rem;font-weight:800;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">尚未選取檔案</span></div><input type="file" id="avFile" accept="image/*" style="display:none"><div style="width:260px;height:260px;margin:12px auto;border-radius:50%;overflow:hidden;border:2px solid #C6A86B;background:#000;touch-action:none"><canvas id="avCanvas" width="600" height="600" style="width:100%;height:100%"></canvas></div><div class="row"><span>縮放</span><input type="range" id="avZoom" min="0.2" max="4" step="0.05" value="1" style="flex:1"><button class="ghost" onclick="resetAv()">重置</button></div><button class="btn" style="width:100%;margin-top:10px" onclick="saveAv()">儲存頭像</button></div></div>
 </div>
 <div class="bottom">
 <div class="nav active" onclick="go('weekly',this)"><span class="ic">📅</span>每週</div>
@@ -70,9 +69,9 @@ select,textarea{width:100%;padding:14px;border-radius:14px;border:2px solid var(
 <div class="modal" id="mWeek" style="z-index:10002"><div class="sheet"><div class="head"><b id="mWeekTitle">日期</b><div class="x" onclick="closeM('mWeek')">✕</div></div><div style="padding:14px"><div class="row"><label>用餐</label><select id="diners"></select><label>外帶</label><select id="takeaway"></select></div><div id="selDishes" style="margin-top:12px"></div><button class="btn" style="width:100%;margin-top:12px" onclick="openPickCat()">選擇菜式</button></div></div></div>
 <div class="modal" id="mPickCat" style="z-index:10003"><div class="sheet"><div class="head"><b>分類</b><div class="x" onclick="closeM('mPickCat')">✕</div></div><div id="mPickCatBody" class="grid3" style="padding:12px"></div></div></div>
 <div class="modal" id="mPickDish" style="z-index:10004"><div class="sheet"><div class="head"><b>菜式</b><div class="x" onclick="closeM('mPickDish')">✕</div></div><div id="mPickDishBody"></div></div></div>
-<div class="modal" id="mAdd" style="z-index:10005"><div class="sheet"><div class="head"><b>新增/修改菜式</b><div class="x" onclick="closeM('mAdd')">✕</div></div><div style="padding:14px"><input id="fName" placeholder="菜名（中文）" style="width:100%;padding:16px;border-radius:14px;border:2px solid var(--border);background:var(--bg);color:var(--text);font-size:1.05rem;box-sizing:border-box;height:56px"><input id="fIndo" placeholder="菜名（印尼文）" style="margin-top:12px;width:100%;padding:16px;border-radius:14px;border:2px solid var(--border);background:var(--bg);color:var(--text);font-size:1.05rem;box-sizing:border-box;height:56px"><textarea id="fNoteZh" placeholder="備註 + 烹調方法（中文）" style="margin-top:10px;height:110px"></textarea><textarea id="fNoteId" placeholder="備註 + 烹調方法（印尼文）" style="margin-top:10px;height:110px"></textarea><select id="fCat" style="margin-top:10px"></select><input type="hidden" id="fId"><button class="btn" style="width:100%;margin-top:12px" onclick="saveDish()">儲存</button></div></div></div>
-<div class="modal" id="mAnyDate" style="z-index:10006"><div class="sheet" style="border-radius:28px;border:3px solid #111"><div class="head"><b>加入到哪一天？</b><div class="x" onclick="closeM('mAnyDate')">✕</div></div><div style="padding:20px;display:flex;flex-direction:column;gap:14px;align-items:center"><input type="date" id="anyDate" style="width:92%!important;height:68px!important;min-height:68px!important;line-height:68px!important;padding:0 12px!important;border-radius:20px!important;border:3px solid #111!important;background:#fffaf5!important;color:#111!important;font-weight:900!important;font-size:1.3rem!important;text-align:center!important;box-sizing:border-box!important;display:block!important"><button onclick="confirmAddToWeek()" style="width:92%!important;height:68px!important;min-height:68px!important;line-height:68px!important;padding:0!important;border-radius:20px!important;border:3px solid #111!important;background:#ff6b35!important;color:#fff!important;font-weight:900!important;font-size:1.35rem!important;box-sizing:border-box!important;display:grid!important;place-items:center!important;text-align:center!important">確認加入</button></div></div></div>
-<div id="pdfWrap"><div class="pdfTool"><button class="btn" id="btnClosePdf" type="button" style="font-size:38px!important;line-height:1!important">✕</button><button class="ghost" id="btnSharePdf" type="button" style="font-size:36px!important;line-height:1!important">📤</button></div><div class="pdfView"><div class="pdfPage"><div class="pdfInner" id="pdfContent"></div></div></div></div>
+<div class="modal" id="mAdd" style="z-index:10005"><div class="sheet"><div class="head"><b>新增/修改菜式</b><div class="x" onclick="closeM('mAdd')">✕</div></div><div style="padding:14px"><input id="fName" placeholder="菜名（中文）" style="width:100%;padding:16px;border-radius:12px;border:1.5px solid var(--border);background:var(--bg);color:var(--text);font-size:1.05rem;box-sizing:border-box;height:56px"><input id="fIndo" placeholder="菜名（印尼文）" style="margin-top:12px;width:100%;padding:16px;border-radius:12px;border:1.5px solid var(--border);background:var(--bg);color:var(--text);font-size:1.05rem;box-sizing:border-box;height:56px"><textarea id="fNoteZh" placeholder="備註 + 烹調方法（中文）" style="margin-top:10px;height:110px"></textarea><textarea id="fNoteId" placeholder="備註 + 烹調方法（印尼文）" style="margin-top:10px;height:110px"></textarea><select id="fCat" style="margin-top:10px"></select><input type="hidden" id="fId"><button class="btn" style="width:100%;margin-top:12px" onclick="saveDish()">儲存</button></div></div></div>
+<div class="modal" id="mAnyDate" style="z-index:10006"><div class="sheet" style="border-radius:16px;border:1.5px solid #C6A86B"><div class="head"><b>加入到哪一天？</b><div class="x" onclick="closeM('mAnyDate')">✕</div></div><div style="padding:20px;display:flex;flex-direction:column;gap:14px;align-items:center"><input type="date" id="anyDate" style="width:92%!important;height:68px!important;min-height:68px!important;line-height:68px!important;padding:0 12px!important;border-radius:12px!important;border:1.5px solid #C6A86B!important;background:#FFFBF3!important;color:#111!important;font-weight:900!important;font-size:1.3rem!important;text-align:center!important;box-sizing:border-box!important;display:block!important"><button onclick="confirmAddToWeek()" style="width:92%!important;height:68px!important;min-height:68px!important;line-height:68px!important;padding:0!important;border-radius:12px!important;border:1.5px solid #C6A86B!important;background:#111111!important;color:#E8DCCA!important;font-weight:900!important;font-size:1.2rem!important;box-sizing:border-box!important;display:grid!important;place-items:center!important;text-align:center!important;font-family:'Playfair Display',serif">確認加入</button></div></div></div>
+<div id="pdfWrap"><div class="pdfTool"><button class="btn" id="btnClosePdf" type="button" style="font-size:38px!important;line-height:1!important;background:#111111;color:#fff">✕</button><button class="ghost" id="btnSharePdf" type="button" style="font-size:36px!important;line-height:1!important">📤</button></div><div class="pdfView"><div class="pdfPage"><div class="pdfInner" id="pdfContent"></div></div></div></div>
 <script>
 const CAT_META={"雞":{bg:"#ffeb8a",e:"🐔"},"牛":{bg:"#d7b899",e:"🐮"},"豬":{bg:"#ffb3c1",e:"🐷"},"魚":{bg:"#8ecfff",e:"🐟"},"蔬菜":{bg:"#a8e6a3",e:"🥬"},"湯水":{bg:"#ffcc7a",e:"🍲"},"西式":{bg:"#e2c499",e:"🍔"},"罐頭":{bg:"#9ec6ff",e:"🥫"},"其他":{bg:"#d8b4fe",e:"🍱"}};
 let cats=JSON.parse(localStorage.getItem('cats')||'null')||Object.keys(CAT_META);
@@ -86,7 +85,7 @@ function fmt(d){if(typeof d==='string')return d;return `${d.getFullYear()}-${Str
 function openM(id){document.getElementById(id).classList.add('open');}function closeM(id){document.getElementById(id).classList.remove('open');}
 let zh2idTimer = null;
 async function autoTransZh2Id(zhText, targetEl){
-  if(!zhText || !zhText.trim()) return;
+  if(!zhText ||!zhText.trim()) return;
   try{
     let q = encodeURIComponent(zhText);
     let res = await fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=zh-CN&tl=id&dt=t&q=${q}`);
@@ -106,120 +105,96 @@ function makeDefaults(){
  const D={
 "雞": [
   ["粟米雞粒飯", "Nasi Ayam Jagung", "雞胸肉切粒用生抽、糖、生粉醃勻。粟米粒加水煮開，下雞粒煮熟，勾芡淋在白飯上。", "Potong dada ayam menjadi dadu, marinasi dengan kecap asin, gula, dan tepung maizena. Rebus jagung dengan air, masukkan ayam hingga matang, kentalkan dengan maizena, lalu siram di atas nasi."],
-  ["冬菇蒸滑雞", "Ayam Kukus Jamur Shiitake", "雞件洗淨斬件，用冬菇絲、薑絲、生抽、糖、生粉和少許油醃好，水滾大火蒸15分鐘。", "Potong-potong ayam, marinasi dengan irisan jamur shiitake, jahe, kecap asin, gula, tepung maizena, dan sedikit minyak. Kukus dengan air mendidih selama 15 menit."],
-  ["咸檸檬蒸雞", "Ayam Kukus Jeruk Lemon Asin", "雞洗淨切件，鹹檸檬切碎或壓爛，加少許糖、生抽、油和生粉拌勻，鋪在雞面上蒸熟。", "Potong ayam, cincang atau hancurkan jeruk lemon asin, tambahkan sedikit gula, kecap asin, minyak, dan tepung maizena, lalu kukus hingga matang."],
-  ["沙薑雞", "Ayam Jahe Pasir (Sha Jiang Ji)", "鮮雞洗淨放入大滾水中熄火浸熟（或隔水蒸熟），沙薑剁碎加鹽及滾油調成沙薑醬作點點醬食用。", "Cuci ayam, rebus dalam air mendidih lalu matikan api untuk merendamnya hingga matang (atau kukus). Cincang jahe pasir, beri garam dan minyak panas untuk dijadikan saus celup."],
-  ["菜脯蒸雞", "Ayam Kukus Lobak Asin (Cai脯)", "菜脯粒用水浸泡洗淨瀝乾，與雞肉件、蒜蓉、少許糖、生抽及油拌勻，大火蒸熟。", "Rendam dan cuci potongan lobak asin, tiriskan, campurkan dengan potongan ayam, bawang putih, sedikit gula, kecap asin, dan minyak, lalu kukus dengan api besar."],
-  ["土魷蒸雞", "Ayam Kukus Cumi Kering", "乾魷魚絲用水浸軟切碎，與雞件、薑絲、生抽、糖、生粉及少許花生油拌勻，蒸12-15分鐘。", "Rendam cumi kering hingga lunak lalu potong kecil, campurkan dengan ayam, irisan jahe, kecap asin, gula, maizena, dan minyak kacang, kukus selama 12-15 menit."],
-  ["栗子炆雞", "Ayam Masak Kastanye", "雞件走油撈起。爆香薑蒜，下栗子及雞肉，贊酒，加生抽、蠔油、糖及適量水炆至栗子軟稔。", "Goreng sebentar potongan ayam lalu tiriskan. Tumis jahe dan bawang putih, masukkan kastanye dan ayam, beri kecap asin, saus tiram, gula, dan air, lalu rebus hingga kastanye empuk."],
-  ["花菇炆雞", "Ayam Masak Jamur Shiitake", "冬菇浸軟。雞件煎香後加入冬菇、薑片、蒜頭，調入生抽、老抽、蠔油和水，細火炆煮至入味。", "Rendam jamur shiitake. Goreng ayam hingga harum, masukkan jamur, jahe, bawang putih, kecap asin, kecap manis, saus tiram, dan air, lalu rebus dengan api kecil hingga meresap."],
-  ["西檸雞", "Ayam Lemon", "雞扒沾上生粉炸至金黃酥脆切件。用鮮檸檬汁、糖、水煮成酸甜汁淋在雞肉上。", "Balur paha ayam dengan tepung maizena, goreng hingga keemasan dan renyah, lalu potong-potong. Masak jus lemon segar, gula, dan air untuk membuat saus asam manis lalu siram di atas ayam."],
-  ["三杯雞", "Ayam Tiga Cangkir (San Bei Ji)", "雞件下麻油、米酒、生抽各一杯的比例（或適量調配），加入九層塔及蒜頭慢火收汁。", "Masak ayam dengan perbandingan minyak wijen, anggur beras, dan kecap asin (atau sesuaikan), tambahkan daun kemangi dan bawang putih, masak dengan api kecil hingga kuah menyusut."]
-],
-
+  ["冬菇蒸滑雞", "Ayam Kukus Jamur Shiitake", "雞件洗淨斬件，用冬菇絲、薑絲、生抽、糖、生粉和少許油醃好，水滾大火蒸15分鐘。", "Potong-potong ayam, marinasi dengan irisan jamur shiitake, jahe, kecap asin, gula, tepung, dan minyak, kukus dengan api besar 15 menit."],
+  ["蒸雞腿", "Paha Ayam Kukus", "雞腿斬件用薑蔥、生抽、糖、生粉醃，水滾大火蒸15分鐘。", "Potong paha ayam, marinasi dengan jahe, daun bawang, kecap asin, gula, maizena, kukus api besar 15 menit."],
+  ["可樂雞翼", "Sayap Ayam Cola", "雞翼煎至金黃，倒入可樂、生抽、老抽，小火煮至收汁。", "Goreng sayap ayam hingga keemasan, tuang cola, kecap asin dan kecap manis, masak api kecil hingga saus mengental."],
+  ["豉油雞", "Ayam Kecap", "原隻雞或雞髀用生抽、老抽、冰糖、八角煮成豉油汁浸熟。", "Rebus ayam utuh atau paha dengan kecap asin, kecap manis, gula batu, dan bunga lawang hingga matang meresap."],
+  ["鹽焗雞", "Ayam Panggang Garam", "雞洗淨抹乾，用鹽焗雞粉醃2小時，包錫紙入焗爐焗熟。", "Cuci ayam, keringkan, marinasi dengan bubuk ayam garam 2 jam, bungkus aluminium foil lalu panggang."],
+  ["咖喱雞", "Ayam Kari", "雞件炒香，下洋蔥、薯仔、咖喱醬炒勻加水煮至熟透。", "Tumis ayam, masukkan bawang bombay, kentang, bumbu kari, tambah air masak hingga matang."],
+  ["白切雞", "Ayam Rebus Putih", "水滾下薑蔥、雞，細火浸30分鐘，取出浸冰水斬件。", "Didihkan air dengan jahe daun bawang, masukkan ayam rebus api kecil 30 menit, angkat rendam air es lalu potong."],
+  ["口水雞", "Ayam Mulut Berair (Kou Shui Ji)", "雞件煮熟切片，淋上花椒、辣椒、花生碎、蔥花醬汁。", "Rebus ayam potong-potong, siram dengan saus Sichuan pedas dari merica Sichuan, cabai, kacang, daun bawang."],
+  ["三杯雞", "Ayam Tiga Cangkir (San Bei Ji)", "雞件爆香，下薑、蒜、九層塔、生抽、麻油、米酒各一杯煮至收汁。", "Tumis ayam, masukkan jahe bawang putih basil, kecap asin minyak wijen arak beras masing-masing satu cangkir masak hingga meresap."],
+ ],
 "牛": [
-  ["番茄炒牛肉", "Daging Sapi Tumis Tomat", "牛肉切片用生抽、糖、生粉醃好。先炒香番茄出汁，下牛肉片快炒至熟即可。", "Iris daging sapi, marinasi dengan kecap asin, gula, dan maizena. Tumis tomat hingga mengeluarkan jus, lalu masukkan daging sapi dan aduk cepat hingga matang."],
-  ["洋蔥炒牛肉", "Daging Sapi Tumis Bawang Bombay", "牛肉切片醃味。爆香洋蔥條至半透明，下牛肉大火快炒，加入少許生抽和蠔油調味。", "Iris daging sapi dan marinasi. Tumis irisan bawang bombay hingga setengah transparan, masukkan daging sapi, aduk cepat dengan api besar, beri kecap asin dan saus tiram."],
-  ["菜心炒牛肉", "Daging Sapi Tumis Chaisim", "菜心洗淨切段焯水瀝乾。牛肉炒至八成熟盛起，回鑊與菜心一起翻炒勾芡。", "Cuci dan potong chaisim, rebus sebentar lalu tiriskan. Tumis daging sapi hingga setengah matang lalu angkat, masukkan kembali bersama chaisim dan beri kuah kental."],
-  ["涼瓜炒牛肉", "Daging Sapi Tumis Pare", "涼瓜切片用鹽醃軟後沖水焯熟。牛肉走油。起鑊炒香蒜頭，下涼瓜和牛肉翻炒調味。", "Iris pare, baluri garam hingga agak lunak lalu bilas dan rebus sebentar. Goreng sebentar daging sapi. Tumis bawang putih, masukkan pare dan daging sapi lalu bumbui."],
-  ["沙爹金菇肥牛煲", "Hotpot Daging Sapi Enoki Saus Satay", "肥牛焯水備用。沙爹醬加蒜蓉爆香，加水及金針菇煮滾，放入肥牛煮熟，轉砂鍋上桌。", "Blansir daging sapi tipis. Tumis saus satay dengan bawang putih, tambahkan air dan jamur enoki, didihkan, masukkan daging sapi, lalu pindahkan ke claypot."],
-  ["XO醬炒牛肉", "Daging Sapi Tumis Saus XO", "牛肉切片醃好。下油爆香XO醬及三色椒，放入牛肉大火快炒至熟。", "Iris daging sapi dan marinasi. Panaskan minyak, tumis saus XO dan paprika, masukkan daging sapi dan tumis dengan api besar hingga matang."],
-  ["薑蔥炒牛肉", "Daging Sapi Tumis Jahe dan Daun Bawang", "牛肉切片醃好。大量薑片、蔥段爆香，下牛肉大火快炒，贊紹興酒及少許生抽。", "Iris daging sapi dan marinasi. Tumis banyak irisan jahe dan daun bawang, masukkan daging sapi, aduk cepat, beri anggur Shaoxing dan sedikit kecap asin."],
-  ["粟米牛肉", "Daging Sapi Jagung Manis", "牛肉片醃好過油。粟米茸加水煮滾，下調味料及牛肉碎煮開，勾芡淋在飯上。", "Marinasi dan goreng sebentar daging sapi. Rebus pure jagung manis dengan air, masukkan bumbu dan daging cincang, kentalnya dengan maizena lalu siram di atas nasi."],
-  ["羅宋湯牛尾", "Sup Ekor Sapi ala Borscht", "牛尾出水。與番茄、椰菜、薯仔、紅蘿蔔加水大火煲滾後轉小火煮2小時。", "Blansir ekor sapi. Masak bersama tomat, kol, kentang, wortel, dan air, didihkan lalu rebus dengan api kecil selama 2 jam."],
-  ["薯仔炆牛肉", "Daging Sapi Masak Kentang", "牛肉切件飛水。薯仔切塊煎香，與牛肉、洋蔥、生抽、蠔油及水一同炆至軟稔。", "Potong dan blansir daging sapi. Goreng potongan kentang hingga harum, lalu rebus bersama daging, bawang bombay, kecap asin, saus tiram, dan air hingga empuk."]
-],
-
+  ["黑椒牛柳粒", "Daging Sapi Lada Hitam Dadu", "牛柳粒用生抽、糖、生粉醃，洋蔥、青椒切塊大火快炒加黑椒汁。", "Marinasi dadu tenderloin sapi dengan kecap asin gula maizena, tumis cepat dengan bawang paprika dan saus lada hitam."],
+  ["柱侯牛腩", "Semur Daging Sapi Chu Hou", "牛腩飛水，爆香薑蒜、柱侯醬，下牛腩加水炆1.5小時。", "Blansir daging sapi, tumis jahe bawang putih saus chu hou, masukkan daging tambah air rebus 1.5 jam."],
+  ["薑蔥牛肉", "Daging Sapi Jahe Daun Bawang", "牛肉切片醃好，薑蔥爆香大火快炒至剛熟。", "Iris tipis daging sapi marinasi, tumis jahe daun bawang api besar cepat hingga setengah matang."],
+  ["番茄牛腩", "Semur Daging Sapi Tomat", "牛腩炆淋，加入番茄、薯仔、洋蔥再炆20分鐘。", "Rebus daging sapi hingga empuk, masukkan tomat kentang bawang bombay masak lagi 20 menit."],
+  ["沙茶牛肉", "Daging Sapi Saus Sate Shacha", "牛肉切片醃好，爆香蒜片，下牛肉炒至半熟加沙茶醬炒勻。", "Iris daging sapi marinasi, tumis bawang putih, masukkan daging setengah matang tambah saus shacha."],
+  ["川椒牛柳", "Daging Sapi Cabai Sichuan", "牛肉絲炒香，下乾辣椒、花椒、蔥段爆香炒勻。", "Tumis suwir daging sapi, masukkan cabai kering merica Sichuan daun bawang tumis harum."],
+  ["牛仔骨", "Iga Sapi Panggang", "牛仔骨用黑椒、蒜蓉、生抽、糖醃，煎或焗至喜愛生熟度。", "Marinasi iga sapi dengan lada hitam bawang putih kecap asin gula, panggang atau pan-fried sesuai selera."],
+ ],
 "豬": [
-  ["粟米紅蘿蔔豬骨湯", "Sup Jagung Wortel Tulang Babi", "豬骨焯水，粟米切段，紅蘿蔔切塊，加水大火煮滾後小火煲1.5小時。", "Rebus tulang babi sebentar, potong jagung dan wortel, tambahkan air, didihkan lalu rebus dengan api kecil selama 1,5 jam."],
-  ["菠蘿咕嚕肉", "Babi Asam Manis Nanas", "豬梅頭肉切塊醃好沾炸粉炸至香脆。炒香三色椒與菠蘿，加入甜酸汁與肉塊兜勻。", "Potong daging babi, marinasi, balur tepung, lalu goreng hingga renyah. Tumis paprika dan nanas, masukkan saus asam manis dan daging, aduk rata."],
-  ["豉汁涼瓜排骨", "Iga Babi Masak Pare Saus Tahu Hitam", "排骨洗淨醃好。豆豉壓碎與蒜蓉爆香，下涼瓜及排骨炒勻，加水加蓋細火炆熟。", "Cuci dan marinasi iga babi. Haluskan taosi (kedelai hitam fermentasi) dengan bawang putih, tumis bersama pare dan iga, beri air lalu rebus dengan api kecil hingga matang."],
-  ["梅菜蒸豬肉餅", "Daging Cincang Kukus Sayur Asin (Meicai)", "梅菜浸洗切碎。豬肉碎加入梅菜、生抽、糖、生粉及少許水攪勻撻至起膠，蒸12分鐘。", "Rendam dan cincang meicai (sayur asin kering). Campur daging babi cincang dengan meicai, kecap asin, gula, maizena, dan air, aduk hingga kenyal, lalu kukus 12 menit."],
-  ["煎肉餅", "Pancake Daging Babi Cincang", "豬肉碎加入葱花、馬蹄碎、生抽、糖、生粉及油拌勻，搓成圓餅狀用平底鍋煎至兩面金黃。", "Campur daging babi cincang dengan daun bawang, cincangan water chestnut, kecap asin, gula, maizena, dan minyak, bentuk bulat pipih lalu pan-searing hingga keemasan."],
-  ["椒鹽豬扒", "Pork Chop Garam Merica", "豬扒拍鬆切件醃味，沾上生粉炸至金黃。爆香蒜碎、辣椒碎及椒鹽粉，將豬扒回鑊兜勻。", "Pukul-pukul pork chop, potong dan marinasi, balur maizena lalu goreng hingga keemasan. Tumis bawang putih, cabai, dan bubuk garam merica, masukkan kembali pork chop."],
-  ["薯仔炆排骨", "Iga Babi Masak Kentang", "排骨焯水。薯仔切塊煎香，下排骨、生抽、老抽、冰糖及水炆至排骨軟稔入味。", "Blansir iga babi. Goreng potongan kentang hingga harum, masukkan iga, kecap asin, kecap manis, gula batu, dan air, rebus hingga iga empuk dan meresap."],
-  ["木耳蒸肉餅", "Daging Cincang Kukus Jamur Hitam", "雲耳浸軟切碎。與豬肉碎、生抽、糖、生粉、油撈勻，壓平在大碟上大火蒸10分鐘。", "Rendam dan cincang jamur kuping hitam. Campur dengan daging babi cincang, kecap asin, gula, maizena, dan minyak, ratakan di piring lalu kukus 10 menit."],
-  ["生炒排骨", "Iga Babi Tumis Kering (Sheng Chao Pai Gu)", "排骨炸至酥脆。用白醋、糖、茄汁煮成醬汁，快速將排骨回鑊翻炒上碟。", "Goreng iga babi hingga renyah. Masak cuka putih, gula, dan saus tomat sebagai saus, lalu aduk cepat bersama iga babi yang digoreng."],
-  ["叉燒", "Char Siu (Babi Panggang Merah)", "梅頭肉用叉燒醬、生抽、蠔油、糖、南乳及玫瑰露酒醃過夜，入爐燒烤至熟並掃蜜糖。", "Marinasi daging babi dengan saus char siu, kecap asin, saus tiram, gula, nanru, dan anggur beras semalaman, lalu panggang hingga matang dan olesi madu."]
-],
-
+  ["咕嚕肉", "Daging Babi Asam Manis", "豬肉切塊醃好炸至金黃，青椒、洋蔥、菠蘿炒香加甜酸汁兜勻。", "Potong daging babi marinasi goreng hingga keemasan, tumis paprika bawang nanas dengan saus asam manis."],
+  ["梅菜蒸豬肉", "Daging Babi Kukus Sayur Asin Meicai", "梅菜浸洗切碎，與豬肉碎、生抽、糖撈勻蒸12分鐘。", "Rendam cuci cincang meicai, campur dengan daging babi cincang kecap asin gula kukus 12 menit."],
+  ["叉燒", "Char Siu", "豬肉用叉燒醬、玫瑰露酒、生抽、糖醃過夜入焗爐焗熟。", "Marinasi daging babi dengan saus char siu arak mawar kecap asin gula semalaman lalu panggang."],
+  ["蒸排骨", "Iga Babi Kukus", "排骨斬件用豆豉、蒜蓉、生抽、糖、生粉醃，蒸15分鐘。", "Potong iga babi marinasi dengan taosi bawang putih kecap asin gula maizena kukus 15 menit."],
+  ["京都排骨", "Iga Babi Saus Tomat Manis (Jing Du)", "排骨炸香，用茄汁、白醋、糖煮成甜酸汁兜勻。", "Goreng iga babi hingga harum, masak dengan saus tomat cuka putih gula menjadi asam manis."],
+ ],
 "魚": [
-  ["清蒸海鮮魚", "Ikan Kukus Kecap Asin", "鮮魚洗淨抹乾，放薑蔥蒸8-10分鐘倒去水。鋪上蔥絲，淋上滾油及蒸魚豉油。", "Cuci dan keringkan ikan, kukus dengan jahe dan daun bawang selama 8-10 menit, buang airnya. Beri irisan daun bawang, siram minyak panas dan kecap ikan/kecap kukus."],
-  ["煎封魚", "Ikan Goreng Pan-Seared", "魚洗淨印乾水分，下鑊用中小火煎至兩面金黃香脆，灒少許生抽和水略燒。", "Cuci dan keringkan ikan, goreng dengan api sedang-kecil menggunakan wajan hingga kedua sisi keemasan dan renyah, beri sedikit kecap asin dan air lalu didihkan sebentar."],
-  ["番茄魚片湯", "Sup Fillet Ikan Tomat", "魚片用鹽及白胡椒粉醃。爆香番茄塊煮成濃湯，放入魚片滾熟即成。", "Marinasi fillet ikan dengan garam dan merica putih. Tumis potongan tomat hingga harum menjadi sup kental, masukkan fillet ikan dan didihkan hingga matang."],
-  ["豆腐魚頭湯", "Sup Kepala Ikan Tahu", "魚頭煎香，加熱水及薑片大火煲滾成奶白色，加入豆腐煮15分鐘下鹽調味。", "Goreng kepala ikan hingga harum, tambahkan air panas dan jahe, didihkan hingga berkuah putih susu, masukkan tahu, rebus 15 menit, bumbui dengan garam."],
-  ["XO醬蒸魚片", "Fillet Ikan Kukus Saus XO", "魚片鋪在豆腐上，抹上一層XO醬，水滾大火蒸6-8分鐘即成。", "Letakkan fillet ikan di atas tahu, olesi dengan saus XO, kukus dengan air mendidih selama 6-8 menit hingga matang."],
-  ["粟米魚塊", "Ikan Saus Jagung Manis", "魚塊沾生粉炸至金黃。粟米茸加水煮滾勾芡，淋在炸魚塊上。", "Balur potongan ikan dengan maizena lalu goreng hingga keemasan. Rebus pure jagung dengan air, kentalkan, lalu siram di atas ikan goreng."],
-  ["糖醋魚塊", "Ikan Asam Manis", "魚塊炸脆。用茄汁、白醋、糖及水煮成酸甜汁，將魚塊回鑊兜勻上碟。", "Goreng potongan ikan hingga renyah. Masak saus tomat, cuka putih, gula, dan air untuk membuat saus asam manis, lalu masukkan ikan dan aduk rata."],
-  ["梅子蒸魚", "Ikan Kukus Buah Plum Asin", "鹹酸梅壓碎，與薑絲、糖、少許油拌勻鋪在魚面上，大火蒸熟。", "Hancurkan plum asin, campur dengan irisan jahe, gula, dan sedikit minyak, ratakan di atas ikan, lalu kukus hingga matang."],
-  ["鹹菜豆腐魚湯", "Sup Ikan Tahu Sayur Asin", "鹹菜切片洗淨。魚煎香後加水、鹹菜和豆腐，大火煮滾轉小火滾20分鐘。", "Potong dan cuci sayur asin. Goreng ikan, lalu tambahkan air, sayur asin, dan tahu, didihkan dengan api besar lalu kecilkan dan rebus selama 20 menit."],
-  ["豉汁蒸魚雲", "Kepala Ikan Kukus Saus Tahu Hitam", "魚雲洗淨，鋪上蒜蓉、豆豉碎、生抽、糖、果皮碎及油，大火蒸10分鐘。", "Cuci bagian kepala ikan, beri taburan bawang putih, cincangan taosi, kecap asin, gula, kulit jeruk mandarin kering, dan minyak, kukus 10 menit dengan api besar."]
-],
-
+  ["清蒸鱸魚", "Ikan Bass Kukus", "鱸魚洗淨劃刀，鋪薑蔥蒸8分鐘，淋滾油及蒸魚豉油。", "Cuci ikan bass belah sedikit, letakkan jahe daun bawang kukus 8 menit, siram minyak panas dan kecap ikan kukus."],
+  ["豉汁蒸魚", "Ikan Kukus Saus Taosi", "魚件鋪豆豉、蒜蓉、薑絲、辣椒絲蒸熟。", "Letakkan taosi bawang putih jahe cabai di atas ikan lalu kukus hingga matang."],
+  ["香煎三文魚", "Salmon Goreng", "三文魚扒抹鹽黑椒，煎至兩面金黃。", "Balur salmon dengan garam merica, goreng hingga kedua sisi keemasan."],
+  ["蒜蓉粉絲蒸帶子", "Scallop Kukus Bihun Bawang Putih", "帶子洗淨，粉絲浸軟鋪底，放蒜蓉蒸5分鐘淋豉油。", "Cuci scallop, rendam bihun letak di bawah, taruh bawang putih cincang kukus 5 menit siram kecap."],
+  ["糖醋魚", "Ikan Asam Manis", "魚塊炸香，用茄汁、糖、醋煮成糖醋汁淋面。", "Goreng potongan ikan hingga harum, masak saus asam manis dari saus tomat gula cuka siram di atasnya."],
+ ],
 "蔬菜": [
-  ["蒜蓉炒菜心", "Tumis Chaisim Bawang Putih", "菜心洗淨切段。起鑊爆香蒜蓉，下菜心大火快炒，贊少許水及下鹽調味炒熟。", "Cuci dan potong chaisim. Panaskan wajan, tumis bawang putih hingga harum, masukkan chaisim, aduk cepat dengan api besar, beri sedikit air dan garam lalu masak hingga matang."],
-  ["腐乳通菜", "Kangkung Tumis Tau Fu Fa/Oncom", "通菜洗淨切段。爆香蒜頭及腐乳，下通菜大火翻炒至軟身熟透。", "Cuci dan potong kangkung. Tumis bawang putih dan tahu fermentasi (fururu), masukkan kangkung dan aduk cepat hingga layu dan matang."],
-  ["上湯浸娃娃菜", "Wp. Baby Cabbage Kuah Kaldu Telur Asin/Pitan", "娃娃菜洗淨切半。用上湯（或雞湯）加入皮蛋碎、鹹蛋碎及蒜頭煮滾，放入娃娃菜煮軟。", "Cuci dan belah dua baby cabbage. Masak kaldu ayam dengan potongan telur pitan, telur asin, dan bawang putih, masukkan baby cabbage dan rebus hingga lunak."],
-  ["涼瓜炒蛋", "Telur Dadar/Tumis Pare", "涼瓜切薄片用鹽醃去苦味沖水。炒香涼瓜後倒入拂好的蛋液，炒至凝固。", "Iris tipis pare, baluri garam untuk kurangi pahit lalu bilas. Tumis pare hingga harum, tuang kocokan telur, aduk hingga mengental."],
-  ["西蘭花炒肉片", "Tumis Brokoli Daging Babi/Ayam", "西蘭花切小朵焯水。肉片炒香後加入西蘭花，下少許蒜蓉、生抽及水快炒調味。", "Potong brokoli dan blansir sebentar. Tumis daging hingga harum, masukkan brokoli, tambahkan sedikit bawang putih, kecap asin, dan air, aduk cepat."],
-  ["茄子炒肉碎", "Terong Tumis Daging Cincang", "茄子切段煎軟備用。爆香蒜蓉及肉碎，加入茄子、生抽、蠔油及少許水煮入味。", "Potong terong dan goreng sebentar hingga lunak. Tumis bawang putih dan daging cincang, masukkan terong, kecap asin, saus tiram, dan sedikit air hingga meresap."],
-  ["椒絲腐乳通菜", "Kangkung Tumis Bawang Putih Cabai Tau Fu Fa", "通菜洗淨。爆香指天椒絲、蒜頭及腐乳，下通菜大火翻炒均勻即可。", "Cuci kangkung. Tumis irisan cabai rawit, bawang putih, dan tau fu fa, masukkan kangkung dan tumis cepat hingga merata."],
-  ["粟米炒蛋", "Telur Orak-Arik Jagung", "粟米粒與拂勻的雞蛋液混合，加少許鹽及蔥花，下平底鍋慢火炒成滑蛋。", "Campur biji jagung manis dengan kocokan telur, beri sedikit garam dan daun bawang, masak perlahan di wajan hingga menjadi telur orak-arik lembut."],
-  ["黃金鮮魷蒸豆腐", "Tahu Kukus Telur Asin", "豆腐切片鋪底，放上鮮魷片，鋪上鹹蛋黃碎，大火蒸8分鐘灑蔥花。", "Tata potongan tahu di dasar piring, letakkan irisan cumi, beri taburan hancuran kuning telur asin, kukus 8 menit dengan api besar lalu taburi daun bawang."],
-  ["清炒荷蘭豆", "Tumis Kacang Polong Manis (He Lan Dou)", "荷蘭豆撕去根部洗淨。起鑊下蒜片，大火快炒荷蘭豆至轉翠綠，下鹽調味上碟。", "Buang serat dan cuci kacang polong manis. Panaskan wajan dengan irisan bawang putih, tumis cepat hingga berwarna hijau cerah, bumbui dengan garam."]
-],
-
+  ["蒜蓉炒菜心", "Tumis Choy Sum Bawang Putih", "菜心洗淨，爆香蒜蓉大火快炒加鹽調味。", "Cuci choy sum, tumis bawang putih api besar cepat bumbui garam."],
+  ["蠔油芥蘭", "Kailan Saus Tiram", "芥蘭灼熟，淋蠔油、蒜蓉、熟油。", "Blansir kailan, siram saus tiram bawang putih minyak panas."],
+  ["清炒西蘭花", "Tumis Brokoli", "西蘭花切件灼水，爆香蒜蓉炒勻。", "Potong brokoli blansir, tumis dengan bawang putih."],
+  ["上湯浸娃娃菜", "Baby Bok Choy Kuah Kaldu", "娃娃菜切開，用上湯、蒜頭、皮蛋或鹹蛋煮軟。", "Belah baby bok choy, rebus dengan kaldu atas bawang putih telur pitan atau telur asin hingga lunak."],
+  ["魚香茄子", "Terong Saus Yu Xiang", "茄子切條炸軟，爆香蒜蓉、豆瓣醬，下茄子炒勻勾芡。", "Potong terong goreng hingga lunak, tumis bawang putih saus doubanjiang, masukkan terong kentalkan."],
+  ["麻婆豆腐", "Mapo Tofu", "豆腐切粒，免治豬肉炒香加豆瓣醬、豆腐煮至入味。", "Potong dadu tahu, tumis daging babi cincang dengan saus doubanjiang dan tahu hingga meresap."],
+ ],
 "湯水": [
-  ["淮山杞子排骨湯", "Sup Iga Babi Yam dan Goji Berries", "排骨飛水。淮山、杞子、茨實洗淨，與排骨加水煲2小時。", "Blansir iga babi. Cuci yam (chinese yam), goji berries, dan fox nut, rebus bersama iga dengan air selama 2 jam."],
-  ["西洋菜豬骨湯", "Sup Tulang Babi Selada Air", "西洋菜洗淨。豬骨焯水，加南北杏、蜜棗及水大火煲滾後轉小火煲1.5小時。", "Cuci selada air. Blansir tulang babi, tambahkan kacang almond utuh, kurma kering (mizao), dan air, didihkan lalu rebus dengan api kecil selama 1,5 jam."],
+  ["ABC湯", "Sup ABC", "番茄、薯仔、洋蔥、紅蘿蔔、粟米加瘦肉或排骨煲1.5小時。", "Rebus tomat, kentang, bawang bombay, wortel, jagung dengan daging kurus atau iga babi selama 1.5 jam."],
+  ["節瓜瘦肉湯", "Sup Labu Kecil dan Daging Kurus", "節瓜去皮切塊，瘦肉切片飛水，加水煲1小時。", "Kupas dan potong labu kecil, blansir daging kurus iris, rebus dengan air 1 jam."],
+  ["西洋菜陳腎湯", "Sup Selada Air dan Ginjal Babi Kering", "西洋菜洗淨，陳腎浸洗切片，豬骨出水加水煲2小時。", "Cuci selada air, rendam dan iris ginjal babi kering, blansir tulang babi rebus 2 jam."],
   ["蓮藕綠豆排骨湯", "Sup Iga Babi Akar Teratai dan Kacang Hijau", "蓮藕切塊，綠豆洗淨。排骨出水，全部材料加水大火煲滾後細火煲2小時。", "Potong akar teratai, cuci kacang hijau. Blansir iga babi, masukkan semua bahan ke air, didihkan lalu rebus dengan api kecil selama 2 jam."],
-  ["番茄薯仔豬踭湯", "Sup Daging Babi Kaki (Zhu Zheng) Tomat dan Kentang", "豬踭飛水。番茄、薯仔、洋蔥切塊，加水大火煮滾後小火煲1.5小時。", "Blansir daging babi. Potong-potong tomat, kentang, dan bawang bombay, tambahkan air, didihkan lalu rebus dengan api kecil selama 1,5 jam."],
+  ["番茄薯仔豬踭湯", "Sup Daging Babi Kaki Tomat dan Kentang", "豬踭飛水。番茄、薯仔、洋蔥切塊，加水大火煮滾後小火煲1.5小時。", "Blansir daging babi. Potong-potong tomat, kentang, dan bawang bombay, tambahkan air, didihkan lalu rebus dengan api kecil selama 1,5 jam."],
   ["木瓜雪耳豬腱湯", "Sup Daging Babi Pepaya dan Jamur Putih", "木瓜去皮切塊，雪耳浸軟去蒂。豬腱飛水，加水煲1.5小時。", "Kupas dan potong pepaya, rendam dan bersihkan jamur putih. Blansir daging babi, rebus bersama air selama 1,5 jam."],
-  ["冬瓜海帶排骨湯", "Sup Iga Babi Labu Air (Dong Gua) dan Rumput Laut", "冬瓜連皮切塊，海帶浸軟切結。排骨出水，加水大火煲滾後細火煲1.5小時。", "Potong labu air beserta kulitnya, rendam rumput laut. Blansir iga babi, tambahkan air, didihkan lalu rebus dengan api kecil selama 1,5 jam."],
-  ["生魚坊黨參湯", "Sup Ikan Gabus (Sheng Yu) dengan Codonopsis", "生魚煎香。黨參、黃耆、紅棗洗淨，加水與生魚大火滾起轉小火煲1小時。", "Goreng ikan gabus hingga harum. Cuci codonopsis, astragalus, dan kurma merah, rebus bersama ikan dengan air mendidih lalu kecilkan api selama 1 jam."],
-  ["老黃瓜赤小豆扁豆湯", "Sup Mentua Tua, Kacang Merah Kecil dan Kacang Lablab", "老黃瓜洗淨切塊（不去皮）。赤小豆、扁豆、陳皮及豬骨加水煲2小時。", "Cuci dan potong mentimun tua/old cucumber (tanpa dikupas). Rebus bersama kacang azuki kecil, kacang lablab, kulit jeruk kering, dan tulang babi selama 2 jam."],
-  ["金針雲耳豆腐湯", "Sup Tahu Jamur Jarum Emas dan Jamur Hitam", "金針菜浸軟打結，雲耳浸軟。豆腐切塊，加瘦肉片及水滾20分鐘。", "Rendam dan ikat jamur jarum emas (jinzhencai), rendam jamur hitam. Potong tahu, rebus bersama irisan daging babi kurus dan air selama 20 menit."],
-  ["蘿蔔生魚湯", "Sup Ikan Gabus dan Lobak Putih", "生魚煎香。白蘿蔔切絲或塊，加薑片與生魚大火煲成奶白湯，下鹽調味。", "Goreng ikan gabus. Potong lobak putih, rebus bersama jahe dan ikan dengan air mendidih hingga berkuah putih susu, bumbui dengan garam."]
-],
-
+  ["冬瓜海帶排骨湯", "Sup Iga Babi Labu Air dan Rumput Laut", "冬瓜連皮切塊，海帶浸軟切結。排骨出水，加水大火煲滾後細火煲1.5小時。", "Potong labu air beserta kulitnya, rendam rumput laut. Blansir iga babi, tambahkan air, didihkan lalu rebus dengan api kecil selama 1,5 jam."],
+  ["生魚坊黨參湯", "Sup Ikan Gabus dengan Codonopsis", "生魚煎香。黨參、黃耆、紅棗洗淨，加水與生魚大火滾起轉小火煲1小時。", "Goreng ikan gabus hingga harum. Cuci codonopsis, astragalus, dan kurma merah, rebus bersama ikan dengan air mendidih lalu kecilkan api selama 1 jam."],
+  ["老黃瓜赤小豆扁豆湯", "Sup Mentimun Tua, Kacang Merah Kecil dan Kacang Lablab", "老黃瓜洗淨切塊（不去皮）。赤小豆、扁豆、陳皮及豬骨加水煲2小時。", "Cuci dan potong mentimun tua tanpa dikupas. Rebus bersama kacang azuki kecil, kacang lablab, kulit jeruk kering, dan tulang babi selama 2 jam."],
+  ["金針雲耳豆腐湯", "Sup Tahu Jamur Jarum Emas dan Jamur Hitam", "金針菜浸軟打結，雲耳浸軟。豆腐切塊，加瘦肉片及水滾20分鐘。", "Rendam dan ikat jamur jarum emas, rendam jamur hitam. Potong tahu, rebus bersama irisan daging babi kurus dan air selama 20 menit."],
+  ["蘿蔔生魚湯", "Sup Ikan Gabus dan Lobak Putih", "生魚煎香。白蘿蔔切絲或塊，加薑片與生魚大火煲成奶白湯，下鹽調味。", "Goreng ikan gabus. Potong lobak putih, rebus bersama jahe dan ikan dengan air mendidih hingga berkuah putih susu, bumbui dengan garam."],
+ ],
 "西式": [
-  ["忌廉三文魚意粉", "Pasta Salmon saus Krim (Creamy Salmon Pasta)", "三文魚煎熟拆肉。意粉煮熟。用牛油炒香洋蔥蘑菇，加入淡忌廉及三文魚肉煮勻撈意粉。", "Goreng salmon lalu suwir dagingnya. Rebus pasta. Tumis bawang bombay dan jamur dengan mentega, tambahkan krim kental dan salmon, aduk rata dengan pasta."],
+  ["忌廉三文魚意粉", "Pasta Salmon saus Krim", "三文魚煎熟拆肉。意粉煮熟。用牛油炒香洋蔥蘑菇，加入淡忌廉及三文魚肉煮勻撈意粉。", "Goreng salmon lalu suwir dagingnya. Rebus pasta. Tumis bawang bombay dan jamur dengan mentega, tambahkan krim kental dan salmon, aduk rata dengan pasta."],
   ["黑椒意粉", "Pasta Sapi Lada Hitam", "意粉煮熟。牛肉片炒香，加入洋蔥絲及黑椒醬炒勻，放入意粉拌勻即成。", "Rebus pasta. Tumis daging sapi hingga harum, masukkan irisan bawang bombay dan saus lada hitam, aduk rata bersama pasta."],
-  ["焗肉醬意粉", "Baked Spaghetti Bolognese", "意粉煮熟鋪底。淋上煮好的意式肉醬（免治牛肉加茄膏），鋪滿芝士碎入焗爐烤至金黃。", "Rebus pasta di dasar wadah. Siram saus bolognese (daging cincang dengan pasta tomat), taburi keju mozzarella, lalu panggang dalam oven hingga keemasan."],
-  ["卡邦尼意粉", "Pasta Carbonara", "意粉煮熟。煙肉煎香。蛋黃與巴馬臣芝士碎拌勻，離火將意粉與蛋漿撈勻成濃郁醬汁。", "Rebus pasta. Goreng bacon hingga renyah. Campurkan kuning telur dan keju parmesan parut, aduk bersama pasta di luar api untuk membentuk saus kental."],
+  ["焗肉醬意粉", "Baked Spaghetti Bolognese", "意粉煮熟鋪底。淋上煮好的意式肉醬，鋪滿芝士碎入焗爐烤至金黃。", "Rebus pasta di dasar wadah. Siram saus bolognese, taburi keju mozzarella, lalu panggang hingga keemasan."],
+  ["卡邦尼意粉", "Pasta Carbonara", "意粉煮熟。煙肉煎香。蛋黃與巴馬臣芝士碎拌勻，離火將意粉與蛋漿撈勻成濃郁醬汁。", "Rebus pasta. Goreng bacon hingga renyah. Campurkan kuning telur dan keju parmesan parut, aduk bersama pasta di luar api."],
   ["法式洋蔥湯", "Sup Bawang ala Prancis", "洋蔥切絲用牛油慢火炒至焦糖化。加入牛肉湯煮滾，上面放法包及芝士入焗爐烤溶。", "Iris bawang bombay, tumis perlahan dengan mentega hingga terkaramelisasi. Tambahkan kaldu sapi, didihkan, letakkan roti baguette dan keju di atasnya lalu panggang."],
-  ["蕃茄海鮮飯", "Risotto/Nasi Seafood Tomat", "蝦仁、蜆肉炒香。加入白飯及番茄醬、香草拌勻煮至收汁入味即成。", "Tumis udang dan kerang. Masukkan nasi putih, saus tomat, dan bumbu herbs, aduk rata dan masak hingga kuah meresap."],
+  ["蕃茄海鮮飯", "Risotto Nasi Seafood Tomat", "蝦仁、蜆肉炒香。加入白飯及番茄醬、香草拌勻煮至收汁入味即成。", "Tumis udang dan kerang. Masukkan nasi putih, saus tomat, dan bumbu herbs, aduk rata dan masak hingga kuah meresap."],
   ["香煎三文魚扒配沙律", "Pan-Seared Salmon dengan Salad", "三文魚扒抹鹽及黑椒，平底鍋煎至兩面金黃熟透，伴新鮮沙律菜食用。", "Balur fillet salmon dengan garam dan merica, pan-searing di wajan hingga kedua sisi matang, sajikan dengan salad sayuran segar."],
   ["黑椒薯仔牛扒", "Steak Sapi Kentang Lada Hitam", "牛扒煎至喜愛生熟度。薯仔切角炸或焗熟。淋上黑椒汁食用。", "Goreng steak sapi sesuai tingkat kematangan. Potong kentang berbentuk baji lalu panggang atau goreng. Sajikan dengan siraman saus lada hitam."],
-  ["芝士煙肉焗薯", "Loaded Baked Potato (Kentang Panggang Keju Bacon)", "原個薯仔連皮入焗爐烤熟。切開中間釀入牛油、芝士碎、煙肉碎及酸忌廉再焗溶。", "Panggang utuh kentang bersama kulitnya dalam oven. Belah tengahnya, isi dengan mentega, keju parut, remahan bacon, dan sour cream, lalu panggang kembali hingga meleleh."],
-  ["經典肉丸意粉", "Pasta Bakso Sapi (Spaghetti and Meatballs)", "免治牛肉搓成肉丸煎熟。加入意式番茄醬煮熱，淋在煮好的意粉上。", "Bentuk daging sapi cincang menjadi bakso lalu goreng. Masak bersama saus tomat italia hingga panas, lalu siram di atas pasta yang sudah direbus."]
-],
-
+  ["芝士煙肉焗薯", "Loaded Baked Potato", "原個薯仔連皮入焗爐烤熟。切開中間釀入牛油、芝士碎、煙肉碎及酸忌廉再焗溶。", "Panggang utuh kentang bersama kulitnya dalam oven. Belah tengahnya, isi dengan mentega, keju parut, remahan bacon, dan sour cream, lalu panggang kembali hingga meleleh."],
+  ["經典肉丸意粉", "Pasta Bakso Sapi", "免治牛肉搓成肉丸煎熟。加入意式番茄醬煮熱，淋在煮好的意粉上。", "Bentuk daging sapi cincang menjadi bakso lalu goreng. Masak bersama saus tomat italia hingga panas, lalu siram di atas pasta yang sudah direbus."],
+ ],
 "罐頭": [
-  ["午餐肉煎蛋公仔麵", "Mie Instan Telur dan Spam Luncheon Meat", "公仔麵煮熟。午餐肉切片煎香，煎荷包蛋一隻，放在麵上即成。", "Rebus mie instan. Goreng irisan spam luncheon meat hingga harum, goreng satu telur mata sapi, letakkan di atas mie."],
+  ["午餐肉煎蛋公仔麵", "Mie Instan Telur dan Spam", "公仔麵煮熟。午餐肉切片煎香，煎荷包蛋一隻，放在麵上即成。", "Rebus mie instan. Goreng irisan spam luncheon meat hingga harum, goreng satu telur mata sapi, letakkan di atas mie."],
   ["沙甸魚通粉", "Makaroni Sarden Kaleng", "通粉煮熟。開罐沙甸魚連茄汁倒入鍋中加熱，加少許水和通粉煮滾調味。", "Rebus makaroni. Buka kaleng sarden, tuang bersama saus tomatnya ke wajan, tambahkan sedikit air dan makaroni, didihkan dan bumbui."],
-  ["豆豉鯪魚炒麥菜", "Tumis Selada (Mai Cai) dengan Ikan Dace Taosi", "麥菜洗淨切段。起鑊下蒜頭，放入豆豉鯪魚罐頭炒香，下麥菜大火翻炒熟透。", "Cuci dan potong sayur mai cai. Panaskan wajan dengan bawang putih, masukkan dace taosi kalengan, tumis sebentar, masukkan mai cai dan aduk cepat hingga matang."],
+  ["豆豉鯪魚炒麥菜", "Tumis Selada dengan Ikan Dace Taosi", "麥菜洗淨切段。起鑊下蒜頭，放入豆豉鯪魚罐頭炒香，下麥菜大火翻炒熟透。", "Cuci dan potong sayur mai cai. Panaskan wajan dengan bawang putih, masukkan dace taosi kalengan, tumis sebentar, masukkan mai cai dan aduk cepat hingga matang."],
   ["粟米吞拿魚治", "Sandwich Tuna Jagung Manis", "吞拿魚罐頭隔水。與粟米粒、沙律醬拌勻，夾在兩片方包中間切邊食用。", "Tiriskan tuna kaleng. Campur dengan biji jagung manis dan mayonnaise, letakkan di antara dua lembar roti tawar, potong pinggirannya dan sajikan."],
   ["番茄肉醬腸仔意粉", "Pasta Sosis Saus Daging Kaleng", "意粉煮熟。腸仔切片煎香，倒入現成肉醬罐頭加熱，撈意粉食用。", "Rebus pasta. Iris sosis dan goreng sebentar, tuang saus daging kaleng siap pakai, panaskan, lalu aduk bersama pasta."],
   ["咖喱牛肉罐頭撈飯", "Nasi Kuah Kari Sapi Kaleng", "咖喱牛肉罐頭加熱煮滾，淋在熱白飯上即可食用。", "Panaskan kari sapi kaleng hingga mendidih, lalu siram di atas nasi putih hangat."],
-  ["午餐肉炒蛋", "Tumis Telur dengan Spam Luncheon Meat", "午餐肉切粒煎香。倒入拂勻的蛋液炒成滑蛋上碟。", "Potong dadu spam luncheon meat lalu goreng hingga harum. Tuang kocokan telur dan aduk lembut menjadi telur orak-arik."],
-  ["榨菜肉碎即食麵", "Mie Instan Daging Cincang Sayur Zha Cai", "公仔麵煮熟。用榨菜碎與免治豬肉快炒作餸菜，鋪在湯麵上。", "Rebus mie instan. Tumis cepat cincangan zha cai (sayur asin khas) dengan daging babi cincang, lalu letakkan di atas mie kuah."],
-  ["沙爹牛肉麵", "Mie Instan Daging Sapi Saus Satay Kaleng/Instant", "公仔麵煮熟。將罐頭沙爹牛肉加熱（或用沙爹醬炒牛肉），鋪在麵面上。", "Rebus mie instan. Panaskan daging sapi satay kaleng (atau tumis daging dengan saus satay), lalu letakkan di atas mie."],
-  ["火腿通粉", "Makaroni Sup Ham", "通粉煮熟過冷河。用雞湯或水煮滾，加入切粒火腿煮熱，下通粉即成。", "Rebus makaroni lalu bilas air dingin. Didihkan kaldu ayam atau air, masukkan potongan ham, lalu masukkan makaroni."]
-],
-
+  ["午餐肉炒蛋", "Tumis Telur dengan Spam", "午餐肉切粒煎香。倒入拂勻的蛋液炒成滑蛋上碟。", "Potong dadu spam luncheon meat lalu goreng hingga harum. Tuang kocokan telur dan aduk lembut menjadi telur orak-arik."],
+  ["榨菜肉碎即食麵", "Mie Instan Daging Cincang Sayur Zha Cai", "公仔麵煮熟。用榨菜碎與免治豬肉快炒作餸菜，鋪在湯麵上。", "Rebus mie instan. Tumis cepat cincangan zha cai dengan daging babi cincang, lalu letakkan di atas mie kuah."],
+  ["沙爹牛肉麵", "Mie Instan Daging Sapi Saus Satay Kaleng", "公仔麵煮熟。將罐頭沙爹牛肉加熱鋪在麵面上。", "Rebus mie instan. Panaskan daging sapi satay kaleng, lalu letakkan di atas mie."],
+  ["火腿通粉", "Makaroni Sup Ham", "通粉煮熟過冷河。用雞湯或水煮滾，加入切粒火腿煮熱，下通粉即成。", "Rebus makaroni lalu bilas air dingin. Didihkan kaldu ayam atau air, masukkan potongan ham, lalu masukkan makaroni."],
+ ],
 "其他": [
-  ["揚州炒飯", "Nasi Goreng Yangzhou", "白飯炒散。加入义燒粒、蝦仁、雞蛋碎、青豆及蔥花，大火拋勻下鹽調味。", "Goreng lepas nasi putih. Masukkan potongan char siu, udang, orak-arik telur, kacang polong, dan daun bawang, aduk rata dengan api besar dan bumbui garam."],
+  ["揚州炒飯", "Nasi Goreng Yangzhou", "白飯炒散。加入叉燒粒、蝦仁、雞蛋碎、青豆及蔥花，大火拋勻下鹽調味。", "Goreng lepas nasi putih. Masukkan potongan char siu, udang, orak-arik telur, kacang polong, dan daun bawang, aduk rata dengan api besar dan bumbui garam."],
   ["蝦仁炒蛋", "Telur Orak-Arik Udang", "蝦仁洗淨印乾醃味炒至半熟。倒入拂好的蛋液，慢火炒至滑蛋狀態即成。", "Cuci udang, keringkan, marinasi, lalu tumis hingga setengah matang. Tuang kocokan telur, masak dengan api kecil hingga bertekstur lembut."],
-  ["菜脯蛋", "Telur Dadar Lobak Asin (Cai脯)", "菜脯粒浸水洗淨切碎榨乾水分。加入蛋液中拌勻，用平底鍋煎至兩面金黃。", "Rendam dan cuci lobak asin, cincang dan peras airnya. Campur ke dalam kocokan telur, goreng dalam wajan datar hingga kedua sisi keemasan."],
+  ["菜脯蛋", "Telur Dadar Lobak Asin", "菜脯粒浸水洗淨切碎榨乾水分。加入蛋液中拌勻，用平底鍋煎至兩面金黃。", "Rendam dan cuci lobak asin, cincang dan peras airnya. Campur ke dalam kocokan telur, goreng dalam wajan datar hingga kedua sisi keemasan."],
   ["鹹魚蒸肉餅", "Daging Cincang Kukus Ikan Asin", "鹹魚肉切極碎。與豬肉碎、生抽、糖、生粉撈勻，鋪在碟上大火蒸12分鐘。", "Cincang sangat halus ikan asin. Campur dengan daging babi cincang, kecap asin, gula, dan maizena, ratakan di piring lalu kukus 12 menit."],
-  ["蝦米蒸豆腐", "Tahu Kukus Udang Kering (Xia Mi)", "豆腐切塊。蝦米浸軟切碎，與蒜蓉、生抽、油鋪在豆腐面蒸8分鐘。", "Potong tahu. Rendam dan cincang udang kering (ebi), campur dengan bawang putih, kecap asin, dan minyak, letakkan di atas tahu lalu kukus 8 menit."],
+  ["蝦米蒸豆腐", "Tahu Kukus Udang Kering", "豆腐切塊。蝦米浸軟切碎，與蒜蓉、生抽、油鋪在豆腐面蒸8分鐘。", "Potong tahu. Rendam dan cincang udang kering, campur dengan bawang putih, kecap asin, dan minyak, letakkan di atas tahu lalu kukus 8 menit."],
   ["滑蛋牛肉飯", "Nasi Daging Sapi Telur Lembut", "牛肉片醃好炒至半熟。加入水和調味料煮開，勾芡後淋入蛋液成半熟滑蛋，淋在飯上。", "Marinasi dan tumis daging sapi hingga setengah matang. Tambahkan air dan bumbu, kentalkan dengan maizena, tuang kocokan telur hingga setengah matang, lalu siram di atas nasi."],
-  ["蘿蔔糕", "Kue Lobak (Luobogao)", "白蘿蔔切絲煮軟。與粘米粉、臘腸粒、蝦米混合蒸熟，切片煎香食用。", "Parut lobak putih dan rebus hingga lunak. Campur dengan tepung beras, potongan sosis lap cheong, dan udang kering, kukus hingga matang, lalu potong dan goreng."],
-  ["煎釀三寶", "Tiga Harta Karun Isi (Tauhu, Terong, Lada Isi Pasta Ikan)", "豆腐、茄子、青椒釀入免治鯪魚膠，用平底鍋煎至金黃，灒生抽芡汁食用。", "Isi tahu, terong, dan paprika hijau dengan adonan pasta ikan dace, pan-searing hingga keemasan, lalu sirami dengan saus kecap asin."],
+  ["蘿蔔糕", "Kue Lobak", "白蘿蔔切絲煮軟。與粘米粉、臘腸粒、蝦米混合蒸熟，切片煎香食用。", "Parut lobak putih dan rebus hingga lunak. Campur dengan tepung beras, potongan sosis lap cheong, dan udang kering, kukus hingga matang, lalu potong dan goreng."],
+  ["煎釀三寶", "Tiga Harta Karun Isi", "豆腐、茄子、青椒釀入免治鯪魚膠，用平底鍋煎至金黃，灒生抽芡汁食用。", "Isi tahu, terong, dan paprika hijau dengan adonan pasta ikan dace, pan-searing hingga keemasan, lalu sirami dengan saus kecap asin."],
   ["豉椒炒片", "Tumis Cumi Saus Tahu Hitam dan Cabai", "鮮魷切花切片焯水。爆香蒜蓉、豆豉、椒絲，下魷魚片大火快炒勾芡。", "Potong cumi bentuk kembang lalu blansir sebentar. Tumis bawang putih, taosi, dan irisan cabai, masukkan cumi, aduk cepat dengan api besar lalu kentalkan."],
-  ["鹹蛋蒸肉餅", "Daging Cincang Kukus Telur Asin", "豬肉碎調味撻好。鹹蛋白拌入肉碎中，鹹蛋黃切件放在肉餅面，大火蒸12分鐘。", "Bumbui daging babi cincang. Campurkan putih telur asin ke dalam daging, potong kuning telur asin lalu letakkan di atasnya, kukus 12 menit dengan api besar."]
-]
+  ["鹹蛋蒸肉餅", "Daging Cincang Kukus Telur Asin", "豬肉碎調味撻好。鹹蛋白拌入肉碎中，鹹蛋黃切件放在肉餅面，大火蒸12分鐘。", "Bumbui daging babi cincang. Campurkan putih telur asin ke dalam daging, potong kuning telur asin lalu letakkan di atasnya, kukus 12 menit dengan api besar."],
+ ]
 };
  Object.entries(D).forEach(([cat,arr])=>{
   arr.forEach(a=>{
@@ -275,7 +250,6 @@ function openAdd(){
   let fNoteId = document.getElementById('fNoteId');
   fIndo.dataset.manual=""; fNoteId.dataset.manual="";
   let lastName = ""; let lastNote = "";
-
   fName.onblur = async ()=>{
     let v = fName.value.trim();
     if(!v || v === lastName || fIndo.dataset.manual==="1") return;
@@ -284,7 +258,6 @@ function openAdd(){
       await autoTransZh2Id(v, fIndo);
     }
   };
-
   fNoteZh.onblur = async ()=>{
     let v = fNoteZh.value.trim();
     if(!v || v === lastNote || fNoteId.dataset.manual==="1") return;
@@ -296,11 +269,7 @@ function openAdd(){
   fIndo.oninput = ()=>fIndo.dataset.manual="1";
   fNoteId.oninput = ()=>fNoteId.dataset.manual="1";
 }
-function editDish(id){ let d=dishes.find(x=>x.id==id); openAdd(); document.getElementById('fId').value=d.id; document.getElementById('fName').value=d.name; document.getElementById('fIndo').value=d.indo||''; let raw = d.noteZh || d.note || ''; let rawId = d.noteId || '';
-if(!rawId && raw.includes('Indonesia:')){ let p=raw.split('Indonesia:'); raw=p[0]; rawId=p[1]||''; }
-raw = raw.replace(/中文：/g,'').replace(/中文:/g,'').replace(/備註/g,'').replace(/Catatan:/g,'').trim();
-rawId = rawId.replace(/：/g,'').replace(/Catatan:/g,'').trim();
-document.getElementById('fNoteZh').value=raw; document.getElementById('fNoteId').value=rawId; document.getElementById('fCat').value=d.cat; }
+function editDish(id){ let d=dishes.find(x=>x.id==id); openAdd(); document.getElementById('fId').value=d.id; document.getElementById('fName').value=d.name; document.getElementById('fIndo').value=d.indo||''; let raw = d.noteZh || d.note || ''; let rawId = d.noteId || ''; if(!rawId && raw.includes('Indonesia:')){ let p=raw.split('Indonesia:'); raw=p[0]; rawId=p[1]||''; } raw = raw.replace(/中文：/g,'').replace(/中文:/g,'').replace(/備註/g,'').replace(/Catatan:/g,'').trim(); rawId = rawId.replace(/：/g,'').replace(/Catatan:/g,'').trim(); document.getElementById('fNoteZh').value=raw; document.getElementById('fNoteId').value=rawId; document.getElementById('fCat').value=d.cat; }
 function saveDish(){ let id=document.getElementById('fId').value,n=document.getElementById('fName').value.trim(),i=document.getElementById('fIndo').value.trim(),zh=document.getElementById('fNoteZh').value.trim(),idn=document.getElementById('fNoteId').value.trim(),c=document.getElementById('fCat').value; if(!n) return alert('中文必填'); if(id){let d=dishes.find(x=>x.id==id);d.name=n;d.indo=i;d.noteZh=zh;d.noteId=idn;d.note=zh;d.cat=c;} else dishes.push({id:Date.now()+Math.random(),name:n,indo:i,noteZh:zh,noteId:idn,note:zh,cat:c});localStorage.setItem('dishes',JSON.stringify(dishes)); renderCats(); closeM('mAdd'); }
 function delDish(id){ if(!confirm('刪除?')) return; dishes=dishes.filter(x=>x.id!=id); localStorage.setItem('dishes',JSON.stringify(dishes)); renderCats(); openCat(document.getElementById('mCatTitle').innerText); }
 function renderWeek(){
