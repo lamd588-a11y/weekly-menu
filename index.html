@@ -274,18 +274,25 @@ function openAdd(){
   let fNoteZh = document.getElementById('fNoteZh');
   let fNoteId = document.getElementById('fNoteId');
   fIndo.dataset.manual=""; fNoteId.dataset.manual="";
-  fName.oninput = debounceTrans(async ()=>{
-    if(!fName.value.trim() || fIndo.dataset.manual==="1") return;
-    if(confirm(`是否將菜名翻譯成印尼文並填入？`)){
-      await autoTransZh2Id(fName.value, fIndo);
+  let lastName = ""; let lastNote = "";
+
+  fName.onblur = async ()=>{
+    let v = fName.value.trim();
+    if(!v || v === lastName || fIndo.dataset.manual==="1") return;
+    lastName = v;
+    if(confirm(`是否翻譯菜名成印尼文並填入？`)){
+      await autoTransZh2Id(v, fIndo);
     }
-  }, 800);
-  fNoteZh.oninput = debounceTrans(async ()=>{
-    if(!fNoteZh.value.trim() || fNoteId.dataset.manual==="1") return;
-    if(confirm(`是否將備註翻譯成印尼文並填入？\n\n${fNoteZh.value.slice(0,60)}...`)){
-      await autoTransZh2Id(fNoteZh.value, fNoteId);
+  };
+
+  fNoteZh.onblur = async ()=>{
+    let v = fNoteZh.value.trim();
+    if(!v || v === lastNote || fNoteId.dataset.manual==="1") return;
+    lastNote = v;
+    if(confirm(`是否翻譯備註成印尼文並填入？\n\n${v.slice(0,80)}...`)){
+      await autoTransZh2Id(v, fNoteId);
     }
-  }, 1200);
+  };
   fIndo.oninput = ()=>fIndo.dataset.manual="1";
   fNoteId.oninput = ()=>fNoteId.dataset.manual="1";
 }
