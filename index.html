@@ -417,33 +417,23 @@ function exportLib(){ let blob=new Blob([JSON.stringify({cats,dishes},null,2)],{
 function importLib(e){ let f=e.target.files[0]; if(!f) return; let r=new FileReader(); r.onload=ev=>{ try{ let j=JSON.parse(ev.target.result); if(j.cats&&j.dishes){ cats=j.cats; dishes=j.dishes; localStorage.setItem('cats',JSON.stringify(cats)); localStorage.setItem('dishes',JSON.stringify(dishes)); renderCats(); renderCatOrder(); alert('匯入成功'); } }catch{ alert('失敗'); } }; r.readAsText(f); e.target.value=''; }
 function renderCatOrder(){
   ensureCatMeta();
-  let b=document.getElementById('catOrder');
-  b.innerHTML=cats.map((c,i)=>{
-    let meta=CAT_META[c]||{bg:'#ffe8c8',e:'🍱'};
-    return `
-    <div class="card row" style="justify-content:space-between;gap:6px;padding:10px 12px;flex-wrap:nowrap">
-      <div style="display:flex;align-items:center;gap:8px;flex:1;min-width:0">
-        <span style="min-width:90px;max-width:90px;width:90px;font-weight:900;font-size:16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${c}</span>
-        <input value="${meta.e}"
-               onchange="updateCatIcon(${i},this.value)"
-               onclick="this.select()"
-               style="width:62px!important;min-width:62px!important;max-width:62px!important;height:44px;text-align:center;font-size:22px;padding:0;border-radius:12px;border:2px solid #f0dcc8;background:#fffaf0;display:block!important;flex-shrink:0"
-               placeholder="😀"/>
-      </div>
-      <div style="display:flex;gap:6px;flex-shrink:0">
-        <button class="iconBtn" onclick="moveCat(${i},-1)">↑</button>
-        <button class="iconBtn" onclick="moveCat(${i},1)">↓</button>
-        <button class="ghost" style="width:auto;min-width:58px;padding:10px 8px" onclick="delCat(${i})">刪除</button>
-      </div>
-    </div>`;
-  }).join('');
+  var b=document.getElementById('catOrder');
+  if(!b) return;
+  var html='';
+  for(var i=0;i<cats.length;i++){
+    var c=cats[i];
+    var e='🍱';
+    if(CAT_META && CAT_META[c] && CAT_META[c].e){ e=CAT_META[c].e; }
+    html+='<div class="card row" style="justify-content:space-between;gap:6px;padding:10px 12px;flex-wrap:nowrap"><div style="display:flex;align-items:center;gap:8px"><span style="min-width:92px;max-width:92px;width:92px;font-weight:900;font-size:16px;overflow:hidden;white-space:nowrap">'+c+'</span><input value="'+e+'" onchange="updateCatIcon('+i+',this.value)" onclick="this.select()" style="width:62px;min-width:62px;height:44px;text-align:center;font-size:22px;border:2px solid #f0dcc8;border-radius:12px;background:#fffaf0"></div><div style="display:flex;gap:6px"><button class="iconBtn" onclick="moveCat('+i+',-1)">↑</button><button class="iconBtn" onclick="moveCat('+i+',1)">↓</button><button class="ghost" style="width:auto" onclick="delCat('+i+')">刪除</button></div></div>';
+  }
+  b.innerHTML=html;
 }
 function updateCatIcon(i,emoji){
-  let cat=cats[i];
+  var cat=cats[i];
   if(!CAT_META[cat]) CAT_META[cat]={bg:'#ffe8c8',e:'🍱'};
-  let newE = emoji.trim();
+  var newE=emoji.trim();
   if(!newE) newE='🍱';
-  CAT_META[cat].e=newE.slice(0,4);
+  CAT_META[cat].e=newE.substring(0,4);
   saveCatMeta();
   renderCats();
   renderCatOrder();
