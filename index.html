@@ -424,7 +424,16 @@ function renderCatOrder(){
     var c=cats[i];
     var e='🍱';
     if(CAT_META && CAT_META[c] && CAT_META[c].e){ e=CAT_META[c].e; }
-    html+='<div class="card row" style="justify-content:space-between;gap:6px;padding:10px 12px;flex-wrap:nowrap"><div style="display:flex;align-items:center;gap:8px"><span style="min-width:92px;max-width:92px;width:92px;font-weight:900;font-size:16px;overflow:hidden;white-space:nowrap">'+c+'</span><input value="'+e+'" onchange="updateCatIcon('+i+',this.value)" onclick="this.select()" style="width:62px;min-width:62px;height:44px;text-align:center;font-size:22px;border:2px solid #f0dcc8;border-radius:12px;background:#fffaf0"></div><div style="display:flex;gap:6px"><button class="iconBtn" onclick="moveCat('+i+',-1)">↑</button><button class="iconBtn" onclick="moveCat('+i+',1)">↓</button><button class="ghost" style="width:auto" onclick="delCat('+i+')">刪除</button></div></div>';
+    html+='<div class="card" style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;gap:8px;margin-bottom:10px">'
+         +'<div style="display:flex;align-items:center;gap:10px;flex:1;min-width:0">'
+         +'<span style="min-width:88px;max-width:88px;width:88px;font-weight:900;font-size:16px;white-space:nowrap;overflow:hidden">'+c+'</span>'
+         +'<input value="'+e+'" onchange="updateCatIcon('+i+',this.value)" onclick="this.select()" style="width:58px;min-width:58px;height:42px;text-align:center;font-size:20px;border:2px solid #f0dcc8;border-radius:12px;background:#fffaf0">'
+         +'</div>'
+         +'<div style="display:flex;align-items:center;gap:6px;flex-shrink:0">'
+         +'<button class="iconBtn" style="width:40px;min-width:40px;height:40px;font-size:16px" onclick="moveCat('+i+',-1)">↑</button>'
+         +'<button class="iconBtn" style="width:40px;min-width:40px;height:40px;font-size:16px" onclick="moveCat('+i+',1)">↓</button>'
+         +'<button class="ghost" style="width:56px;min-width:56px;padding:8px 0;font-size:14px" onclick="delCat('+i+')">刪除</button>'
+         +'</div></div>';
   }
   b.innerHTML=html;
 }
