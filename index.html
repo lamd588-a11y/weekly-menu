@@ -56,7 +56,7 @@ select,textarea{width:100%;padding:14px;border-radius:14px;border:2px solid var(
 <div id="p-settings" class="page"><div class="card"><h3>分類排序</h3><div id="catOrder"></div><div class="row" style="margin-top:12px;flex-wrap:nowrap;gap:8px"><input id="newCatIcon" placeholder="😀圖示" style="flex:0 0 64px;width:64px;min-width:64px;padding:14px 6px;border-radius:16px;border:2px solid var(--border);background:var(--bg);color:var(--text);font-size:1.2rem;font-weight:800;box-sizing:border-box;text-align:center"><input id="newCat" placeholder="新分類名稱" style="flex:1;min-width:0;padding:14px 16px;border-radius:16px;border:2px solid var(--border);background:var(--bg);color:var(--text);font-size:1rem;font-weight:800;box-sizing:border-box"><button class="btn" onclick="addCat()" style="flex:0 0 90px;min-width:90px">新增</button></div></div><div class="card"><h3>外觀</h3><div class="row"><span>深淺色</span><button class="ghost" onclick="toggleTheme()">切換</button></div><div style="margin-top:12px"><label>字體大小 <span id="fsVal">20</span>px</label><input type="range" id="fsRange" min="14" max="28" value="20" oninput="setFS(this.value)" style="width:100%"></div></div><div class="card row" style="justify-content:space-between">
   <div style="display:flex;align-items:center;gap:12px">
     <img id="avatarTopMini" src="icon.png" style="width:56px;height:56px;border-radius:50%;border:2.5px solid var(--primary);object-fit:cover">
-    <div><b>頭像</b><div style="font-size:12px;color:var(--muted)">按此更改</div></div>
+    <div><b>頭像</b></div>
   </div>
   <button class="ghost" style="flex:0 0 90px" onclick="openM('mAvatar')">更改</button>
 </div></div>
