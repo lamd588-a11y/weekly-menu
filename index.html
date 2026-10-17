@@ -12,7 +12,7 @@
 <style>
 :root{--bg:#fffaf0;--card:#fff;--text:#111;--muted:#888;--primary:#ff6b35;--border:#f0dcc8;--fs:20px}
 body.theme-classic{--bg:#fffaf0;--card:#fff;--text:#111;--muted:#888;--primary:#ff6b35;--border:#f0dcc8}
-body.theme-gold{--bg:#0f0f0f;--card:#1c1c1c;--text:#f6e8b0;--muted:#bfae7a;--primary:#d4af37;--border:#3a2f1a} /* 黑金 */
+body.theme-gold{--bg:#232323;--card:#2e2a22;--text:#f8edc0;--muted:#c9b896;--primary:#d4af37;--border:#5a4a28} /* 黑金 */
 body.theme-british{--bg:#f2ece0;--card:#fffaf2;--text:#2a2e45;--muted:#8a8fa3;--primary:#9b1b30;--border:#c9b896} /* 英倫 深藍+酒紅 */
 body.theme-pastoral{--bg:#f4f7ec;--card:#ffffff;--text:#3e4f3a;--muted:#8aa08a;--primary:#7aa86a;--border:#d6e3c8} /* 田園 */
 body.theme-scifi{--bg:#080f1e;--card:#111d33;--text:#c9f0ff;--muted:#6e8fa8;--primary:#00e5ff;--border:#1f3a5f} /* 科幻 */
@@ -96,13 +96,13 @@ select,textarea{width:100%;padding:14px;border-radius:14px;border:2px solid var(
     </div>
   </div>
 </div>
-<div class="modal" id="mTheme" style="z-index:10008"><div class="sheet"><div class="head"><b>選擇風格</b><div class="x" onclick="closeM('mTheme')">✕</div></div>
+<div class="modal" id="mTheme" style="z-index:10008"><div class="sheet" style="background:#fffaf0;border-color:#f0dcc8"><div class="head" style="color:#111"><b>選擇風格</b><div class="x" onclick="closeM('mTheme')">✕</div></div>
 <div style="padding:14px;display:grid;gap:12px">
-  <div class="card row" style="margin:0;cursor:pointer" onclick="setTheme('classic')"><span>🤎 經典</span><b>米白+橙</b></div>
-  <div class="card row" style="margin:0;cursor:pointer;background:#1c1c1c;color:#f6e8b0;border-color:#3a2f1a" onclick="setTheme('gold')"><span>🖤 黑金</span><b>黑金餐廳風</b></div>
-  <div class="card row" style="margin:0;cursor:pointer;background:#fffaf2" onclick="setTheme('british')"><span>🇬🇧 英倫</span><b>格紋+酒紅</b></div>
-  <div class="card row" style="margin:0;cursor:pointer;background:#f4f7ec" onclick="setTheme('pastoral')"><span>🌿 田園</span><b>草綠+碎花</b></div>
-  <div class="card row" style="margin:0;cursor:pointer;background:#111d33;color:#c9f0ff;border-color:#1f3a5f" onclick="setTheme('scifi')"><span>🚀 科幻</span><b>深藍+霓虹</b></div>
+  <div class="card row" style="margin:0;cursor:pointer;background:#fff;color:#111;border-color:#f0dcc8" onclick="setTheme('classic')"><span> 😄 經典</span></div>
+  <div class="card row" style="margin:0;cursor:pointer;background:#2a2a2a;color:#f6e8b0;border-color:#5a4a28" onclick="setTheme('gold')"><span>🖤 黑金</span></div>
+  <div class="card row" style="margin:0;cursor:pointer;background:#fffaf2;color:#2a2e45;border-color:#c9b896" onclick="setTheme('british')"><span>🇬🇧 英倫</span></div>
+  <div class="card row" style="margin:0;cursor:pointer;background:#f4f7ec;color:#3e4f3a;border-color:#d6e3c8" onclick="setTheme('pastoral')"><span>🌿 田園</span></div>
+  <div class="card row" style="margin:0;cursor:pointer;background:#111d33;color:#c9f0ff;border-color:#1f3a5f" onclick="setTheme('scifi')"><span>🛸 科幻</span></div>
 </div></div></div>
 <div id="pdfWrap"><div class="pdfTool"><button class="btn" id="btnClosePdf" type="button" style="font-size:38px!important;line-height:1!important">✕</button><button class="ghost" id="btnSharePdf" type="button" style="font-size:36px!important;line-height:1!important">📤</button></div><div class="pdfView"><div class="pdfPage"><div class="pdfInner" id="pdfContent"></div></div></div></div>
 <script>
