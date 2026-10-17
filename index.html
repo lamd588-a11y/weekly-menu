@@ -12,7 +12,7 @@
 <style>
 :root{--bg:#fffaf0;--card:#fff;--text:#111;--muted:#888;--primary:#ff6b35;--border:#f0dcc8;--fs:20px}
 body.theme-classic{--bg:#fffaf0;--card:#fff;--text:#111;--muted:#888;--primary:#ff6b35;--border:#f0dcc8}
-body.theme-gold{--bg:#232323;--card:#2e2a22;--text:#f8edc0;--muted:#c9b896;--primary:#d4af37;--border:#5a4a28} /* 黑金 */
+body.theme-gold{--bg:#2b2b2b;--card:#33312a;--text:#fff4c8;--muted:#c9b896;--primary:#d4af37;--border:#5a4a28} /* 黑金 */
 body.theme-british{--bg:#f2ece0;--card:#fffaf2;--text:#2a2e45;--muted:#8a8fa3;--primary:#9b1b30;--border:#c9b896} /* 英倫 深藍+酒紅 */
 body.theme-pastoral{--bg:#f4f7ec;--card:#ffffff;--text:#3e4f3a;--muted:#8aa08a;--primary:#7aa86a;--border:#d6e3c8} /* 田園 */
 body.theme-scifi{--bg:#080f1e;--card:#111d33;--text:#c9f0ff;--muted:#6e8fa8;--primary:#00e5ff;--border:#1f3a5f} /* 科幻 */
@@ -49,6 +49,18 @@ select,textarea{width:100%;padding:14px;border-radius:14px;border:2px solid var(
 .pdfView{flex:1;overflow:auto;background:#333;padding:16px;display:flex;justify-content:center}
 .pdfPage{width:100%;max-width:800px;background:#fff;margin:0 auto}
 .pdfInner{padding:15mm 15mm 25mm 15mm!important;background:#fff;color:#000;box-sizing:border-box;font-size:16pt;line-height:1.5}
+body.theme-gold .pages .card,
+body.theme-scifi .pages .card,
+body.theme-gold .pages .card span,
+body.theme-scifi .pages .card span,
+body.theme-gold [onclick*="goCat"],
+body.theme-scifi [onclick*="goCat"] {
+  color:#222 !important;
+}
+body.theme-gold .pages .card div,
+body.theme-scifi .pages .card div {
+  color:#222 !important;
+}
 </style>
 </head>
 <body>
